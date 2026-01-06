@@ -1183,10 +1183,27 @@
     function talkToResident(idx) {
         const res = state.residents[idx];
         if(!res) return;
-        let pool = res.dialogues['Solo'];
-        if (res.stress > 80) pool = res.dialogues['Stress'];
-        const msg = pool[Math.floor(Math.random()*pool.length)];
+
+        // 1. 일단 최신 대사집을 가져옵니다 (업데이트 반영)
+        const latestDialogues = jobsData[res.job]; 
         
+        // 2. 기본은 솔로 대사
+        let pool = latestDialogues['Solo'];
+        
+        // 3. 🔥 관계 상태 체크 (이 부분이 빠져있었어요!)
+        if (res.relType === '커플') {
+            pool = latestDialogues['Love'];
+        } else if (res.relType === '불륜') {
+            pool = latestDialogues['Affair'];
+        }
+
+        // 4. 스트레스가 높으면 스트레스 대사가 최우선
+        if (res.stress > 80) {
+            pool = latestDialogues['Stress'];
+        }
+
+        // 대사 랜덤 선택 및 출력
+        const msg = pool[Math.floor(Math.random()*pool.length)];
         spawnMessage(`${res.name}: "${msg}"`, 'talk');
     }
 
