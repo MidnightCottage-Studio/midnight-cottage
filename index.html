@@ -83,7 +83,7 @@
             font-size: 15px; font-weight: 700; color: #fff; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             animation: slide-up-fade 0.3s ease-out forwards; max-width: 100%; pointer-events: none;
         }
-        .dialogue-bubble.event { border-color: var(--gold); color: var(--gold); }
+        .dialogue-bubble.event { border-color: var(--accent); color: var(--accent); }
         @keyframes slide-up-fade {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -183,30 +183,29 @@
             body { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
             #app { height: 100%; width: 100%; border-radius: 0; display: flex; flex-direction: column; }
 
-            /* 🛠️ [모바일] 헤더 순서 재배치: 돈(1) -> 메뉴(2) -> 주민(3) */
-            .app-header { display: flex; flex-direction: column; padding: 5px 15px 15px 15px; gap: 2px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
+            /* 헤더 여백 줄이기 */
+            .app-header { display: flex; flex-direction: column; padding: 5px 15px 0px 15px; gap: 0px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
             
             .header-left { width: 100%; order: 1; align-items: flex-start; margin-bottom: 0px; }
             .budget-display { font-size: 24px; margin: 0; justify-content: flex-start; white-space: nowrap; width: 100%; }
             #news-banner { display: none; }
             #pc-city-status { display: none; }
 
-            /* 🛠️ [모바일] 상단 메뉴 아이콘 가로 중앙 정렬 */
+            /* 상단 메뉴 아이콘 가로 중앙 정렬 */
             .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
             .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
             .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
             
-            /* [모바일] 이벤트 로그 텍스트 숨김 */
             #event-log { display: none !important; }
 
-            /* 🛠️ [모바일] 주민 목록 가로 중앙 정렬 */
-            .res-area { order: 3; width: 100%; margin-top: 10px; padding-bottom: 2px; overflow-x: auto; justify-content: center; display: flex; }
+            /* 주민 목록 가로 중앙 정렬 */
+            .res-area { order: 3; width: 100%; margin-top: 5px; padding-bottom: 5px; overflow-x: auto; justify-content: center; display: flex; }
             .res-card { min-width: 55px; margin-right: 5px; transform: none !important; transition: none !important; }
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
             
-            /* 🛠️ [모바일 수정] 직업과 관계(솔로/커플) 모두 표시 */
+            /* 직업과 관계(솔로/커플) 모두 표시 */
             .res-job { 
                 display: block !important; 
                 font-size: 8px; 
@@ -224,24 +223,33 @@
 
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-            .main-panel { flex: 0 0 35%; padding: 0; order: 1; position: relative; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-            #desk-clicker { width: 100%; height: 100%; object-fit: contain; margin: 0; }
-            /* 대화창 위치 조정 */
+            /* 방 화면 확대 */
+            /* [모바일] 방 화면 높이 축소 */
+            .main-panel { 
+                flex: 0 0 35%; /* 45% -> 35%로 변경 */
+                padding: 0; 
+                order: 1; 
+                position: relative; 
+                background: #000; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                overflow: hidden; 
+            }
+            #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(-10px); }
+            
             #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
             .dialogue-bubble { font-size: 13px; padding: 10px; }
 
-            /* 🛠️ [모바일] 사이드 메뉴(정보창) 여백 타이트하게 조정 */
             .side-menu { flex: 1; order: 2; height: auto; overflow-y: auto; border-top: 2px solid var(--border); background: rgba(0,0,0,0.9); padding: 10px 15px 80px 15px; }
             #mobile-city-status { display: flex; margin-bottom: 5px; padding: 8px; } 
             
-            /* 🔥 [수정] 1. 개발일지 왼쪽 정렬 */
             .menu-title { margin-bottom: 5px; text-align: left; border-left: none; padding-left: 0; }
             
-            /* 🔥 [수정] 2. 업그레이드 카드 세로 정렬 및 버튼 하단 배치 */
             .up-card { flex-direction: column; align-items: flex-start; padding: 12px; min-height: auto; margin-bottom: 8px; gap: 8px; }
             .up-info { width: 100%; margin-right: 0; }
-            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } /* 텍스트 줄바꿈 허용 */
-            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } /* 버튼 하단 꽉 채우기 */
+            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } 
+            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } 
 
             .evo-toast { width: 85%; min-width: unset; white-space: nowrap; font-size: 16px; padding: 12px 10px; bottom: 35%; border-width: 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
@@ -263,6 +271,16 @@
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
+        }
+
+        @keyframes boing {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.9); }  
+            60% { transform: scale(1.1); }  
+            100% { transform: scale(1); }   
+        }
+        .click-animate {
+            animation: boing 0.3s ease-out forwards;
         }
 
         /* 🔘 [추가] 버튼 클릭 뽀잉 애니메이션 */
