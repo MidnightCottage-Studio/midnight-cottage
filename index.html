@@ -296,11 +296,8 @@
             <div style="background:rgba(66, 133, 244, 0.1); border:1px solid rgba(66, 133, 244, 0.3); border-radius:12px; padding:10px; margin-bottom:15px; text-align:center;">
                 <p style="font-size:12px; color:#ccc; margin:0 0 8px 0;">이미 미드나잇 코티지에 살고 계신가요?</p>
                 <div style="display:flex; gap:5px; justify-content:center;">
-                    <button id="btn-login-start" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">
-                        G 구글 로그인
-                    </button>
-                    <button id="btn-load-start" onclick="loadDataFromCloud()" style="background:#34A853; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">
-                        📂 데이터 불러오기
+                    <button id="btn-login-start" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px; width: 100%;">
+                        G 구글 로그인으로 데이터 불러오기
                     </button>
                 </div>
             </div>
@@ -310,38 +307,36 @@
                 <label>이름 (닉네임)</label>
                 <input type="text" id="input-name" placeholder="이름을 정해주세요">
             </div>
-            <div class="form-group">
-                <label>성별</label>
-                <select id="input-gender">
-                    <option value="남">남성</option>
-                    <option value="여">여성</option>
-                    <option value="무">무성/기타</option>
-                </select>
+            ```
+
+### 2. HTML 수정: 가이드 창 (`#help-modal`)
+`<div id="help-modal" ...>` 안쪽의 내용을 아래 코드로 교체해 주세요. **[클라우드 저장하기(수동)]** 버튼을 삭제했습니다.
+
+```html
+    <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
+            <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
+            <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
+                1. <b>🏺 유물 박물관</b>에서 유물을 복원해 수익을 뻥튀기하세요.<br>
+                2. <b>📱 미드나잇 톡</b>에서 주민들의 속마음을 엿보세요.<br>
+                3. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
+            </p>
+            
+            <div style="margin-bottom: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <h3 style="margin-top:0; font-size:16px; color:var(--neon-blue); margin-bottom: 10px;">☁️ 데이터 백업</h3>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button id="btn-login-help" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
+                        G 구글 계정 연동
+                    </button>
+                </div>
+                <p id="cloud-status-msg" style="font-size:11px; color:#888; margin-top:8px;">
+                    * 로그인 시 4초마다 자동으로 클라우드에 저장됩니다.
+                </p>
             </div>
-            <div class="form-group">
-                <label>직업 (선택)</label>
-                <select id="input-job">
-                    <option value="화가">🎨 화가</option>
-                    <option value="소설가">✍️ 소설가</option>
-                    <option value="교수">📚 교수</option>
-                    <option value="리퍼닥">🛠️ 리퍼닥</option>
-                    <option value="ASMR DJ">🎧 ASMR DJ</option>
-                    <option value="모델">👠 모델</option>
-                    <option value="형사">🕵️ 형사</option>
-                    <option value="넷러너">💻 넷러너</option>
-                    <option value="라멘노점상">🍜 라멘노점상</option>
-                    <option value="온천주인">♨️ 온천주인</option>
-                    <option value="LP바 사장님">💿 LP바 사장님</option>
-                    <option value="뮤지션">🎸 뮤지션</option>
-                    <option value="고양이">🐱 고양이</option>
-                    <option value="VIP">👑 VIP</option>
-                </select>
-            </div>
-            <div class="nav-btns">
-                <button class="prev-btn" onclick="prevChar()" id="btn-prev" style="display:none;">이전</button>
-                <button class="start-btn" onclick="nextChar()" id="btn-next">추가 (1/5)</button>
-                <button class="finish-btn" onclick="finishSetup()" id="btn-finish">입주 시작</button>
-            </div>
+
+            <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
+                ⚠️ 데이터 초기화 (처음부터)
+            </button>
         </div>
     </div>
 
@@ -551,11 +546,10 @@
             });
     }
 
-    // 🌟 [추가] 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
+    // 🌟 [수정] 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
     function updateAuthUI(user) {
         const loginBtnStart = document.getElementById('btn-login-start');
         const loginBtnHelp = document.getElementById('btn-login-help');
-        const saveBtnHelp = document.getElementById('btn-save-help');
         const msg = document.getElementById('cloud-status-msg');
 
         if (user) {
@@ -572,20 +566,15 @@
                 loginBtnHelp.style.opacity = "0.7";
                 loginBtnHelp.style.cursor = "default";
             }
-            if(saveBtnHelp) {
-                saveBtnHelp.innerText = "☁️ 실시간 자동 저장 중...";
-                // 수동 저장을 막고 싶다면 disabled = true 하셔도 됩니다.
-                // 여기선 '저장 중'임을 알리기만 합니다.
-            }
             if(msg) msg.innerText = `* ${user.displayName}님의 계정에 안전하게 자동 저장되고 있습니다.`;
         } else {
             // 로그아웃 상태일 때: 원래대로 복구
-            if(loginBtnStart) { loginBtnStart.innerText = "G 구글 로그인"; loginBtnStart.disabled = false; }
+            if(loginBtnStart) { loginBtnStart.innerText = "G 구글 로그인으로 데이터 불러오기"; loginBtnStart.disabled = false; }
             if(loginBtnHelp) { loginBtnHelp.innerText = "G 구글 계정 연동"; loginBtnHelp.disabled = false; }
-            if(saveBtnHelp) saveBtnHelp.innerText = "☁️ 클라우드 저장하기";
         }
     }
 
+    
     // [수정] 로그인 상태 감지 리스너 (UI 업데이트 연결)
     auth.onAuthStateChanged((user) => {
         if (user) {
