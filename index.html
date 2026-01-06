@@ -205,7 +205,21 @@
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
-            .res-job, .res-rel { display: none; } 
+            /* 🛠️ [모바일 수정] 직업과 관계(솔로/커플) 모두 표시 */
+            .res-job { 
+                display: block !important; 
+                font-size: 8px; 
+                color: var(--neon-blue); 
+                margin-top: 1px;
+                white-space: nowrap;
+            }
+            .res-rel { 
+                display: block !important; 
+                font-size: 8px; 
+                color: var(--heart); 
+                margin-top: 0px;
+                white-space: nowrap;
+            }
 
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -1164,20 +1178,63 @@
 
     function randomDailyEvent() {
         if (state.residents.length < 2) return;
+
+        // 랜덤하게 두 명 뽑기
         const p1 = Math.floor(Math.random() * state.residents.length);
         let p2 = Math.floor(Math.random() * state.residents.length);
         while(p1 === p2) { p2 = Math.floor(Math.random() * state.residents.length); } 
-        const charA = state.residents[p1], charB = state.residents[p2];
+        
+        const charA = state.residents[p1];
+        const charB = state.residents[p2];
         const rand = Math.random();
+
+        // 1. 대화 및 호감도 변화
         if (rand < 0.45) {
             charA.affection += 5; charB.affection += 5;
             addHistory(`💬 <b>대화:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 즐거운 대화를 나눴어. <span style="color:var(--heart)">(❤️+5)</span>`);
         } else if (rand < 0.65) {
-            charA.affection -= 5; charB.affection -= 5;
-            addHistory(`⚡ <b>논쟁:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 사소한 오해로 다퉜어. <span style="color:#888">(💔-5)</span>`);
+            charA.affection -= 10; charB.affection -= 10; // 싸우면 호감도 더 많이 깎임
+            addHistory(`⚡ <b>논쟁:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 사소한 오해로 다퉜어. <span style="color:#888">(💔-10)</span>`);
         }
+
+        // 호감도 0~100 제한
         state.residents.forEach(r => { r.affection = Math.max(0, Math.min(100, r.affection)); });
-        render();
+
+        // 2. 관계 변화 로직
+        
+        // A. [이별] 커플인데 호감도가 30 미만으로 떨어지면 헤어짐
+        if (charA.partnerId === charB.id && (charA.affection < 30 || charB.affection < 30)) {
+            charA.relType = '솔로'; charB.relType = '솔로';
+            charA.partnerId = null; charB.partnerId = null;
+            
+            showCenterPopup("💔", "결별", `${charA.name} ⚡ ${charB.name}`);
+            addHistory(`💔 <b>이별:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 성격 차이를 극복하지 못하고 남남이 되었습니다.`);
+            saveGame();
+        }
+
+        // B. [커플 탄생] 둘 다 솔로이고 호감도가 90 이상일 때
+        else if (charA.affection >= 90 && charB.affection >= 90) {
+            if (charA.relType === '솔로' && charB.relType === '솔로') {
+                charA.relType = '커플'; charB.relType = '커플';
+                charA.partnerId = charB.id; charB.partnerId = charA.id;
+                
+                showCenterPopup("💖", "커플 탄생!", `${charA.name} ♥ ${charB.name}`);
+                addHistory(`💖 <b>축하합니다!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 연인이 되었습니다!`);
+                saveGame();
+            }
+            
+            // C. [불륜] 한 명이라도 파트너가 있는데 호감도가 높을 때
+            else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
+                if (charA.relType !== '불륜' || charB.relType !== '불륜') {
+                    charA.relType = '불륜'; charB.relType = '불륜';
+                    showCenterPopup("😈", "위험한 관계", `${charA.name} & ${charB.name}`);
+                    addHistory(`😈 <b>충격!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 금지된 사랑에 빠졌습니다...`);
+                    saveGame();
+                }
+            }
+        }
+
+        render(); // 화면 갱신
     }
 
     document.getElementById('desk-clicker').onclick = (e) => { 
@@ -1193,16 +1250,20 @@
             // 1. 로컬 저장소 데이터 삭제
             localStorage.removeItem('midnight_cottage_v30_hardcore');
 
-            // 2. 구글 로그인이 되어있다면, 서버(클라우드) 데이터도 삭제
+            // 2. 구글 로그인이 되어있다면, 서버 데이터 삭제 + 로그아웃 수행
             if (currentUser) {
+                // A. 서버 데이터 삭제
                 db.collection("users").doc(currentUser.uid).delete()
                     .then(() => {
-                        alert("모든 데이터가 깨끗하게 삭제되었습니다.");
-                        location.reload(); // 삭제 성공 후 새로고침
+                        // B. 삭제 성공 시 로그아웃 (연동 끊기)
+                        auth.signOut().then(() => {
+                            alert("모든 데이터가 삭제되고 계정 연동이 해제되었습니다.");
+                            location.reload(); // 깨끗한 상태로 새로고침
+                        });
                     })
                     .catch((error) => {
                         console.error("클라우드 삭제 실패:", error);
-                        // 에러가 나더라도 일단 로컬은 지웠으니 새로고침 진행
+                        // 에러가 나더라도 로컬은 지웠으니 일단 새로고침
                         location.reload(); 
                     });
             } else {
