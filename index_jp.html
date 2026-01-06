@@ -14,7 +14,7 @@
         }
         body { font-family: 'Pretendard', 'Noto Sans JP', sans-serif; background-color: #050507; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text); overflow: hidden; user-select: none; }
         
-        /* PC 基本レイアウト */
+      /* PC 기본 레이아웃 */
         #app { width: 98%; max-width: 1350px; height: 96vh; background: var(--bg); border-radius: 24px; display: flex; flex-direction: column; position: relative; transition: all 0.5s ease; box-shadow: 0 0 80px rgba(0,0,0,1); box-sizing: border-box; }
         
         .app-header { padding: 15px 30px; display: grid; grid-template-columns: 350px 1fr 500px; align-items: center; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--border); border-radius: 24px 24px 0 0; z-index: 10; height: auto; min-height: 60px; }
@@ -22,13 +22,13 @@
         .budget-display { font-size: 32px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 10px; }
         #news-banner { font-size: 12px; color: var(--neon-blue); font-weight: 700; background: rgba(122, 162, 247, 0.1); padding: 4px 10px; border-radius: 6px; margin-top: 2px; border-left: 3px solid var(--neon-blue); width: fit-content; max-width: 320px; }
         
-        /* PC専用 ステータス */
+        /* PC 전용 상태창 */
         #pc-city-status { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
         #city-name-display { font-size: 17px; color: var(--accent); font-weight: 800; text-shadow: 0 0 10px rgba(187, 154, 247, 0.5); }
         .dev-bar-bg { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
         #dev-bar-fill { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: width 0.4s ease; }
 
-        /* モバイル専用 ステータス */
+        /* 모바일 전용 상태창 */
         #mobile-city-status { display: none; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-bottom: 5px; flex-direction: column; gap: 4px; }
         #mob-city-name-display { font-size: 15px; color: var(--accent); font-weight: 800; text-shadow: 0 0 10px rgba(187, 154, 247, 0.5); }
         .mob-dev-bar-bg { width: 100%; height: 6px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin-top: 2px; }
@@ -50,7 +50,7 @@
         .icon-btn:hover { background: var(--border); transform: scale(1.1); }
         .noti-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg); display: none; }
         
-        /* PC イベントログ */
+        /* PC 이벤트 로그 */
         #event-log { 
             font-size: 19px; 
             color: var(--accent); 
@@ -68,12 +68,12 @@
 
         .content-container { flex: 1; display: flex; overflow: hidden; }
         .main-panel { flex: 1.8; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; }
-        #desk-clicker { width: 100%; max-width: 480px; cursor: pointer; transition: transform 0.1s ease, filter 0.3s ease; filter: drop-shadow(0 0 30px rgba(187, 154, 247, 0.2)); margin-top: 40px; margin-bottom: 20px; }
+        #desk-clicker { width: 100%; max-width: 40px; cursor: pointer; transition: transform 0.1s ease, filter 0.3s ease; filter: drop-shadow(0 0 30px rgba(187, 154, 247, 0.2)); margin-top: 40px; margin-bottom: 20px; }
         #desk-clicker:active { transform: scale(0.95); }
         .hit-effect { position: absolute; pointer-events: none; font-size: 65px; z-index: 100; animation: hit-star 0.3s ease-out forwards; }
         @keyframes hit-star { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.1); opacity: 0; } }
         
-        /* 対話ウィンドウ */
+        /* 대화창 컨테이너 */
         #dialogue-stack { 
             position: absolute; bottom: 120px; z-index: 50; width: 90%; max-width: 500px; 
             display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; 
@@ -96,7 +96,7 @@
         .side-menu { flex: 1.1; background: rgba(0,0,0,0.4); padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; border-left: 1px solid var(--border); }
         .menu-title { font-size: 17px; font-weight: 800; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 12px; margin-bottom: 10px; }
         
-        /* カードレイアウト */
+        /* 카드 레이아웃 */
         .up-card { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 15px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03); width: 100%; box-sizing: border-box; min-height: 80px; }
         .up-info { flex: 1; min-width: 0; margin-right: 10px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
         .up-info h4 { margin: 0; font-size: 15px; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -168,7 +168,7 @@
         .ach-title { font-weight: 800; color: #fff; font-size: 14px; }
         .ach-desc { font-size: 11px; color: #aaa; margin-top: 3px; }
         
-        /* 💌 エンディングシーケンス */
+        /* 💌 엔딩 시퀀스 스타일 */
         #ending-sequence { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .rolling-container { text-align: center; opacity: 0; transform: translateY(20px); transition: 1s ease; display: flex; flex-direction: column; align-items: center; }
         .rolling-container.show { opacity: 1; transform: translateY(0); }
@@ -179,12 +179,12 @@
         .ending-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--gold); }
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 🌟 2. モバイルレスポンシブ CSS */
+        /* 🌟 2. 모바일 반응형 CSS */
         @media (max-width: 768px) {
             body { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
             #app { height: 100%; width: 100%; border-radius: 0; display: flex; flex-direction: column; }
 
-            /* ヘッダーの余白調整 */
+            /* 헤더 여백 줄이기 */
             .app-header { display: flex; flex-direction: column; padding: 5px 15px 0px 15px; gap: 0px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
             
             .header-left { width: 100%; order: 1; align-items: flex-start; margin-bottom: 0px; }
@@ -192,21 +192,21 @@
             #news-banner { display: none; }
             #pc-city-status { display: none; }
 
-            /* 上部メニューアイコンの中央揃え */
+            /* 상단 메뉴 아이콘 가로 중앙 정렬 */
             .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
             .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
             .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
             
             #event-log { display: none !important; }
 
-            /* 住民リストの中央揃え */
+            /* 주민 목록 가로 중앙 정렬 */
             .res-area { order: 3; width: 100%; margin-top: 5px; padding-bottom: 5px; overflow-x: auto; justify-content: center; display: flex; }
             .res-card { min-width: 55px; margin-right: 5px; transform: none !important; transition: none !important; }
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
             
-            /* 職業と関係(ソロ/カップル)を表示 */
+            /* 직업과 관계(솔로/커플) 모두 표시 */
             .res-job { 
                 display: block !important; 
                 font-size: 8px; 
@@ -224,9 +224,10 @@
 
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-            /* [モバイル] 部屋画面の高さ縮小 (45% -> 35%) */
+            /* 방 화면 확대 */
+            /* [모바일] 방 화면 높이 축소 */
             .main-panel { 
-                flex: 0 0 35%; 
+                flex: 0 0 35%; /* 45% -> 35%로 변경 */
                 padding: 0; 
                 order: 1; 
                 position: relative; 
@@ -236,14 +237,7 @@
                 align-items: center; 
                 overflow: hidden; 
             }
-            /* [モバイル] 画像拡大の解除 (130% -> 100%) */
-            #desk-clicker { 
-                width: 100%; 
-                height: 100%; 
-                object-fit: contain; 
-                margin: 0; 
-                transform: none; 
-            }
+            #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(-10px); }
             
             #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
             .dialogue-bubble { font-size: 13px; padding: 10px; }
@@ -314,19 +308,19 @@
             <div class="form-group">
                 <label>職業 (選択)</label>
                 <select id="input-job">
-                    <option value="画家">🎨 画家</option>
-                    <option value="小説家">✍️ 小説家</option>
-                    <option value="教授">📚 教授</option>
-                    <option value="リパードク">🛠️ リパードク</option>
+                    <option value="화가">🎨 画家</option>
+                    <option value="소설가">✍️ 小説家</option>
+                    <option value="교수">📚 教授</option>
+                    <option value="리퍼닥">🛠️ リパードク</option>
                     <option value="ASMR DJ">🎧 ASMR DJ</option>
-                    <option value="モデル">👠 モデル</option>
-                    <option value="刑事">🕵️ 刑事</option>
-                    <option value="ネットランナー">💻 ネットランナー</option>
-                    <option value="ラーメン屋">🍜 ラーメン屋台の店主</option>
-                    <option value="温泉主人">♨️ 温泉旅館の主人</option>
-                    <option value="バーマスター">💿 レコードバーのマスター</option>
-                    <option value="ミュージシャン">🎸 ミュージシャン</option>
-                    <option value="猫">🐱 猫</option>
+                    <option value="모델">👠 モデル</option>
+                    <option value="형사">🕵️ 刑事</option>
+                    <option value="넷러너">💻 ネットランナー</option>
+                    <option value="라멘노점상">🍜 ラーメン屋台の店主</option>
+                    <option value="온천주인">♨️ 温泉旅館の主人</option>
+                    <option value="LP바 사장님">💿 レコードバーのマスター</option>
+                    <option value="뮤지션">🎸 ミュージシャン</option>
+                    <option value="고양이">🐱 猫</option>
                     <option value="VIP">👑 VIP</option>
                 </select>
             </div>
@@ -482,28 +476,27 @@
     };
 
     // 5. 게임 데이터 및 로직 (일본어 번역됨)
-    // 🛠️ [수정] 키값을 모두 일본어로 변경했습니다!
     const jobEmojis = {
-        "画家": "🎨", "小説家": "✍️", "教授": "📚", "リパードク": "🛠️",
-        "ASMR DJ": "🎧", "モデル": "👠", "刑事": "🕵️", "ネットランナー": "💻",
-        "ラーメン屋": "🍜", "温泉主人": "♨️", "バーマスター": "💿",
-        "ミュージシャン": "🎸", "猫": "🐱", "VIP": "👑"
+        "화가": "🎨", "소설가": "✍️", "교수": "📚", "리퍼닥": "🛠️",
+        "ASMR DJ": "🎧", "모델": "👠", "형사": "🕵️", "넷러너": "💻",
+        "라멘노점상": "🍜", "온천주인": "♨️", "LP바 사장님": "💿",
+        "뮤지션": "🎸", "고양이": "🐱", "VIP": "👑"
     };
 
     const jobsData = {
-        "画家": { 'Solo': ["ネオンの絵の具がふわふわしてる。", "この色彩は君に似ているね。", "筆先から夜明けが咲くよ。", "キャンバスはまだ未完成だ。"], 'Love': ["君の瞳の色をキャンバスに込めたい。", "君といると世界が蛍光色に見えるよ。", "最も完璧な色は君だ。"], 'Affair': ["秘密めいた色は魅惑的だね。", "禁じられた線を越えるのはスリルがある。", "こっそり描く君の肖像画が好きだ。"], 'Stress': ["筆をへし折ってしまいたい！", "何も描きたくない。", "世界がすべて灰色だ。"] },
-        "小説家": { 'Solo': ["文章たちが踊っている。", "この街のすべてが小説のネタだ。", "エンディングはどうしようかな？"], 'Love': ["君との恋はベストセラーだ。", "私の小説の主人公は君だよ。", "ハッピーエンドだけを書きたい。"], 'Affair': ["禁止されたチャプターを書く気分だ。", "読者は知らない私たちだけのどんでん返し。", "危険な伏線のように君に惹かれる。"], 'Stress': ["文字が虫みたいに見える！", "原稿用紙を全部燃やしてやる！", "私の人生は失敗作だ。"] },
-        "教授": { 'Solo': ["歴史は繰り返す。", "古い本の匂いが好きだ。", "2026年は実にロマンチックだったな。"], 'Love': ["君は歴史上、最も美しい。", "君を一生研究したい。", "古典の詩より君の方が優雅だ。"], 'Affair': ["禁じられた歴史ほど興味深いな。", "道徳的尺度より君が大事だ。", "これは秘密の授業だよ。"], 'Stress': ["データの屑どもめ！静かにしろ！", "知識なんて全部役立たずだ。", "本を全部破り捨てたい気分だ。"] },
-        "リパードク": { 'Solo': ["機械は嘘をつかない。", "どこか故障したところはないか？", "オイルの匂いが香ばしいな。"], 'Love': ["俺の心臓エンジンは君のために回ってる。", "君のために最高のパーツを用意した。", "君がいなければ俺はシャットダウンだ。"], 'Affair': ["セキュリティプロトコルを迂回した。", "危険なオーバークロック中だ。", "ショートしそうなくらい痺れるぜ。"], 'Stress': ["全部スクラップ場に捨ててしまえ！", "火花が散ってる！俺の頭もだ！", "クソッたれな鉄屑どもめ。"] },
+        "화가": { 'Solo': ["ネオンの絵の具がふわふわしてる。", "この色彩は君に似ているね。", "筆先から夜明けが咲くよ。", "キャンバスはまだ未完成だ。"], 'Love': ["君の瞳の色をキャンバスに込めたい。", "君といると世界が蛍光色に見えるよ。", "最も完璧な色は君だ。"], 'Affair': ["秘密めいた色は魅惑的だね。", "禁じられた線を越えるのはスリルがある。", "こっそり描く君の肖像画が好きだ。"], 'Stress': ["筆をへし折ってしまいたい！", "何も描きたくない。", "世界がすべて灰色だ。"] },
+        "소설가": { 'Solo': ["文章たちが踊っている。", "この街のすべてが小説のネタだ。", "エンディングはどうしようかな？"], 'Love': ["君との恋はベストセラーだ。", "私の小説の主人公は君だよ。", "ハッピーエンドだけを書きたい。"], 'Affair': ["禁止されたチャプターを書く気分だ。", "読者は知らない私たちだけのどんでん返し。", "危険な伏線のように君に惹かれる。"], 'Stress': ["文字が虫みたいに見える！", "原稿用紙を全部燃やしてやる！", "私の人生は失敗作だ。"] },
+        "교수": { 'Solo': ["歴史は繰り返す。", "古い本の匂いが好きだ。", "2026年は実にロマンチックだったな。"], 'Love': ["君は歴史上、最も美しい。", "君を一生研究したい。", "古典の詩より君の方が優雅だ。"], 'Affair': ["禁じられた歴史ほど興味深いな。", "道徳的尺度より君が大事だ。", "これは秘密の授業だよ。"], 'Stress': ["データの屑どもめ！静かにしろ！", "知識なんて全部役立たずだ。", "本を全部破り捨てたい気分だ。"] },
+        "리퍼닥": { 'Solo': ["機械は嘘をつかない。", "どこか故障したところはないか？", "オイルの匂いが香ばしいな。"], 'Love': ["俺の心臓エンジンは君のために回ってる。", "君のために最高のパーツを用意した。", "君がいなければ俺はシャットダウンだ。"], 'Affair': ["セキュリティプロトコルを迂回した。", "危険なオーバークロック中だ。", "ショートしそうなくらい痺れるぜ。"], 'Stress': ["全部スクラップ場に捨ててしまえ！", "火花が散ってる！俺の頭もだ！", "クソッたれな鉄屑どもめ。"] },
         "ASMR DJ": { 'Solo': ["雨音を聞かせてあげようか？", "ティングルを感じる？", "今夜は私の声と一緒に過ごして。"], 'Love': ["君にだけ聞かせる囁きだよ。", "君の寝息が最高のASMRだね。", "私たちの周波数は一致してる。"], 'Affair': ["マイクを切って秘密の話をしようか？", "放送事故みたいな恋だね。", "他人には聞こえないシグナル。"], 'Stress': ["叫びだしたい！", "耳鳴りがして辛い。", "すべての騒音が恐ろしいわ。"] },
-        "モデル": { 'Solo': ["今日のクロームの光沢、完璧？", "フラッシュの洗礼は飽き飽き。", "この通りは私のランウェイよ。"], 'Love': ["私より君の方が輝いてる。", "私たちのツーショットは画報そのものよ。", "君だけのミューズになるわ。"], 'Affair': ["スキャンダル？関係ないわ。", "カメラの裏で会うのが好きなの。", "危険なほどスタイリッシュでしょ。"], 'Stress': ["私の顔を見ないで！", "照明を全部消して！", "みんな私を見かけだけで判断するのね。"] },
-        "刑事": { 'Solo': ["雨の降る通りは証拠を隠すな。", "合成タバコの煙が目に染みる。", "直感が来たぞ。"], 'Love': ["お前は俺が探していた最後のパズルだ。", "お前が犯人なら逮捕されてやる。", "俺の銃口はお前を守るためだけに向く。"], 'Affair': ["張り込みを言い訳にして出てきた。", "この関係はトップシークレットだ。", "証拠を残すなよ。"], 'Stress': ["この街は腐ってる。", "犯人も正義も全部うんざりだ。", "頭が割れそうだ。"] },
-        "ネットランナー": { 'Solo': ["アイス（防壁）を破るなんて朝飯前さ。", "現実よりネットワークが楽だね。", "データの流れが美しい。"], 'Love': ["君の脳と同期（シンクロ）したい。", "僕のファイアウォールを解除できる唯一の人。", "君は僕の最高のアルゴリズムだ。"], 'Affair': ["バックドアからこっそり接続したよ。", "ログは全部削除しておくね。", "ウイルスの用で致命的だ。"], 'Stress': ["脳が焼け焦げそうだ！", "接続を切れ！強制ログアウト！", "ノイズのせいで気が狂いそうだ。"] },
-        "ラーメン屋": { 'Solo': ["スープが煮える匂い、最高だろ？", "温かいスープ一杯やっていきな。", "今日もお客さんが多いね。"], 'Love': ["あんたにはチャーシュー食べ放題だよ。", "スープよりあんたの心の方が温かいね。", "一生ラーメン作ってあげるよ。"], 'Affair': ["シャッターを下ろしてこっそり会おうか？", "激辛よりホットだね。", "スープが冷める前に早くおいで。"], 'Stress': ["スープをひっくり返したい。", "客ども全員出て行けと言え！", "麺が全部伸びちまった。"] },
-        "温泉主人": { 'Solo': ["お湯の温度がちょうどいいよ。", "疲れがすっきり取れるはずさ。", "硫黄の匂い、慣れればいいもんだよ。"], 'Love': ["君と混浴…なんて、冗談だよ。", "私の心も温泉みたいに熱いよ。", "君は私の温泉の花だ。"], 'Affair': ["脱衣所の裏で会おう。", "湿気のせいで顔が赤くなったね。", "危険な温度になってるよ。"], 'Stress': ["お湯を全部抜いてしまえ！", "客がうるさすぎる。", "のぼせて目が回りそうだ。"] },
-        "バーマスター": { 'Solo': ["この曲は20世紀の名曲さ。", "ジャズが流れる夜だね。", "ウイスキー一杯どう？"], 'Love': ["この歌は君のためのものだ。", "君の声が最高の音楽だよ。", "僕らの愛をレコードに刻みたいね。"], 'Affair': ["店の鍵を閉めて始めようか？", "秘密めいたリズムに乗ってみよう。", "禁止された曲をかける気分だ。"], 'Stress': ["音楽を消せ！静かにしろ！", "酒瓶を全部割りたい気分だ。", "こんな安っぽい音楽はかけないぞ。"] },
-        "ミュージシャン": { 'Solo': ["新しいコードが浮かんだ。", "俺のギターソロどう？", "この街は俺のステージだ。"], 'Love': ["君のためのセレナーデを作ったよ。", "君の心臓の鼓動にテンポを合わせる。", "君は俺のインスピレーションの源だ。"], 'Affair': ["バックステージでこっそり会おう。", "これはアンコールのない公演だ。", "危険なロックンロールだぜ。"], 'Stress': ["ギターの弦を全部切っちまった。", "楽想が浮かばない！", "みんな俺の音楽を侮辱してる。"] },
-        "猫": { 'Solo': ["ニャー。（飯くれ。）", "ゴロゴロ…（満足）", "香箱座り中だよ。", "高いところが好き。", "段ボールだ！私のもの。"], 'Love': ["ニャ～オ（君にスリスリ）", "ゴロゴロソング歌ってる最中だよ。", "君のお腹の上が一番暖かい。", "フミフミしてあげる。"], 'Affair': ["シャーッ！（他の下僕の匂いがする！）", "こっそり夜遊びしてくるニャ。", "こっそりチュール盗み食いした。", "秘密の友達ができたニャ。"], 'Stress': ["フガーッ！！（触るな！）", "シャーッ！（あっち行け！）", "尻尾ボン！毛が逆立つ！", "爪で全部引っ掻いてやる！"] },
+        "모델": { 'Solo': ["今日のクロームの光沢、完璧？", "フラッシュの洗礼は飽き飽き。", "この通りは私のランウェイよ。"], 'Love': ["私より君の方が輝いてる。", "私たちのツーショットは画報そのものよ。", "君だけのミューズになるわ。"], 'Affair': ["スキャンダル？関係ないわ。", "カメラの裏で会うのが好きなの。", "危険なほどスタイリッシュでしょ。"], 'Stress': ["私の顔を見ないで！", "照明を全部消して！", "みんな私を見かけだけで判断するのね。"] },
+        "형사": { 'Solo': ["雨の降る通りは証拠を隠すな。", "合成タバコの煙が目に染みる。", "直感が来たぞ。"], 'Love': ["お前は俺が探していた最後のパズルだ。", "お前が犯人なら逮捕されてやる。", "俺の銃口はお前を守るためだけに向く。"], 'Affair': ["張り込みを言い訳にして出てきた。", "この関係はトップシークレットだ。", "証拠を残すなよ。"], 'Stress': ["この街は腐ってる。", "犯人も正義も全部うんざりだ。", "頭が割れそうだ。"] },
+        "넷러너": { 'Solo': ["アイス（防壁）を破るなんて朝飯前さ。", "現実よりネットワークが楽だね。", "データの流れが美しい。"], 'Love': ["君の脳と同期（シンクロ）したい。", "僕のファイアウォールを解除できる唯一の人。", "君は僕の最高のアルゴリズムだ。"], 'Affair': ["バックドアからこっそり接続したよ。", "ログは全部削除しておくね。", "ウイルスの用で致命的だ。"], 'Stress': ["脳が焼け焦げそうだ！", "接続を切れ！強制ログアウト！", "ノイズのせいで気が狂いそうだ。"] },
+        "라멘노점상": { 'Solo': ["スープが煮える匂い、最高だろ？", "温かいスープ一杯やっていきな。", "今日もお客さんが多いね。"], 'Love': ["あんたにはチャーシュー食べ放題だよ。", "スープよりあんたの心の方が温かいね。", "一生ラーメン作ってあげるよ。"], 'Affair': ["シャッターを下ろしてこっそり会おうか？", "激辛よりホットだね。", "スープが冷める前に早くおいで。"], 'Stress': ["スープをひっくり返したい。", "客ども全員出て行けと言え！", "麺が全部伸びちまった。"] },
+        "온천주인": { 'Solo': ["お湯の温度がちょうどいいよ。", "疲れがすっきり取れるはずさ。", "硫黄の匂い、慣れればいいもんだよ。"], 'Love': ["君と混浴…なんて、冗談だよ。", "私の心も温泉みたいに熱いよ。", "君は私の温泉の花だ。"], 'Affair': ["脱衣所の裏で会おう。", "湿気のせいで顔が赤くなったね。", "危険な温度になってるよ。"], 'Stress': ["お湯を全部抜いてしまえ！", "客がうるさすぎる。", "のぼせて目が回りそうだ。"] },
+        "LP바 사장님": { 'Solo': ["この曲は20世紀の名曲さ。", "ジャズが流れる夜だね。", "ウイスキー一杯どう？"], 'Love': ["この歌は君のためのものだ。", "君の声が最高の音楽だよ。", "僕らの愛をレコードに刻みたいね。"], 'Affair': ["店の鍵を閉めて始めようか？", "秘密めいたリズムに乗ってみよう。", "禁止された曲をかける気分だ。"], 'Stress': ["音楽を消せ！静かにしろ！", "酒瓶を全部割りたい気分だ。", "こんな安っぽい音楽はかけないぞ。"] },
+        "뮤지션": { 'Solo': ["新しいコードが浮かんだ。", "俺のギターソロどう？", "この街は俺のステージだ。"], 'Love': ["君のためのセレナーデを作ったよ。", "君の心臓の鼓動にテンポを合わせる。", "君は俺のインスピレーションの源だ。"], 'Affair': ["バックステージでこっそり会おう。", "これはアンコールのない公演だ。", "危険なロックンロールだぜ。"], 'Stress': ["ギターの弦を全部切っちまった。", "楽想が浮かばない！", "みんな俺の音楽を侮辱してる。"] },
+        "고양이": { 'Solo': ["ニャー。（飯くれ。）", "ゴロゴロ…（満足）", "香箱座り中だよ。", "高いところが好き。", "段ボールだ！私のもの。"], 'Love': ["ニャ～オ（君にスリスリ）", "ゴロゴロソング歌ってる最中だよ。", "君のお腹の上が一番暖かい。", "フミフミしてあげる。"], 'Affair': ["シャーッ！（他の下僕の匂いがする！）", "こっそり夜遊びしてくるニャ。", "こっそりチュール盗み食いした。", "秘密の友達ができたニャ。"], 'Stress': ["フガーッ！！（触るな！）", "シャーッ！（あっち行け！）", "尻尾ボン！毛が逆立つ！", "爪で全部引っ掻いてやる！"] },
         "VIP": { 'Solo': ["いくらだ？全部買い占めてやる。", "ここがペントハウスか？", "シャンパンを持ってこい。", "景色はなかなか悪くないな。"], 'Love': ["この街を君にあげよう。", "ダイヤモンドより君が輝いている。", "私の財産目録1号は君だ。"], 'Affair': ["秘密の契約書にサインしろ。", "ホテルのスイートルームを取っておいた。", "金では買えないスリルだな。"], 'Stress': ["全員クビにしろ！間抜けどもめ！", "私の株が暴落した！", "サービスが最悪だ。訴えてやる！"] }
     };
 
@@ -578,7 +571,7 @@
     }));
 
     const achievements = [
-        { id: 'cat', name: 'にゃんこワールド', icon: '🐱', desc: 'すべての住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '猫') },
+        { id: 'cat', name: 'にゃんこワールド', icon: '🐱', desc: 'すべての住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '고양이') },
         { id: 'drama', name: '愛と戦争', icon: '💔', desc: '不倫関係が発生しました。', unlocked: false, check: s => s.residents.some(r => r.relType === '불륜') },
         { id: 'rich', name: '億万長者', icon: '💰', desc: '所持金1,000,000突破。', unlocked: false, check: s => s.money >= 1000000 },
         { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === '솔로') },
@@ -647,7 +640,7 @@
         const currentData = tempResidents[idx] || {};
         nameInput.value = currentData.name || '';
         document.getElementById('input-gender').value = currentData.gender || '남';
-        document.getElementById('input-job').value = currentData.job || '画家'; 
+        document.getElementById('input-job').value = currentData.job || '화가'; 
 
         prevBtn.style.display = idx === 0 ? 'none' : 'block';
         finishBtn.style.display = tempResidents.length > 0 || idx > 0 ? 'block' : 'none';
@@ -747,19 +740,19 @@
     }
 
     const endingDialogues = {
-        "画家": "この部屋の色彩は私のキャンバスより美しかった。永遠に記憶するよ。",
-        "小説家": "私たちのチャプターはここで終わるけど、君の物語はずっと書き続けてね。",
-        "教授": "ここの記録は歴史に残るだろう。君のおかげだ。",
-        "リパードク": "俺の心臓エンジンも高鳴るぜ。完璧な修理だった。",
+        "화가": "この部屋の色彩は私のキャンバスより美しかった。永遠に記憶するよ。",
+        "소설가": "私たちのチャプターはここで終わるけど、君の物語はずっと書き続けてね。",
+        "교수": "ここの記録は歴史に残るだろう。君のおかげだ。",
+        "리퍼닥": "俺の心臓エンジンも高鳴るぜ。完璧な修理だった。",
         "ASMR DJ": "今夜は一番穏やかな雨音を聞かせてあげる。おやすみ。",
-        "モデル": "派手な照明より、この部屋のほのかなネオンの方が良かったわ。",
-        "刑事": "事件終了。犯人は…私たちが探していた幸福だったか。",
-        "ネットランナー": "ログアウトしたくないサーバーはここが初めてだ。",
-        "ラーメン屋": "いつでもおいで。温かいスープ一杯は一生タダだから。",
-        "温泉主人": "心の垢まですっかり洗い流せた気分だよ。ありがとう。",
-        "バーマスター": "最後の曲は君のためにかけるよ。このリズムを忘れないで。",
-        "ミュージシャン": "俺の最高の名曲はこのコテージで誕生した。サンキュー！",
-        "猫": "ニャー。（元気でな、最高の下僕。チュール忘れるなよ。）",
+        "모델": "派手な照明より、この部屋のほのかなネオンの方が良かったわ。",
+        "형사": "事件終了。犯人は…私たちが探していた幸福だったか。",
+        "넷러너": "ログアウトしたくないサーバーはここが初めてだ。",
+        "라멘노점상": "いつでもおいで。温かいスープ一杯は一生タダだから。",
+        "온천주인": "心の垢まですっかり洗い流せた気分だよ。ありがとう。",
+        "LP바 사장님": "最後の曲は君のためにかけるよ。このリズムを忘れないで。",
+        "뮤지션": "俺の最高の名曲はこのコテージで誕生した。サンキュー！",
+        "고양이": "ニャー。（元気でな、最高の下僕。チュール忘れるなよ。）",
         "VIP": "これほど価値のある投資は初めてだな。素晴らしかった。"
     };
 
@@ -845,7 +838,7 @@
         const char = state.residents[Math.floor(Math.random() * state.residents.length)];
         let text = "";
         const generalPosts = ["今日パーティする人？", "家が最高。", "この通り、イケてるね。", "バッテリー充電中...", "読書にいい夜。", "暇だから遊んで！", "コンビニ弁当は飽きた。", "誰か私の自転車盗んだ？", "雨の日はチヂミでしょ。", "ネオンサインが今日に限って綺麗。", "猫かわいい。", "人生とは...", "給料いつ入るの？", "夜食のおすすめ教えて。", "新しくできた店行く人？", "今日の天気ヤバイ。", "出勤したくない。", "退勤後にビール一杯どう？", "週末があっという間に...", "Netflix見るものオススメ教えて。", "ダイエットは明日から。", "今日のOOTD。", "美味しい店発見！", "コーヒー輸血至急。", "眠れない。", "深夜の感性爆発。", "昔の歌を聴いてる。", "旅行行きたい。", "部屋の掃除しなきゃなのに...", "布団の外は危険だ。", "今日の気分は晴れ。", "ストレスには激辛料理。", "ささやかな幸せ。", "ぼーっとしてる。", "お腹すいた。", "地球滅亡すればいいのに。", "宝くじ当選祈願。", "散歩行くか？", "宅配届いた！", "溜まった洗濯しなきゃ。"];
-        if (char.job === '猫') { text = ["ニャン。", "ゴロゴロ...", "チュールよこせニンゲン。", "ドドドドドッ！！", "グルル...", "段ボールは私の。", "高いところが好き。", "お昼寝の時間だニャ。", "下僕よ、遊んで。"][Math.floor(Math.random()*9)]; } 
+        if (char.job === '고양이') { text = ["ニャン。", "ゴロゴロ...", "チュールよこせニンゲン。", "ドドドドドッ！！", "グルル...", "段ボールは私の。", "高いところが好き。", "お昼寝の時間だニャ。", "下僕よ、遊んで。"][Math.floor(Math.random()*9)]; } 
         else if (char.relType === '불륜') { text = ["裏アカです。", "今夜も...", "しーっ。", "誰にも内緒で。", "心臓がうるさい。", "危険だけど止められない。", "こんなのダメなのに...", "会いたい。"][Math.floor(Math.random()*8)]; } 
         else if (char.stress > 80) { text = ["あーマジで全部うざい。", "触るな。", "退社したい。", "世界なんて滅びろ。", "何もしたくない。", "頭痛い。", "全部投げ出したい。", "爆発寸前。"][Math.floor(Math.random()*8)]; } 
         else { text = generalPosts[Math.floor(Math.random() * generalPosts.length)]; }
