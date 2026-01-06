@@ -225,7 +225,18 @@
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
             /* 방 화면 확대 */
-            .main-panel { flex: 0 0 45%; padding: 0; order: 1; position: relative; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+            /* [모바일] 방 화면 높이 축소 */
+            .main-panel { 
+                flex: 0 0 35%; /* 45% -> 35%로 변경 */
+                padding: 0; 
+                order: 1; 
+                position: relative; 
+                background: #000; 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                overflow: hidden; 
+            }
             #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(-10px); }
             
             #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
