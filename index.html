@@ -52,9 +52,18 @@
         
         /* PC 이벤트 로그 */
         #event-log { 
-            font-size: 19px; color: var(--accent); font-weight: 800; text-align: right; line-height: 1.3; width: 100%; 
-            display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; 
-            word-break: keep-all; min-height: 50px; 
+            font-size: 19px; 
+            color: var(--accent); 
+            font-weight: 800; 
+            text-align: right; 
+            line-height: 1.3; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            justify-content: flex-end;
+            word-break: keep-all; 
+            min-height: 50px; 
         }
 
         .content-container { flex: 1; display: flex; overflow: hidden; }
@@ -239,6 +248,17 @@
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
+        }
+
+        /* 🔘 [추가] 버튼 클릭 뽀잉 애니메이션 */
+        @keyframes boing {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.9); }  /* 꾹 눌림 */
+            60% { transform: scale(1.1); }  /* 띠용 하고 커짐 */
+            100% { transform: scale(1); }   /* 원상복구 */
+        }
+        .click-animate {
+            animation: boing 0.3s ease-out forwards;
         }
     </style>
 </head>
@@ -487,13 +507,6 @@
             });
     }
 
-    function saveDataToCloud() {
-        if (currentUser) {
-            db.collection("users").doc(currentUser.uid).set(state, { merge: true })
-                .catch((error) => console.error("클라우드 자동 저장 실패:", error));
-        }
-    }
-
     // 🌟 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
     function updateAuthUI(user) {
         const loginBtnStart = document.getElementById('btn-login-start');
@@ -541,8 +554,6 @@
 
                     // 저장된 데이터가 있으면 바로 시작
                     document.getElementById('start-screen').style.display = 'none';
-                    // 중복 실행 방지
-                    // (init에서 이미 실행되었다면 건너뛰어야 하지만, 여기선 덮어쓰기 로직이므로 괜찮음)
                 } else {
                     console.log("저장된 데이터가 없습니다.");
                 }
@@ -689,44 +700,48 @@
         init();
     };
 
+    // [수정] 1. 저장 기능 (로컬 + 클라우드 동시에 처리)
     function saveGame() {
-        // 1. 로컬 저장 (기본)
+        // A. 브라우저 캐시(로컬) 저장 - 로그인 안 해도 작동함
         try {
             localStorage.setItem('midnight_cottage_v30_hardcore', JSON.stringify(state));
         } catch (e) {
             console.error("로컬 저장 실패", e);
         }
 
-        // 2. 클라우드 자동 저장 (로그인 상태라면)
+        // B. 클라우드 저장 - 로그인했을 때만 작동함
         if (currentUser) {
-            // set(state, { merge: true }) 옵션을 써서 안전하게 덮어씌웁니다.
             db.collection("users").doc(currentUser.uid).set(state, { merge: true })
                 .catch((error) => console.error("클라우드 자동 저장 실패:", error));
         }
     }
 
+    // [수정] 2. 불러오기 기능 (시작할 때 자동 실행됨)
     function loadGame() {
         const saved = localStorage.getItem('midnight_cottage_v30_hardcore');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
                 Object.assign(state, parsed);
-                return true;
+                return true; 
             } catch (e) {
                 console.error("세이브 파일 오류", e);
                 return false;
             }
         }
-        return false;
+        return false; 
     }
 
+    // [수정] 3. 게임 초기화
     function init() {
         state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
 
+        // 로컬 데이터를 먼저 찾아보고, 있으면 바로 게임 시작!
         if (loadGame()) {
+            console.log("📂 브라우저 자동 저장 데이터 로드됨");
             document.getElementById('start-screen').style.display = 'none';
             startGame();
-            addHistory("💻 <b>시스템:</b> 어서와! 오늘도 작업 화이팅!");
+            addHistory("💻 <b>시스템:</b> 지난번 작업을 이어서 시작합니다.");
         } else {
             loadSetupUI(0);
         }
@@ -788,11 +803,18 @@
         if (setupIndex > 0) loadSetupUI(setupIndex - 1);
     }
 
+    // [수정] 4. 입주 시작 (가장 중요!)
     function finishSetup() {
         saveCurrentInput(); 
         state.residents = [...tempResidents]; 
         document.getElementById('start-screen').style.display = 'none';
+        
+        // 게임 시작
         startGame();
+
+        // 🔥 입주하자마자 즉시 강제 저장!
+        saveGame(); 
+        console.log("✅ 입주 완료 및 즉시 저장됨");
     }
 
     function startGame() {
@@ -819,7 +841,6 @@
         // 💾 4초마다 자동 저장 실행
         setInterval(saveGame, 4000);
 
-        // 🔥 모바일 버전일 때만 첫 접속 메시지를 스택으로 띄움
         if (window.innerWidth <= 768) {
             spawnMessage('💻작업 화이팅! 미드나잇 코티지가 너를 반겨.', 'event');
         }
@@ -837,6 +858,23 @@
             }
         }
     }
+
+    const endingDialogues = {
+        "화가": "이 방의 색채는 내 캔버스보다 아름다웠어. 영원히 기억할게.",
+        "소설가": "우리의 챕터는 여기서 끝나지만, 네 이야기는 계속 써 내려가길.",
+        "교수": "이곳의 기록은 역사에 남을 걸세. 자네 덕분이야.",
+        "리퍼닥": "내 심장 엔진도 벅차오르는군. 완벽한 수리였어.",
+        "ASMR DJ": "오늘 밤은 가장 평온한 빗소리를 들려줄게. 잘 자.",
+        "모델": "화려한 조명보다 이 방의 은은한 네온이 더 좋았어.",
+        "형사": "사건 종료. 범인은... 우리가 찾던 행복이었군.",
+        "넷러너": "로그아웃하고 싶지 않은 서버는 여기가 처음이야.",
+        "라멘노점상": "언제든 와. 따뜻한 국물 한 그릇은 평생 공짜니까.",
+        "온천주인": "마음의 때까지 씻겨나가는 기분이었어. 고마워.",
+        "LP바 사장님": "마지막 곡은 너를 위해 틀게. 이 리듬을 잊지 마.",
+        "뮤지션": "내 최고의 명곡은 이 코티지에서 탄생했어. 땡큐!",
+        "고양이": "야옹. (잘 있어라, 최고의 집사. 츄르 잊지 말고.)",
+        "VIP": "이 정도 가치 있는 투자는 처음이군. 훌륭했어."
+    };
 
     function startEndingSequence() {
         const screen = document.getElementById('ending-sequence');
@@ -1048,21 +1086,50 @@
 
     function buy(idx) {
         const u = state.upgrades[idx], d = upgrades[idx];
+        
+        // 1. 구매 로직
         if(state.money >= u.price) {
             state.money -= u.price; 
-            if(u.lv === 0) { state.totalUniquePurchased++; addHistory(`🏗️ <b>신규 시설:</b> [${d.name}] 건설 완료.`); }
+            
+            if(u.lv === 0) { 
+                state.totalUniquePurchased++; 
+                addHistory(`🏗️ <b>신규 시설:</b> [${d.name}] 건설 완료.`); 
+            }
             u.lv++;
-            if(d.type === 'click') state.clickPower += d.power; else state.autoIncome += d.power;
+            
+            if(d.type === 'click') state.clickPower += d.power; 
+            else state.autoIncome += d.power;
+            
             if(d.isHealing) state.residents.forEach(r => r.stress = Math.max(0, r.stress - 20));
+            
             u.price = Math.floor(u.price * 1.6);
+            
             const newRank = Math.min(20, Math.floor(state.totalUniquePurchased / 5) + 1);
             if (newRank > state.rank) {
-                state.rank = newRank; state.currentSelectedRank = newRank;
+                state.rank = newRank; 
+                state.currentSelectedRank = newRank;
                 showEvolutionToast(rankNames[newRank-1]);
                 addHistory(`🌟 <b>도시 진화:</b> [${rankNames[newRank-1]}] 달성!`);
-                if (newRank >= 20 && !state.endingSeen) { state.endingSeen = true; startEndingSequence(); }
+                
+                if (newRank >= 20 && !state.endingSeen) { 
+                    state.endingSeen = true; 
+                    startEndingSequence(); 
+                }
             }
-            render(); updateUI();
+            
+            render(); 
+            updateUI();
+            
+            // 🔥 [수정] 돈 썼으니까 바로 저장!
+            saveGame();
+        }
+
+        // 2. 버튼 뽀잉 연출
+        const btn = document.getElementById(`btn-${u.id}`);
+        if (btn) {
+            btn.classList.remove('click-animate'); 
+            void btn.offsetWidth; // 애니메이션 리셋 매직 코드
+            btn.classList.add('click-animate'); 
         }
     }
 
@@ -1085,6 +1152,34 @@
         if (document.getElementById('artifact-boost')) document.getElementById('artifact-boost').innerText = artCount > 0 ? `(유물 버프 +${artCount*10}%)` : "";
     }
 
+    function talkToResident(idx) {
+        const res = state.residents[idx];
+        if(!res) return;
+        let pool = res.dialogues['Solo'];
+        if (res.stress > 80) pool = res.dialogues['Stress'];
+        const msg = pool[Math.floor(Math.random()*pool.length)];
+        
+        spawnMessage(`${res.name}: "${msg}"`, 'talk');
+    }
+
+    function randomDailyEvent() {
+        if (state.residents.length < 2) return;
+        const p1 = Math.floor(Math.random() * state.residents.length);
+        let p2 = Math.floor(Math.random() * state.residents.length);
+        while(p1 === p2) { p2 = Math.floor(Math.random() * state.residents.length); } 
+        const charA = state.residents[p1], charB = state.residents[p2];
+        const rand = Math.random();
+        if (rand < 0.45) {
+            charA.affection += 5; charB.affection += 5;
+            addHistory(`💬 <b>대화:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 즐거운 대화를 나눴어. <span style="color:var(--heart)">(❤️+5)</span>`);
+        } else if (rand < 0.65) {
+            charA.affection -= 5; charB.affection -= 5;
+            addHistory(`⚡ <b>논쟁:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 사소한 오해로 다퉜어. <span style="color:#888">(💔-5)</span>`);
+        }
+        state.residents.forEach(r => { r.affection = Math.max(0, Math.min(100, r.affection)); });
+        render();
+    }
+
     document.getElementById('desk-clicker').onclick = (e) => { 
         state.money += state.clickPower; 
         const star = document.createElement('div'); star.className = 'hit-effect'; star.innerText = '🌟';
@@ -1094,9 +1189,26 @@
     };
 
     function resetGame() {
-        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?")) {
+        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 클라우드에 저장된 백업 데이터도 영구 삭제됩니다.)")) {
+            // 1. 로컬 저장소 데이터 삭제
             localStorage.removeItem('midnight_cottage_v30_hardcore');
-            location.reload();
+
+            // 2. 구글 로그인이 되어있다면, 서버(클라우드) 데이터도 삭제
+            if (currentUser) {
+                db.collection("users").doc(currentUser.uid).delete()
+                    .then(() => {
+                        alert("모든 데이터가 깨끗하게 삭제되었습니다.");
+                        location.reload(); // 삭제 성공 후 새로고침
+                    })
+                    .catch((error) => {
+                        console.error("클라우드 삭제 실패:", error);
+                        // 에러가 나더라도 일단 로컬은 지웠으니 새로고침 진행
+                        location.reload(); 
+                    });
+            } else {
+                // 로그인 안 한 상태면 바로 새로고침
+                location.reload();
+            }
         }
     }
 
