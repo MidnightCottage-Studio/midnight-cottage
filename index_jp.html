@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ミッドナイト・コテージ (Midnight Cottage)</title>
+    <style>
+        :root {
+            --bg: #09090d; --card: #12121a; --accent: #bb9af7; --gold: #ff9e64;
+            --neon-blue: #7aa2f7; --heart: #f7768e; --text: #c0caf5; --border: rgba(187, 154, 247, 0.2);
+            --female-bg: rgba(255, 182, 193, 0.35); --male-bg: rgba(135, 206, 235, 0.35);
+            --healing: #50fa7b; --danger: #ff5555;
+        }
+        body { font-family: 'Pretendard', 'Noto Sans JP', sans-serif; background-color: #050507; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text); overflow: hidden; user-select: none; }
+        
+        /* PC 基本レイアウト */
+        #app { width: 98%; max-width: 1350px; height: 96vh; background: var(--bg); border-radius: 24px; display: flex; flex-direction: column; position: relative; transition: all 0.5s ease; box-shadow: 0 0 80px rgba(0,0,0,1); box-sizing: border-box; }
+        
+        .app-header { padding: 15px 30px; display: grid; grid-template-columns: 350px 1fr 500px; align-items: center; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--border); border-radius: 24px 24px 0 0; z-index: 10; height: auto; min-height: 60px; }
+        .header-left { display: flex; flex-direction: column; gap: 8px; }
+        .budget-display { font-size: 32px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 10px; }
+        #news-banner { font-size: 12px; color: var(--neon-blue); font-weight: 700; background: rgba(122, 162, 247, 0.1); padding: 4px 10px; border-radius: 6px; margin-top: 2px; border-left: 3px solid var(--neon-blue); width: fit-content; max-width: 320px; }
+        
+        /* PC専用 ステータス */
+        #pc-city-status { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+        #city-name-display { font-size: 17px; color: var(--accent); font-weight: 800; text-shadow: 0 0 10px rgba(187, 154, 247, 0.5); }
+        .dev-bar-bg { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        #dev-bar-fill { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: width 0.4s ease; }
+
+        /* モバイル専用 ステータス */
+        #mobile-city-status { display: none; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-bottom: 5px; flex-direction: column; gap: 4px; }
+        #mob-city-name-display { font-size: 15px; color: var(--accent); font-weight: 800; text-shadow: 0 0 10px rgba(187, 154, 247, 0.5); }
+        .mob-dev-bar-bg { width: 100%; height: 6px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin-top: 2px; }
+        #mob-dev-bar-fill { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: width 0.4s ease; }
+        
+        .res-area { display: flex; justify-content: center; gap: 10px; }
+        .res-card { display: flex; flex-direction: column; align-items: center; width: 85px; cursor: pointer; position: relative; transition: 0.2s; }
+        .res-card:hover { transform: translateY(-5px); }
+        .res-icon-box { width: 50px; height: 50px; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; font-size: 24px; position: relative; }
+        .stress-box { width: 100%; height: 5px; background: #222; border-radius: 3px; margin-top: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .stress-fill { height: 100%; background: var(--heart); transition: width 0.3s ease; }
+        .res-name { font-size: 13px; margin-top: 4px; font-weight: 800; color: #fff; }
+        .res-job { font-size: 9px; color: var(--neon-blue); font-weight: 700; margin-top: 1px; }
+        .res-rel { font-size: 9px; color: var(--heart); font-weight: 800; text-align: center; min-height: 24px; margin-top: 2px; line-height: 1.2; }
+        
+        .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .top-buttons { display: flex; gap: 8px; }
+        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; transition: 0.3s; position: relative; }
+        .icon-btn:hover { background: var(--border); transform: scale(1.1); }
+        .noti-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg); display: none; }
+        
+        /* PC イベントログ */
+        #event-log { 
+            font-size: 19px; 
+            color: var(--accent); 
+            font-weight: 800; 
+            text-align: right; 
+            line-height: 1.3; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            justify-content: flex-end;
+            word-break: keep-all; 
+            min-height: 50px; 
+        }
+
+        .content-container { flex: 1; display: flex; overflow: hidden; }
+        .main-panel { flex: 1.8; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; }
+        #desk-clicker { width: 100%; max-width: 480px; cursor: pointer; transition: transform 0.1s ease, filter 0.3s ease; filter: drop-shadow(0 0 30px rgba(187, 154, 247, 0.2)); margin-top: 40px; margin-bottom: 20px; }
+        #desk-clicker:active { transform: scale(0.95); }
+        .hit-effect { position: absolute; pointer-events: none; font-size: 65px; z-index: 100; animation: hit-star 0.3s ease-out forwards; }
+        @keyframes hit-star { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.1); opacity: 0; } }
+        
+        /* 対話ウィンドウ */
+        #dialogue-stack { 
+            position: absolute; bottom: 120px; z-index: 50; width: 90%; max-width: 500px; 
+            display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; 
+        }
+        .dialogue-bubble { 
+            background: rgba(0,0,0,0.85); border: 2px solid var(--accent); border-radius: 20px; padding: 12px 20px; 
+            font-size: 15px; font-weight: 700; color: #fff; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slide-up-fade 0.3s ease-out forwards; max-width: 100%; pointer-events: none;
+        }
+        .dialogue-bubble.event { border-color: var(--accent); color: var(--accent); }
+        @keyframes slide-up-fade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-out-bubble {
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .side-menu { flex: 1.1; background: rgba(0,0,0,0.4); padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; border-left: 1px solid var(--border); }
+        .menu-title { font-size: 17px; font-weight: 800; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 12px; margin-bottom: 10px; }
+        
+        /* カードレイアウト */
+        .up-card { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 15px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03); width: 100%; box-sizing: border-box; min-height: 80px; }
+        .up-info { flex: 1; min-width: 0; margin-right: 10px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+        .up-info h4 { margin: 0; font-size: 15px; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .up-info p { margin: 0; font-size: 13px; color: #aaa; white-space: nowrap; }
+        .tags { display: flex; gap: 5px; margin-top: 0; }
+        .tag-dev { font-size: 9px; background: rgba(255, 158, 100, 0.2); color: var(--gold); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+        .tag-healing { font-size: 10px; background: rgba(80, 250, 123, 0.2); color: var(--healing); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+        .buy-btn { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 8px 10px; border-radius: 10px; font-size: 13px; font-weight: 900; cursor: pointer; min-width: 80px; flex-shrink: 0; text-align: center; }
+        .buy-btn:disabled { border-color: #2a2a2a; color: #444; }
+        
+        .toast { background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: 900; font-size: 18px; box-shadow: 0 0 30px var(--gold); animation: toast-pop 3s forwards; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .evo-toast { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: var(--accent); color: #000; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: 900; z-index: 2000; animation: evo-pop 4s forwards; box-shadow: 0 0 50px var(--accent); text-align: center; border: 4px solid #fff; }
+        .center-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(10, 10, 15, 0.95); border: 2px solid var(--accent); color: var(--accent); padding: 25px 50px; border-radius: 20px; font-size: 22px; font-weight: 900; z-index: 2000; animation: fade-in-out 3s forwards; box-shadow: 0 0 40px rgba(187, 154, 247, 0.4); text-align: center; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        @keyframes fade-in-out { 0% { opacity:0; transform:translate(-50%, -40%); } 15% { opacity:1; transform:translate(-50%, -50%); } 85% { opacity:1; transform:translate(-50%, -50%); } 100% { opacity:0; transform:translate(-50%, -60%); } }
+        @keyframes evo-pop { 0% { opacity:0; transform:translate(-50%, -30%) scale(0.8); } 10% { opacity:1; transform:translate(-50%, -50%) scale(1.1); } 20% { transform:translate(-50%, -50%) scale(1); } 90% { opacity:1; } 100% { opacity:0; transform:translate(-50%, -70%) scale(0.8); } }
+        @keyframes toast-pop { 0% { opacity:0; transform:translateY(20px); } 15% { opacity:1; transform:translateY(0); } 85% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-20px); } }
+        
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; padding: 40px; text-align: center; border-radius: 24px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal h2 { margin-top: 0; margin-bottom: 30px; font-size: 28px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; width: 90%; overflow-y: auto; padding: 10px; max-height: 70vh; box-sizing: border-box; }
+        .gallery-item { cursor: pointer; border-radius: 12px; border: 2px solid transparent; transition: 0.3s; overflow: hidden; position: relative; background: #181820; display: flex; flex-direction: column; padding-bottom: 10px; height: auto; }
+        .gallery-item img { width: 100%; height: 110px; object-fit: cover; opacity: 0.4; display: block; border-bottom: 1px solid #333; }
+        .gallery-item.unlocked img { opacity: 1; }
+        .gallery-item.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 158, 100, 0.3); }
+        .gallery-item div { padding: 5px 10px; box-sizing: border-box; line-height: 1.2; }
+        .gallery-item.locked img { display: block; opacity: 0.15; filter: blur(3px) grayscale(100%); }
+        .gallery-item.locked::before { content: '🔒'; font-size: 24px; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 5; opacity: 0.7; }
+        .museum-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; height: 100%; justify-content: center; pointer-events: none; }
+        .museum-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding: 10px; pointer-events: auto; }
+        .artifact-slot { width: 85px; height: 85px; background: #111; border: 1px solid var(--border); display: flex; justify-content: center; align-items: center; border-radius: 15px; cursor: pointer; font-size: 32px; transition: 0.3s; pointer-events: auto; }
+        .artifact-slot.found { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 158, 100, 0.3); }
+        #artifact-desc { pointer-events: auto; color:#aaa; font-style:italic; font-size: 18px; margin-top: 20px; }
+        #history-list li { margin-bottom: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; color: #ccc; }
+        
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050507; z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text); }
+        .start-form { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); width: 400px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-size: 14px; font-weight: 700; color: var(--gold); }
+        .form-group input, .form-group select { background: #1a1a24; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; font-family: 'Pretendard', sans-serif; outline: none; }
+        .form-group input::placeholder { color: #666; font-style: italic; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--neon-blue); }
+        .nav-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .start-btn { flex: 1; background: var(--accent); color: #000; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; transition: 0.3s; }
+        .start-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--accent); }
+        .prev-btn { flex: 0.4; background: #333; color: #fff; border-radius: 12px; font-weight: 700; border:none; cursor: pointer; }
+        .finish-btn { flex: 1; background: #50fa7b; color: #000; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: 900; border: none; cursor: pointer; transition: 0.3s; display: none; }
+        .finish-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px #50fa7b; }
+        #char-count { position: absolute; top: 20px; right: 20px; font-size: 14px; color: #666; font-weight: 900; }
+        .sns-container { width: 450px; height: 600px; background: var(--card); border: 2px solid var(--border); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; }
+        .sns-header { background: rgba(0,0,0,0.5); padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .sns-feed { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .sns-post { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .sns-user { display: flex; gap: 10px; align-items: center; margin-bottom: 5px; }
+        .sns-avatar { width: 30px; height: 30px; background: #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+        .sns-name { font-size: 14px; font-weight: 700; color: #fff; }
+        .sns-time { font-size: 11px; color: #666; margin-left: auto; }
+        .sns-text { font-size: 13px; color: #ccc; line-height: 1.4; }
+        
+        .gacha-container { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 400px; text-align: center; }
+        .gacha-btn { background: var(--accent); color: #000; padding: 20px; border-radius: 15px; font-weight: 900; font-size: 20px; border: none; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(187, 154, 247, 0.4); display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .gacha-btn:hover { transform: scale(1.05); }
+        .gacha-btn:disabled { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; transform: none; }
+        .gacha-cost { font-size: 14px; opacity: 0.8; }
+        
+        .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 500px; max-height: 500px; overflow-y: auto; }
+        .ach-item { background: #1a1a24; padding: 15px; border-radius: 12px; border: 1px solid #333; opacity: 0.5; transition: 0.3s; }
+        .ach-item.unlocked { opacity: 1; border-color: var(--gold); background: rgba(255, 158, 100, 0.05); }
+        .ach-icon { font-size: 24px; margin-bottom: 5px; }
+        .ach-title { font-weight: 800; color: #fff; font-size: 14px; }
+        .ach-desc { font-size: 11px; color: #aaa; margin-top: 3px; }
+        
+        /* 💌 エンディングシーケンス */
+        #ending-sequence { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .rolling-container { text-align: center; opacity: 0; transform: translateY(20px); transition: 1s ease; display: flex; flex-direction: column; align-items: center; }
+        .rolling-container.show { opacity: 1; transform: translateY(0); }
+        .end-emoji { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--accent)); }
+        .end-name { font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
+        .end-msg { font-size: 22px; color: #fff; font-weight: 300; line-height: 1.6; max-width: 80%; margin: 0 auto; word-break: keep-all; font-family: 'Pretendard', serif; }
+        .ending-btn { background: var(--gold); color: #000; padding: 15px 30px; border-radius: 30px; font-weight: 900; font-size: 18px; border: none; cursor: pointer; transition: 0.3s; }
+        .ending-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--gold); }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 🌟 2. モバイルレスポンシブ CSS */
+        @media (max-width: 768px) {
+            body { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
+            #app { height: 100%; width: 100%; border-radius: 0; display: flex; flex-direction: column; }
+
+            /* ヘッダーの余白調整 */
+            .app-header { display: flex; flex-direction: column; padding: 5px 15px 0px 15px; gap: 0px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
+            
+            .header-left { width: 100%; order: 1; align-items: flex-start; margin-bottom: 0px; }
+            .budget-display { font-size: 24px; margin: 0; justify-content: flex-start; white-space: nowrap; width: 100%; }
+            #news-banner { display: none; }
+            #pc-city-status { display: none; }
+
+            /* 上部メニューアイコンの中央揃え */
+            .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
+            .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
+            .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
+            
+            #event-log { display: none !important; }
+
+            /* 住民リストの中央揃え */
+            .res-area { order: 3; width: 100%; margin-top: 5px; padding-bottom: 5px; overflow-x: auto; justify-content: center; display: flex; }
+            .res-card { min-width: 55px; margin-right: 5px; transform: none !important; transition: none !important; }
+            .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
+            .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
+            .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+            
+            /* 職業と関係(ソロ/カップル)を表示 */
+            .res-job { 
+                display: block !important; 
+                font-size: 8px; 
+                color: var(--neon-blue); 
+                margin-top: 1px;
+                white-space: nowrap;
+            }
+            .res-rel { 
+                display: block !important; 
+                font-size: 8px; 
+                color: var(--heart); 
+                margin-top: 0px;
+                white-space: nowrap;
+            }
+
+            .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+            /* 部屋の画像を拡大 */
+            .main-panel { flex: 0 0 45%; padding: 0; order: 1; position: relative; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+            #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(-10px); }
+            
+            #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
+            .dialogue-bubble { font-size: 13px; padding: 10px; }
+
+            .side-menu { flex: 1; order: 2; height: auto; overflow-y: auto; border-top: 2px solid var(--border); background: rgba(0,0,0,0.9); padding: 10px 15px 80px 15px; }
+            #mobile-city-status { display: flex; margin-bottom: 5px; padding: 8px; } 
+            
+            .menu-title { margin-bottom: 5px; text-align: left; border-left: none; padding-left: 0; }
+            
+            .up-card { flex-direction: column; align-items: flex-start; padding: 12px; min-height: auto; margin-bottom: 8px; gap: 8px; }
+            .up-info { width: 100%; margin-right: 0; }
+            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } 
+            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } 
+
+            .evo-toast { width: 85%; min-width: unset; white-space: nowrap; font-size: 16px; padding: 12px 10px; bottom: 35%; border-width: 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+            .modal h2, #history-modal h2 { margin-top: 0 !important; margin-bottom: 15px !important; padding-top: 0 !important; line-height: 1.2; transform: translateY(-10px); }
+            #history-list { padding-top: 0 !important; margin-top: 0 !important; }
+
+            .sns-container { width: 100%; height: 75%; margin-top: -20px; margin-bottom: 20px; }
+
+            .museum-container { width: 100%; display: flex; flex-direction: column; padding: 10px 0; overflow-x: hidden; height: 100%; }
+            .museum-container h2 { order: 1; flex-shrink: 0; }
+            #artifact-desc { order: 2; margin-bottom: 10px; margin-top: 0; font-size: 13px; color: var(--neon-blue); min-height: 20px; flex-shrink: 0; }
+            .museum-grid { order: 3; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 95%; margin: 0 auto; padding: 0 5px 100px 5px; box-sizing: border-box; overflow-y: auto; }
+            .artifact-slot { width: 100%; aspect-ratio: 1 / 1; font-size: 14px; } 
+
+            .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 5px 80px 5px; width: 100%; box-sizing: border-box; overflow-y: auto; }
+            .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; }
+            .gallery-item img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+
+            .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
+            .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
+            .gacha-container { width: 100%; }
+        }
+
+        @keyframes boing {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.9); }  
+            60% { transform: scale(1.1); }  
+            100% { transform: scale(1); }   
+        }
+        .click-animate {
+            animation: boing 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="start-screen" style="display:flex;">
+        <div class="start-form">
+            <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 入居申込書</h2>
+            
+            <div id="char-count">1 / 5</div>
+            <div class="form-group">
+                <label>名前 (ニックネーム)</label>
+                <input type="text" id="input-name" placeholder="名前を決めてください">
+            </div>
+            <div class="form-group">
+                <label>性別</label>
+                <select id="input-gender">
+                    <option value="남">男性</option>
+                    <option value="여">女性</option>
+                    <option value="무">無性/その他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>職業 (選択)</label>
+                <select id="input-job">
+                    <option value="画家">🎨 画家</option>
+                    <option value="小説家">✍️ 小説家</option>
+                    <option value="教授">📚 教授</option>
+                    <option value="リパードク">🛠️ リパードク</option>
+                    <option value="ASMR DJ">🎧 ASMR DJ</option>
+                    <option value="モデル">👠 モデル</option>
+                    <option value="刑事">🕵️ 刑事</option>
+                    <option value="ネットランナー">💻 ネットランナー</option>
+                    <option value="ラーメン屋">🍜 ラーメン屋台の店主</option>
+                    <option value="温泉主人">♨️ 温泉旅館の主人</option>
+                    <option value="バーマスター">💿 レコードバーのマスター</option>
+                    <option value="ミュージシャン">🎸 ミュージシャン</option>
+                    <option value="猫">🐱 猫</option>
+                    <option value="VIP">👑 VIP</option>
+                </select>
+            </div>
+            <div class="nav-btns">
+                <button class="prev-btn" onclick="prevChar()" id="btn-prev" style="display:none;">戻る</button>
+                <button class="start-btn" onclick="nextChar()" id="btn-next">追加 (1/5)</button>
+                <button class="finish-btn" onclick="finishSetup()" id="btn-finish">入居開始</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ending-sequence">
+        <div class="rolling-container">
+            <div id="end-emoji" class="end-emoji"></div>
+            <div id="end-name" class="end-name"></div>
+            <div id="end-msg" class="end-msg"></div>
+        </div>
+        <div id="final-screen" style="display:none; text-align:center; z-index:6005;">
+            <h1 style="font-size:40px; color:var(--accent); margin-bottom:20px;">The End</h1>
+            <p style="color:#ccc; margin-bottom:30px; line-height: 1.6;">
+                ミッドナイト・コテージの夜は続きます。<br>
+                あなたの作業も、彼らのように輝きますように。
+            </p>
+            <button class="ending-btn" onclick="closeEndingSequence()">残って続ける</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    
+    <div class="app-header">
+        <div class="header-left">
+            <div class="budget-display">💵 <span id="budget">0</span></div>
+            <div id="news-banner">📢 ニュース読み込み中...</div>
+            <div id="pc-city-status">
+                <div id="city-name-display">素朴で居心地の良いサイバーパンクの部屋</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:3px; margin-top:2px;">
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span style="color:var(--gold); font-weight:800;">⭐ 発展度</span>
+                        <div onclick="toggleModal('dev-info-modal')" 
+                             style="cursor:pointer; border:1px solid #666; border-radius:50%; width:13px; height:13px; display:flex; justify-content:center; align-items:center; color:#aaa; font-size:9px;">?</div>
+                    </div>
+                    <div id="dev-count" style="color:#fff; font-weight:700;">0 / 5</div>
+                </div>
+                <div class="dev-bar-bg"><div id="dev-bar-fill"></div></div>
+            </div>
+        </div>
+        
+        <div class="res-area" id="res-grid"></div>
+        
+        <div class="header-right">
+            <div class="top-buttons">
+                <button class="icon-btn" onclick="toggleModal('shop-modal')">🏺</button>
+                <button class="icon-btn" onclick="toggleModal('sns-modal')">📱<div id="sns-dot" class="noti-dot"></div></button>
+                <button class="icon-btn" onclick="toggleModal('ach-modal')">🏆</button>
+                <button class="icon-btn" onclick="openGallery()">🖼️</button>
+                <button class="icon-btn" onclick="toggleModal('museum-modal')" style="font-size:12px !important;">🏛️</button>
+                <button class="icon-btn" onclick="toggleModal('history-modal')">📜</button>
+                <button class="icon-btn" onclick="toggleModal('help-modal')">?</button>
+            </div>
+            <div id="event-log">💻作業ファイト！ミッドナイト・コテージへようこそ。</div>
+        </div>
+    </div>
+
+    <div class="content-container">
+        <div class="main-panel">
+            <img id="desk-clicker" src="https://i.imgur.com/MuFQQ5A.png" alt="City Image">
+            <div id="dialogue-stack"></div>
+        </div>
+        <div class="side-menu">
+            <div class="menu-title">ミッドナイトシティ開発日誌 <span id="artifact-boost" style="font-size:11px; color:var(--gold)"></span></div>
+            
+            <div id="mobile-city-status">
+                <div id="mob-city-name-display">素朴で居心地の良いサイバーパンクの部屋</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:3px; margin-top:2px;">
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <span style="color:var(--gold); font-weight:800;">⭐ 発展度</span>
+                        <div onclick="toggleModal('dev-info-modal')" 
+                             style="cursor:pointer; border:1px solid #666; border-radius:50%; width:13px; height:13px; display:flex; justify-content:center; align-items:center; color:#aaa; font-size:9px;">?</div>
+                    </div>
+                    <div id="mob-dev-count" style="color:#fff; font-weight:700;">0 / 5</div>
+                </div>
+                <div class="mob-dev-bar-bg"><div id="mob-dev-bar-fill"></div></div>
+            </div>
+
+            <div id="upgrade-list"></div>
+        </div>
+    </div>
+
+    <div id="gallery-modal" class="modal" onclick="closeModalByBg(event, 'gallery-modal')">
+        <h2 style="color:var(--gold); pointer-events:none;">🖼️ コテージ・ルームギャラリー</h2>
+        <div id="gallery-grid" class="gallery-grid" onclick="event.stopPropagation()"></div>
+    </div>
+    <div id="museum-modal" class="modal" onclick="closeModalByBg(event, 'museum-modal')">
+        <div class="museum-container">
+            <h2 style="color:var(--gold); margin: 0; pointer-events: none;">🏛️ 2202年 歴史博物館 (2026年の遺物)</h2>
+            <div id="museum-list" class="museum-grid"></div>
+            <p id="artifact-desc" style="pointer-events: none;">遺物をクリックするとテオ教授の一言解説が出ます。</p>
+        </div>
+    </div>
+    <div id="history-modal" class="modal" onclick="closeModalByBg(event, 'history-modal')">
+        <h2 style="color:var(--accent); margin-bottom: 20px; pointer-events:none;">📜 ミッドナイト・コテージの記録</h2>
+        <ul id="history-list" style="width:90%; text-align:left; overflow-y:auto; max-height:500px; padding:0 30px; list-style:none;" onclick="event.stopPropagation()"></ul>
+    </div>
+    <div id="shop-modal" class="modal" onclick="closeModalByBg(event, 'shop-modal')">
+        <h2 style="color:#bd93f9;">🏺 古代遺物博物館 (Artifacts)</h2>
+        <div class="gacha-container" onclick="event.stopPropagation()">
+            <p style="color:#ccc; font-size:14px; margin-bottom:20px;">
+                2026年の忘れ去られた古代遺物を発掘し、復元する場所です。<br>
+                遺物を復元して展示すると、<b>全体収益ボーナス</b>が得られます。
+            </p>
+            <button class="gacha-btn" id="btn-gacha" onclick="buyArtifact()">
+                ⛏️ 遺物の発掘・復元を試みる
+                <span class="gacha-cost" id="gacha-price"></span>
+            </button>
+        </div>
+    </div>
+    <div id="sns-modal" class="modal" onclick="closeModalByBg(event, 'sns-modal')">
+        <div class="sns-container">
+            <div class="sns-header">
+                <span style="font-weight:900; color:var(--neon-blue);">📱 Midnight Talk</span>
+                <span style="font-size:12px; color:#666;">リアルタイム</span>
+            </div>
+            <div id="sns-feed" class="sns-feed"></div>
+        </div>
+    </div>
+    <div id="ach-modal" class="modal" onclick="closeModalByBg(event, 'ach-modal')">
+        <h2 style="color:var(--gold);">🏆 隠し実績</h2>
+        <div id="ach-grid" class="ach-grid" onclick="event.stopPropagation()"></div>
+    </div>
+    <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
+            <h2 style="color:var(--gold)">🏠 設定＆ガイド</h2>
+            <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
+                1. <b>🏺 遺物博物館</b>で遺物を復元し、収益をブーストさせましょう。<br>
+                2. <b>📱 ミッドナイト・トーク</b>で住民たちの本音を覗き見しましょう。<br>
+                3. 最後の<b>ユートピア・ランク</b>に到達すればエンディングです！
+            </p>
+            
+            <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
+                ⚠️ データ初期化 (最初から)
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 3. 전역 변수 선언
+    const state = {
+        money: 0, clickPower: 1, autoIncome: 1, 
+        upgrades: [], history: [], artifacts: Array(20).fill(false),
+        rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
+        residents: [], achievements: [], endingSeen: false
+    };
+
+    // 5. 게임 데이터 및 로직 (일본어 번역됨)
+    // 🛠️ [수정] 키값을 모두 일본어로 변경했습니다!
+    const jobEmojis = {
+        "画家": "🎨", "小説家": "✍️", "教授": "📚", "リパードク": "🛠️",
+        "ASMR DJ": "🎧", "モデル": "👠", "刑事": "🕵️", "ネットランナー": "💻",
+        "ラーメン屋": "🍜", "温泉主人": "♨️", "バーマスター": "💿",
+        "ミュージシャン": "🎸", "猫": "🐱", "VIP": "👑"
+    };
+
+    const jobsData = {
+        "画家": { 'Solo': ["ネオンの絵の具がふわふわしてる。", "この色彩は君に似ているね。", "筆先から夜明けが咲くよ。", "キャンバスはまだ未完成だ。"], 'Love': ["君の瞳の色をキャンバスに込めたい。", "君といると世界が蛍光色に見えるよ。", "最も完璧な色は君だ。"], 'Affair': ["秘密めいた色は魅惑的だね。", "禁じられた線を越えるのはスリルがある。", "こっそり描く君の肖像画が好きだ。"], 'Stress': ["筆をへし折ってしまいたい！", "何も描きたくない。", "世界がすべて灰色だ。"] },
+        "小説家": { 'Solo': ["文章たちが踊っている。", "この街のすべてが小説のネタだ。", "エンディングはどうしようかな？"], 'Love': ["君との恋はベストセラーだ。", "私の小説の主人公は君だよ。", "ハッピーエンドだけを書きたい。"], 'Affair': ["禁止されたチャプターを書く気分だ。", "読者は知らない私たちだけのどんでん返し。", "危険な伏線のように君に惹かれる。"], 'Stress': ["文字が虫みたいに見える！", "原稿用紙を全部燃やしてやる！", "私の人生は失敗作だ。"] },
+        "教授": { 'Solo': ["歴史は繰り返す。", "古い本の匂いが好きだ。", "2026年は実にロマンチックだったな。"], 'Love': ["君は歴史上、最も美しい。", "君を一生研究したい。", "古典の詩より君の方が優雅だ。"], 'Affair': ["禁じられた歴史ほど興味深いな。", "道徳的尺度より君が大事だ。", "これは秘密の授業だよ。"], 'Stress': ["データの屑どもめ！静かにしろ！", "知識なんて全部役立たずだ。", "本を全部破り捨てたい気分だ。"] },
+        "リパードク": { 'Solo': ["機械は嘘をつかない。", "どこか故障したところはないか？", "オイルの匂いが香ばしいな。"], 'Love': ["俺の心臓エンジンは君のために回ってる。", "君のために最高のパーツを用意した。", "君がいなければ俺はシャットダウンだ。"], 'Affair': ["セキュリティプロトコルを迂回した。", "危険なオーバークロック中だ。", "ショートしそうなくらい痺れるぜ。"], 'Stress': ["全部スクラップ場に捨ててしまえ！", "火花が散ってる！俺の頭もだ！", "クソッたれな鉄屑どもめ。"] },
+        "ASMR DJ": { 'Solo': ["雨音を聞かせてあげようか？", "ティングルを感じる？", "今夜は私の声と一緒に過ごして。"], 'Love': ["君にだけ聞かせる囁きだよ。", "君の寝息が最高のASMRだね。", "私たちの周波数は一致してる。"], 'Affair': ["マイクを切って秘密の話をしようか？", "放送事故みたいな恋だね。", "他人には聞こえないシグナル。"], 'Stress': ["叫びだしたい！", "耳鳴りがして辛い。", "すべての騒音が恐ろしいわ。"] },
+        "モデル": { 'Solo': ["今日のクロームの光沢、完璧？", "フラッシュの洗礼は飽き飽き。", "この通りは私のランウェイよ。"], 'Love': ["私より君の方が輝いてる。", "私たちのツーショットは画報そのものよ。", "君だけのミューズになるわ。"], 'Affair': ["スキャンダル？関係ないわ。", "カメラの裏で会うのが好きなの。", "危険なほどスタイリッシュでしょ。"], 'Stress': ["私の顔を見ないで！", "照明を全部消して！", "みんな私を見かけだけで判断するのね。"] },
+        "刑事": { 'Solo': ["雨の降る通りは証拠を隠すな。", "合成タバコの煙が目に染みる。", "直感が来たぞ。"], 'Love': ["お前は俺が探していた最後のパズルだ。", "お前が犯人なら逮捕されてやる。", "俺の銃口はお前を守るためだけに向く。"], 'Affair': ["張り込みを言い訳にして出てきた。", "この関係はトップシークレットだ。", "証拠を残すなよ。"], 'Stress': ["この街は腐ってる。", "犯人も正義も全部うんざりだ。", "頭が割れそうだ。"] },
+        "ネットランナー": { 'Solo': ["アイス（防壁）を破るなんて朝飯前さ。", "現実よりネットワークが楽だね。", "データの流れが美しい。"], 'Love': ["君の脳と同期（シンクロ）したい。", "僕のファイアウォールを解除できる唯一の人。", "君は僕の最高のアルゴリズムだ。"], 'Affair': ["バックドアからこっそり接続したよ。", "ログは全部削除しておくね。", "ウイルスの用で致命的だ。"], 'Stress': ["脳が焼け焦げそうだ！", "接続を切れ！強制ログアウト！", "ノイズのせいで気が狂いそうだ。"] },
+        "ラーメン屋": { 'Solo': ["スープが煮える匂い、最高だろ？", "温かいスープ一杯やっていきな。", "今日もお客さんが多いね。"], 'Love': ["あんたにはチャーシュー食べ放題だよ。", "スープよりあんたの心の方が温かいね。", "一生ラーメン作ってあげるよ。"], 'Affair': ["シャッターを下ろしてこっそり会おうか？", "激辛よりホットだね。", "スープが冷める前に早くおいで。"], 'Stress': ["スープをひっくり返したい。", "客ども全員出て行けと言え！", "麺が全部伸びちまった。"] },
+        "温泉主人": { 'Solo': ["お湯の温度がちょうどいいよ。", "疲れがすっきり取れるはずさ。", "硫黄の匂い、慣れればいいもんだよ。"], 'Love': ["君と混浴…なんて、冗談だよ。", "私の心も温泉みたいに熱いよ。", "君は私の温泉の花だ。"], 'Affair': ["脱衣所の裏で会おう。", "湿気のせいで顔が赤くなったね。", "危険な温度になってるよ。"], 'Stress': ["お湯を全部抜いてしまえ！", "客がうるさすぎる。", "のぼせて目が回りそうだ。"] },
+        "バーマスター": { 'Solo': ["この曲は20世紀の名曲さ。", "ジャズが流れる夜だね。", "ウイスキー一杯どう？"], 'Love': ["この歌は君のためのものだ。", "君の声が最高の音楽だよ。", "僕らの愛をレコードに刻みたいね。"], 'Affair': ["店の鍵を閉めて始めようか？", "秘密めいたリズムに乗ってみよう。", "禁止された曲をかける気分だ。"], 'Stress': ["音楽を消せ！静かにしろ！", "酒瓶を全部割りたい気分だ。", "こんな安っぽい音楽はかけないぞ。"] },
+        "ミュージシャン": { 'Solo': ["新しいコードが浮かんだ。", "俺のギターソロどう？", "この街は俺のステージだ。"], 'Love': ["君のためのセレナーデを作ったよ。", "君の心臓の鼓動にテンポを合わせる。", "君は俺のインスピレーションの源だ。"], 'Affair': ["バックステージでこっそり会おう。", "これはアンコールのない公演だ。", "危険なロックンロールだぜ。"], 'Stress': ["ギターの弦を全部切っちまった。", "楽想が浮かばない！", "みんな俺の音楽を侮辱してる。"] },
+        "猫": { 'Solo': ["ニャー。（飯くれ。）", "ゴロゴロ…（満足）", "香箱座り中だよ。", "高いところが好き。", "段ボールだ！私のもの。"], 'Love': ["ニャ～オ（君にスリスリ）", "ゴロゴロソング歌ってる最中だよ。", "君のお腹の上が一番暖かい。", "フミフミしてあげる。"], 'Affair': ["シャーッ！（他の下僕の匂いがする！）", "こっそり夜遊びしてくるニャ。", "こっそりチュール盗み食いした。", "秘密の友達ができたニャ。"], 'Stress': ["フガーッ！！（触るな！）", "シャーッ！（あっち行け！）", "尻尾ボン！毛が逆立つ！", "爪で全部引っ掻いてやる！"] },
+        "VIP": { 'Solo': ["いくらだ？全部買い占めてやる。", "ここがペントハウスか？", "シャンパンを持ってこい。", "景色はなかなか悪くないな。"], 'Love': ["この街を君にあげよう。", "ダイヤモンドより君が輝いている。", "私の財産目録1号は君だ。"], 'Affair': ["秘密の契約書にサインしろ。", "ホテルのスイートルームを取っておいた。", "金では買えないスリルだな。"], 'Stress': ["全員クビにしろ！間抜けどもめ！", "私の株が暴落した！", "サービスが最悪だ。訴えてやる！"] }
+    };
+
+    const artifactsData = [
+        { name: "旧型iPhone", emoji: "📱", desc: "2026年、人類が親指で世界を支配していた魔法の道具。" },
+        { name: "ワイヤレスイヤホン", emoji: "🫛", desc: "豆のような形をしており、古代人はこれを耳に挿して信号を受信した。" },
+        { name: "実物カード", emoji: "💳", desc: "プラスチックの欠片一つですべての価値を交換していた時代の産物。" },
+        { name: "カップ麺の容器", emoji: "🍜", desc: "3分で神々の食べ物を錬成していた古代の錬金術容器。" },
+        { name: "有線マウス", emoji: "🖱️", desc: "尻尾がついたネズミ型の装置。2202年には脳波が代わりを務める。" },
+        { name: "紙幣の束", emoji: "💵", desc: "紙切れに価値を与えていた人類の集団的信仰の証拠。" },
+        { name: "紙の本", emoji: "📖", desc: "データではなく、実際の木を薄く切って情報を記録していたロマン。" },
+        { name: "眼鏡", emoji: "👓", desc: "視覚データを矯正するために顔に掛けていた物理的補正装置。" },
+        { name: "鍵束", emoji: "🔑", desc: "物理的なドアを開けるために持ち歩いていた鉄の欠片たち。" },
+        { name: "旧型ゲーム機", emoji: "🎮", desc: "2026年の人々が仮想世界へ逃避していた小さな窓口。" },
+        { name: "古いコンパクトディスク", emoji: "💿", desc: "2026年、音楽を物理的に記録していた輝く円盤。" },
+        { name: "アナログ置き時計", emoji: "⏰", desc: "針が動き、物理的に時間を指し示していた機械。" },
+        { name: "手動マッチ箱", emoji: "🕯️", desc: "摩擦を通じて火花を作り出していた2026年の原始的な道具。" },
+        { name: "使い捨てフィルムカメラ", emoji: "📸", desc: "結果を即座に確認できないからこそ、より大切だった記録機。" },
+        { name: "USBメモリチップ", emoji: "💾", desc: "データを物理的な欠片に入れて運んでいた煩わしい時代の産物。" },
+        { name: "黄色いポストイット", emoji: "📝", desc: "デジタルメモの代わりに紙に書いて貼っておいた古代人の記録法。" },
+        { name: "鉄製ステープラー", emoji: "🖇️", desc: "紙の束を物理的に固定していた小さくて強い事務道具。" },
+        { name: "竹の団扇", emoji: "🪭", desc: "直接腕を振って風を作っていた2026年のロマンチックな冷房装置。" },
+        { name: "電池式懐中電灯", emoji: "🔦", desc: "電気エネルギーを直接携帯し、闇を照らしていた遺物。" },
+        { name: "500ウォン硬貨", emoji: "🪙", desc: "金属の欠片に価値を込めて取引していた時代の最後の貨幣の一つ。" }
+    ];
+
+    const uniqueInfra = [
+        {n: "古びたネオンサインの修理", h: false}, {n: "街角の自販機補充", h: false}, {n: "合成ラーメン屋台", h: false},
+        {n: "ビンテージ・レコード店", h: false}, {n: "深夜の串焼き屋", h: false}, {n: "神経同期アクセサリー店", h: false},
+        {n: "エリアベーカリー「夜明け」", h: false}, {n: "魂の記憶バックアップ所", h: false}, {n: "ネオンたこ焼き露店", h: false},
+        {n: "グロー・スイーツプリン・カフェ", h: true}, {n: "人工雨浄化装置", h: false}, {n: "ふわふわ耳掃除センター", h: true},
+        {n: "無人ランドリーラウンジ", h: false}, {n: "サイバーウェア専用マッサージ", h: true}, {n: "合成シーシャ（水タバコ）ラウンジ", h: true},
+        {n: "小型アンドロイド修理所", h: false}, {n: "深夜の合成薬局", h: false}, {n: "ナノタトゥー・アトリエ", h: false},
+        {n: "ピアス＆クローム・カスタム店", h: false}, {n: "サイバー筋肉物理治療室", h: true}, {n: "ネオン・ライブハウス", h: false},
+        {n: "ストレス脳洗浄ショップ", h: true}, {n: "オーガニック・アロマサウナ", h: true}, {n: "睡眠誘導ASMRルーム", h: true},
+        {n: "ミッドナイト独立シネマ", h: false}, {n: "ネオン大衆浴場", h: false}, {n: "24時コンビニ「ネオン」", h: false},
+        {n: "データチップ古書店", h: false}, {n: "レトロゲームセンター", h: false}, {n: "サイバーウェア精密検診所", h: false},
+        {n: "空飛ぶバイク係留所", h: false}, {n: "ホログラム・アクセサリー店", h: false}, {n: "深夜の漫画喫茶", h: true},
+        {n: "エリアの小さな美術館", h: true}, {n: "空中庭園ティールーム", h: true}, {n: "ネオン・ピンボールセンター", h: false},
+        {n: "空飛ぶ車専用駐車場", h: false}, {n: "データスロット・カラオケ", h: false}, {n: "VRテーマ・ルーム", h: true},
+        {n: "サイバーペット用品店", h: true}, {n: "天然合成温泉 (Premium)", h: true}, {n: "クローム市民専用休憩所「サンクチュアリ」", h: true},
+        {n: "ネオン・フィットネスクラブ", h: false}, {n: "水中マッサージプール", h: true}, {n: "皮膚再生エステ", h: true},
+        {n: "バイオ酸素カプセル", h: true}, {n: "キャンドル＆ディフューザー専門店", h: true}, {n: "記憶の欠片ホログラム店", h: true},
+        {n: "瞑想＆ヨガセンター", h: true}, {n: "睡眠補助剤薬局", h: true}, {n: "地下街ラーメンツアー", h: false},
+        {n: "ブルーオーシャン・リゾート", h: true}, {n: "サイバー餃子職人", h: false}, {n: "深夜の点心専門館", h: false},
+        {n: "人工肉バーガーハウス", h: false}, {n: "コテージ・ローカルマガジン支部", h: false}, {n: "コインランドリー＆ブックカフェ", h: true},
+        {n: "路地裏の古着屋", h: false}, {n: "ネオンシューズ・セレクトショップ", h: false}, {n: "サイバー・フラワーガーデン", h: true},
+        {n: "知能型防犯ドローンハブ", h: false}, {n: "パーソナルカラー診断室", h: false}, {n: "ネオン・ネイルアート・アトリエ", h: true},
+        {n: "サイバー・メイクアップセンター", h: true}, {n: "魂の記憶クラウドセンター", h: false}, {n: "中古ホバーバイク店", h: false},
+        {n: "自動運転タクシー乗り場", h: false}, {n: "エリア共有駐車タワー", h: false}, {n: "飛行船ツアー予約処", h: false},
+        {n: "都市統合乗り換えセンター", h: false}, {n: "5つ星プレミアム・テックホテル", h: true}, {n: "色あせたセントラル・アベニュー・プラザ", h: true},
+        {n: "エネルギー回収発電団地", h: false}, {n: "水耕栽培ネオン温室", h: true}, {n: "地中熱暖房システム", h: false},
+        {n: "バイオナノ再生センター", h: true}, {n: "大規模ネオン・ショッピングモール", h: false}, {n: "メガ・コーポレーション・カンパニー", h: false},
+        {n: "都市血管物流網", h: false}, {n: "高高度ドローン補給路", h: false}, {n: "バイオエネルギー植物園", h: true},
+        {n: "コテージ・マインド管制センター", h: false}, {n: "ハイパーループ・センター", h: false}, {n: "宇宙航空センター", h: false},
+        {n: "コテージ・タワー建設", h: false}, {n: "天の川観測タワー", h: false}, {n: "深夜衛星周波数伝送局", h: false},
+        {n: "環境回復加速センター", h: true}, {n: "記憶保管銀行", h: false}, {n: "人間-機械協力センター", h: false},
+        {n: "テラフォーミング・シミュレーションラボ", h: true}, {n: "オメガ・インフラ網", h: false}, {n: "アルファ・シティ演算センター", h: false},
+        {n: "新世界への関門", h: false}, {n: "2026年式アナログ日差し窓", h: true}, {n: "古びた共用酸素充電所", h: true},
+        {n: "深夜のティングルASMRヘアサロン", h: true}, {n: "演劇が終わった後の小劇場", h: true}, {n: "低軌道流れ星誘導装置", h: false},
+        {n: "ミッドナイト・ユートピア", h: true}
+    ];
+
+    const rankNames = ["素朴で居心地の良いサイバーパンクの部屋", "ネオン・アトリエ", "作家と教授の書斎", "リパードクの整備所", "ラジオ・スタジオ", "フォトグラファーの暗室", "合成ラーメン屋台", "雨の降るテラス", "ビンテージ・レコード店", "屋上の庭園", "サウナ", "クローム温泉室", "LPバー", "ペントハウスの晩餐", "モルソフト・レストラン", "ディストリクト・クォーター", "データ・ハイウェイ", "ギャラクシー・シティ", "ゴールデン・サンセット・シティ", "ユートピア・ミッドナイト・コテージ"];
+    const rankImages = ["https://i.imgur.com/MuFQQ5A.png", "https://i.imgur.com/1nAnNIb.png", "https://i.imgur.com/eqwGBhl.png", "https://i.imgur.com/br0HdSG.png", "https://i.imgur.com/2Sz2iYA.png", "https://i.imgur.com/3qXyDTr.png", "https://i.imgur.com/J5mjTBn.png", "https://i.imgur.com/aI6UVY2.png", "https://i.imgur.com/QMSpzfL.png", "https://i.imgur.com/PwZ6vm3.png", "https://i.imgur.com/S4yBFXT.png", "https://i.imgur.com/A0HQ7e3.png", "https://i.imgur.com/qeB68bj.png", "https://i.imgur.com/RoQeLG8.png", "https://i.imgur.com/vuNzL4d.png", "https://i.imgur.com/P1SjHGR.png", "https://i.imgur.com/tApbEin.png", "https://i.imgur.com/ylCZJyn.png", "https://i.imgur.com/vA1hKCT.png", "https://i.imgur.com/ecGrFrH.png"];
+
+    const upgrades = uniqueInfra.map((item, i) => ({
+        id: `up${i}`, name: item.n,
+        basePrice: Math.floor(15 * Math.pow(1.4, i)), 
+        power: Math.floor(1 * Math.pow(1.2, i)), 
+        type: i % 2 === 0 ? 'auto' : 'click', isHealing: item.h
+    }));
+
+    const achievements = [
+        { id: 'cat', name: 'にゃんこワールド', icon: '🐱', desc: 'すべての住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '猫') },
+        { id: 'drama', name: '愛と戦争', icon: '💔', desc: '不倫関係が発生しました。', unlocked: false, check: s => s.residents.some(r => r.relType === '불륜') },
+        { id: 'rich', name: '億万長者', icon: '💰', desc: '所持金1,000,000突破。', unlocked: false, check: s => s.money >= 1000000 },
+        { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === '솔로') },
+        { id: 'stress', name: '燃え尽き症候群', icon: '🔥', desc: '住民の平均ストレスが90%以上。', unlocked: false, check: s => s.residents.length > 0 && (s.residents.reduce((a,b)=>a+b.stress,0)/s.residents.length) > 90 },
+        { id: 'collector', name: '歴史学者', icon: '📜', desc: 'すべての遺物(20種)の収集完了。', unlocked: false, check: s => s.artifacts.every(a => a === true) }
+    ];
+
+    let setupIndex = 0;
+    const tempResidents = []; 
+    let snsPosts = [];
+
+    window.onload = function() {
+        init();
+    };
+
+    // [수정] 1. 저장 기능 (일본어판 키값 분리)
+    function saveGame() {
+        try {
+            localStorage.setItem('midnight_cottage_v30_JP', JSON.stringify(state));
+        } catch (e) {
+            console.error("ローカル保存失敗", e);
+        }
+    }
+
+    // [수정] 2. 불러오기 기능
+    function loadGame() {
+        const saved = localStorage.getItem('midnight_cottage_v30_JP');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                Object.assign(state, parsed);
+                return true; 
+            } catch (e) {
+                console.error("セーブファイルエラー", e);
+                return false;
+            }
+        }
+        return false; 
+    }
+
+    // [수정] 3. 게임 초기화
+    function init() {
+        state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
+
+        // 로컬 데이터를 먼저 찾아보고, 있으면 바로 게임 시작!
+        if (loadGame()) {
+            console.log("📂 ブラウザ自動保存データのロード完了");
+            document.getElementById('start-screen').style.display = 'none';
+            startGame();
+            addHistory("💻 <b>システム:</b> 前回の作業を続けて開始します。");
+        } else {
+            loadSetupUI(0);
+        }
+    }
+
+    function loadSetupUI(idx) {
+        setupIndex = idx;
+        const countDisplay = document.getElementById('char-count');
+        const nextBtn = document.getElementById('btn-next');
+        const prevBtn = document.getElementById('btn-prev');
+        const finishBtn = document.getElementById('btn-finish');
+        const nameInput = document.getElementById('input-name');
+
+        countDisplay.innerText = `${idx + 1} / 5`;
+        
+        const currentData = tempResidents[idx] || {};
+        nameInput.value = currentData.name || '';
+        document.getElementById('input-gender').value = currentData.gender || '남';
+        document.getElementById('input-job').value = currentData.job || '画家'; 
+
+        prevBtn.style.display = idx === 0 ? 'none' : 'block';
+        finishBtn.style.display = tempResidents.length > 0 || idx > 0 ? 'block' : 'none';
+
+        if (idx === 4) {
+            nextBtn.style.display = 'none'; 
+            finishBtn.style.width = "100%"; 
+        } else {
+            nextBtn.style.display = 'block';
+            nextBtn.innerText = `追加 (${idx + 1}/5)`;
+            nextBtn.style.background = "#bb9af7";
+        }
+    }
+
+    function saveCurrentInput() {
+        const job = document.getElementById('input-job').value;
+        const selectedDialogues = jobsData[job]; 
+        const selectedEmoji = jobEmojis[job] || '👤';
+
+        tempResidents[setupIndex] = {
+            id: setupIndex,
+            name: document.getElementById('input-name').value || `住民${setupIndex+1}`,
+            emoji: selectedEmoji, 
+            gender: document.getElementById('input-gender').value,
+            job: job,
+            stress: 0, 
+            affection: 50, 
+            partnerId: null, 
+            relType: '솔로',
+            dialogues: selectedDialogues
+        };
+    }
+
+    function nextChar() {
+        saveCurrentInput();
+        if (setupIndex < 4) loadSetupUI(setupIndex + 1);
+    }
+
+    function prevChar() {
+        if (setupIndex > 0) loadSetupUI(setupIndex - 1);
+    }
+
+    // [수정] 4. 입주 시작 (가장 중요!)
+    function finishSetup() {
+        saveCurrentInput(); 
+        state.residents = [...tempResidents]; 
+        document.getElementById('start-screen').style.display = 'none';
+        
+        // 게임 시작
+        startGame();
+
+        // 🔥 입주하자마자 즉시 강제 저장!
+        saveGame(); 
+        console.log("✅ 入居完了、即時保存");
+    }
+
+    function startGame() {
+        changeNews();
+        setInterval(changeNews, 300000);
+        render(); updateUI(); renderAchievements();
+        
+        setInterval(() => { 
+            let boost = 1 + (state.artifacts.filter(x=>x).length * 0.1);
+            let income = state.autoIncome * boost;
+            if (state.residents.length > 0) {
+                let avgStress = state.residents.reduce((a,b)=>a+b.stress, 0) / state.residents.length;
+                if (avgStress > 80) income *= 0.5;
+            }
+
+            state.money += income / 10; 
+            state.residents.forEach(r => r.stress = Math.min(100, r.stress + 0.007));
+            updateUI(); 
+            checkAchievements();
+        }, 100);
+        setInterval(randomDailyEvent, 25000);
+        setInterval(generateSNSPost, 60000); 
+
+        // 💾 4초마다 자동 저장 실행
+        setInterval(saveGame, 4000);
+
+        if (window.innerWidth <= 768) {
+            spawnMessage('💻作業ファイト！ミッドナイト・コテージへようこそ。', 'event');
+        }
+    }
+
+    function toggleModal(id) { 
+        const m = document.getElementById(id); 
+        if (m) {
+            m.style.display = (m.style.display==='flex')?'none':'flex';
+            if(id === 'sns-modal' && m.style.display === 'flex') {
+                 document.getElementById('sns-dot').style.display = 'none'; 
+            }
+            if(id === 'shop-modal' && m.style.display === 'flex') {
+                updateGachaUI();
+            }
+        }
+    }
+
+    const endingDialogues = {
+        "画家": "この部屋の色彩は私のキャンバスより美しかった。永遠に記憶するよ。",
+        "小説家": "私たちのチャプターはここで終わるけど、君の物語はずっと書き続けてね。",
+        "教授": "ここの記録は歴史に残るだろう。君のおかげだ。",
+        "リパードク": "俺の心臓エンジンも高鳴るぜ。完璧な修理だった。",
+        "ASMR DJ": "今夜は一番穏やかな雨音を聞かせてあげる。おやすみ。",
+        "モデル": "派手な照明より、この部屋のほのかなネオンの方が良かったわ。",
+        "刑事": "事件終了。犯人は…私たちが探していた幸福だったか。",
+        "ネットランナー": "ログアウトしたくないサーバーはここが初めてだ。",
+        "ラーメン屋": "いつでもおいで。温かいスープ一杯は一生タダだから。",
+        "温泉主人": "心の垢まですっかり洗い流せた気分だよ。ありがとう。",
+        "バーマスター": "最後の曲は君のためにかけるよ。このリズムを忘れないで。",
+        "ミュージシャン": "俺の最高の名曲はこのコテージで誕生した。サンキュー！",
+        "猫": "ニャー。（元気でな、最高の下僕。チュール忘れるなよ。）",
+        "VIP": "これほど価値のある投資は初めてだな。素晴らしかった。"
+    };
+
+    function startEndingSequence() {
+        const screen = document.getElementById('ending-sequence');
+        const container = document.querySelector('.rolling-container');
+        const emojiDiv = document.getElementById('end-emoji');
+        const nameDiv = document.getElementById('end-name');
+        const msgDiv = document.getElementById('end-msg');
+        const finalScreen = document.getElementById('final-screen');
+
+        screen.style.display = 'flex';
+        let step = 0;
+        
+        function showNextResident() {
+            if (step >= state.residents.length) {
+                container.style.display = 'none';
+                finalScreen.style.display = 'block';
+                finalScreen.style.animation = 'fade-in 2s forwards';
+                return;
+            }
+            const char = state.residents[step];
+            const msg = endingDialogues[char.job] || "一緒で楽しかったよ。幸せになってね！";
+            emojiDiv.innerText = char.emoji;
+            nameDiv.innerText = `${char.job} ${char.name}`;
+            msgDiv.innerText = `"${msg}"`;
+            container.classList.add('show');
+            setTimeout(() => {
+                container.classList.remove('show');
+                setTimeout(() => {
+                    step++;
+                    showNextResident();
+                }, 1000); 
+            }, 4000); 
+        }
+        showNextResident();
+    }
+
+    function closeEndingSequence() {
+        document.getElementById('ending-sequence').style.display = 'none';
+    }
+
+    function getGachaPrice() {
+        const foundCount = state.artifacts.filter(x => x).length;
+        return 10000 * Math.pow(2, foundCount);
+    }
+
+    function updateGachaUI() {
+        const price = getGachaPrice();
+        const btn = document.getElementById('btn-gacha');
+        const priceText = document.getElementById('gacha-price');
+        priceText.innerText = `💵 ${price.toLocaleString()}`;
+        if(state.artifacts.every(x => x)) {
+            btn.disabled = true;
+            btn.innerHTML = "全遺物の収集完了！";
+        } else if(state.money < price) {
+            btn.disabled = true;
+        } else {
+            btn.disabled = false;
+        }
+    }
+
+    function buyArtifact() {
+        const price = getGachaPrice();
+        if(state.money >= price) {
+            state.money -= price;
+            const unfound = state.artifacts.map((v, i) => v === false ? i : null).filter(v => v !== null);
+            if (unfound.length > 0) {
+                const pick = unfound[Math.floor(Math.random()*unfound.length)];
+                state.artifacts[pick] = true; 
+                renderMuseum();
+                showCenterPopup(artifactsData[pick].emoji, '遺物の復元成功！', artifactsData[pick].name);
+                addHistory(`🏺 <b>遺物復元:</b> [${artifactsData[pick].name}] 復元完了！ (収益 +10%)`);
+            }
+            updateUI();
+            updateGachaUI();
+            saveGame();
+        }
+    }
+
+    function generateSNSPost() {
+        if (state.residents.length === 0) return;
+        const char = state.residents[Math.floor(Math.random() * state.residents.length)];
+        let text = "";
+        const generalPosts = ["今日パーティする人？", "家が最高。", "この通り、イケてるね。", "バッテリー充電中...", "読書にいい夜。", "暇だから遊んで！", "コンビニ弁当は飽きた。", "誰か私の自転車盗んだ？", "雨の日はチヂミでしょ。", "ネオンサインが今日に限って綺麗。", "猫かわいい。", "人生とは...", "給料いつ入るの？", "夜食のおすすめ教えて。", "新しくできた店行く人？", "今日の天気ヤバイ。", "出勤したくない。", "退勤後にビール一杯どう？", "週末があっという間に...", "Netflix見るものオススメ教えて。", "ダイエットは明日から。", "今日のOOTD。", "美味しい店発見！", "コーヒー輸血至急。", "眠れない。", "深夜の感性爆発。", "昔の歌を聴いてる。", "旅行行きたい。", "部屋の掃除しなきゃなのに...", "布団の外は危険だ。", "今日の気分は晴れ。", "ストレスには激辛料理。", "ささやかな幸せ。", "ぼーっとしてる。", "お腹すいた。", "地球滅亡すればいいのに。", "宝くじ当選祈願。", "散歩行くか？", "宅配届いた！", "溜まった洗濯しなきゃ。"];
+        if (char.job === '猫') { text = ["ニャン。", "ゴロゴロ...", "チュールよこせニンゲン。", "ドドドドドッ！！", "グルル...", "段ボールは私の。", "高いところが好き。", "お昼寝の時間だニャ。", "下僕よ、遊んで。"][Math.floor(Math.random()*9)]; } 
+        else if (char.relType === '불륜') { text = ["裏アカです。", "今夜も...", "しーっ。", "誰にも内緒で。", "心臓がうるさい。", "危険だけど止められない。", "こんなのダメなのに...", "会いたい。"][Math.floor(Math.random()*8)]; } 
+        else if (char.stress > 80) { text = ["あーマジで全部うざい。", "触るな。", "退社したい。", "世界なんて滅びろ。", "何もしたくない。", "頭痛い。", "全部投げ出したい。", "爆発寸前。"][Math.floor(Math.random()*8)]; } 
+        else { text = generalPosts[Math.floor(Math.random() * generalPosts.length)]; }
+        const post = { emoji: char.emoji, name: char.name, time: new Date().toLocaleTimeString().slice(0, 5), text: text };
+        snsPosts.unshift(post);
+        if (snsPosts.length > 20) snsPosts.pop();
+        renderSNS();
+        document.getElementById('sns-dot').style.display = 'block';
+    }
+
+    function renderSNS() {
+        const feed = document.getElementById('sns-feed');
+        if(feed) feed.innerHTML = snsPosts.map(p => `<div class="sns-post"><div class="sns-user"><div class="sns-avatar">${p.emoji}</div><div class="sns-name">${p.name}</div><div class="sns-time">${p.time}</div></div><div class="sns-text">${p.text}</div></div>`).join('');
+    }
+
+    function checkAchievements() {
+        let changed = false;
+        achievements.forEach(ach => {
+            if (!ach.unlocked && ach.check(state)) {
+                ach.unlocked = true;
+                changed = true;
+                showCenterPopup(ach.icon, "実績達成！", ach.name);
+                addHistory(`🏆 <b>実績達成:</b> [${ach.name}] - ${ach.desc}`);
+            }
+        });
+        if (changed) { renderAchievements(); }
+    }
+
+    function renderAchievements() {
+        document.getElementById('ach-grid').innerHTML = achievements.map(a => `<div class="ach-item ${a.unlocked ? 'unlocked' : ''}"><div class="ach-icon">${a.icon}</div><div class="ach-title">${a.name}</div><div class="ach-desc">${a.unlocked ? a.desc : '???' }</div></div>`).join('');
+    }
+
+    function spawnMessage(text, type) {
+        const stack = document.getElementById('dialogue-stack');
+        if(!stack) return;
+        const bubble = document.createElement('div');
+        bubble.className = `dialogue-bubble ${type}`;
+        bubble.innerHTML = text;
+        stack.appendChild(bubble);
+        
+        setTimeout(() => {
+            bubble.style.animation = 'fade-out-bubble 0.5s forwards';
+            setTimeout(() => bubble.remove(), 500);
+        }, 3500);
+    }
+
+    function addHistory(msg) {
+        const timeMsg = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        state.history.unshift(timeMsg);
+        if (state.history.length > 50) state.history.pop();
+        
+        const list = document.getElementById('history-list');
+        if (list) list.innerHTML = state.history.map(h => `<li>${h}</li>`).join('');
+        
+        const eventLog = document.getElementById('event-log');
+        if (eventLog) eventLog.innerHTML = msg; 
+
+        if (window.innerWidth <= 768) {
+            let cleanMsg = msg.replace(/<[^>]*>?/gm, ''); 
+            if(cleanMsg.includes(']')) cleanMsg = cleanMsg.split(']')[1].trim(); 
+            spawnMessage(cleanMsg, 'event');
+        }
+    }
+
+    function changeNews() {
+        const newsList = ["酸性雨注意報 (ストレスUP)", "ネオン祭り (ヒーリングUP)", "ネットワーク障害 (収益DOWN)", "企業補助金 (収益UP)", "深夜の静寂 (平和)"];
+        const pick = newsList[Math.floor(Math.random()*newsList.length)];
+        const banner = document.getElementById('news-banner');
+        if (banner) banner.innerText = "📢 今日のニュース: " + pick;
+    }
+
+    function showCenterPopup(emoji, title, sub) {
+        const popup = document.createElement('div');
+        popup.className = 'center-popup';
+        popup.innerHTML = `<div style="font-size:40px;">${emoji}</div><div>${title}</div><div style="font-size:16px; color:#fff; font-weight:500;">[${sub}]</div>`;
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 3000);
+    }
+
+    function showEvolutionToast(rankName) {
+        const evo = document.createElement('div');
+        evo.className = 'evo-toast';
+        evo.innerHTML = `🌙 コテージルーム進化！<br><span style="font-size:18px; color:#fff;">[${rankName}] 解禁</span>`;
+        document.body.appendChild(evo);
+        setTimeout(() => evo.remove(), 4000);
+    }
+
+    function closeModalByBg(e, id) {
+        if (id === 'museum-modal') { if (!e.target.closest('.artifact-slot')) { toggleModal(id); } return; }
+        if (e.target.id === id) { toggleModal(id); }
+    }
+
+    function selectRoom(rankIndex) {
+        state.currentSelectedRank = rankIndex;
+        updateUI();
+        showCenterPopup('🖼️', '背景変更完了！', rankNames[rankIndex-1]);
+        toggleModal('gallery-modal');
+    }
+
+    function render() {
+        document.getElementById('res-grid').innerHTML = state.residents.map((r, i) => {
+            let relText = r.relType === '솔로' ? 'ソロ' : (r.relType === '커플' ? 'カップル' : '不倫');
+            if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}と${relText}`; }
+            const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
+            return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
+        }).join('');
+        
+        document.getElementById('upgrade-list').innerHTML = state.upgrades.map((u, i) => {
+            const data = upgrades[i];
+            return `<div class="up-card"><div class="up-info"><h4>${data.name} <small>(Lv.${u.lv})</small></h4><div class="tags">${u.lv === 0 ? '<span class="tag-dev">⭐ 発展度 +1</span>' : ''}${data.isHealing ? '<span class="tag-healing">🌿 ストレス解消</span>' : ''}</div><p>${data.type === 'click' ? 'クリック' : '秒間'} +${data.power.toLocaleString()}</p></div><button class="buy-btn" id="btn-${u.id}" onclick="buy(${i})">💵 ${u.price.toLocaleString()}</button></div>`;
+        }).join('');
+        renderMuseum();
+    }
+
+    function renderMuseum() {
+        document.getElementById('museum-list').innerHTML = artifactsData.map((a, i) => `<div class="artifact-slot ${state.artifacts[i] ? 'found' : ''}" onclick="showArt(${i}, event)">${state.artifacts[i] ? a.emoji : '?'}</div>`).join('');
+    }
+
+    function showArt(i, e) { 
+        e.stopPropagation(); 
+        const descBox = document.getElementById('artifact-desc');
+        if(state.artifacts[i]) descBox.innerText = `テオ教授: "${artifactsData[i].desc}"`; 
+        else descBox.innerText = "まだ未収集の遺物だ。闇市で探してみよう！";
+    }
+
+    function buy(idx) {
+        const u = state.upgrades[idx], d = upgrades[idx];
+        
+        // 1. 구매 로직
+        if(state.money >= u.price) {
+            state.money -= u.price; 
+            
+            if(u.lv === 0) { 
+                state.totalUniquePurchased++; 
+                addHistory(`🏗️ <b>新規施設:</b> [${d.name}] 建設完了。`); 
+            }
+            u.lv++;
+            
+            if(d.type === 'click') state.clickPower += d.power; 
+            else state.autoIncome += d.power;
+            
+            if(d.isHealing) state.residents.forEach(r => r.stress = Math.max(0, r.stress - 20));
+            
+            u.price = Math.floor(u.price * 1.6);
+            
+            const newRank = Math.min(20, Math.floor(state.totalUniquePurchased / 5) + 1);
+            if (newRank > state.rank) {
+                state.rank = newRank; 
+                state.currentSelectedRank = newRank;
+                showEvolutionToast(rankNames[newRank-1]);
+                addHistory(`🌟 <b>都市進化:</b> [${rankNames[newRank-1]}] 達成！`);
+                
+                if (newRank >= 20 && !state.endingSeen) { 
+                    state.endingSeen = true; 
+                    startEndingSequence(); 
+                }
+            }
+            
+            render(); 
+            updateUI();
+            
+            // 🔥 [수정] 돈 썼으니까 바로 저장!
+            saveGame();
+        }
+
+        // 2. 버튼 뽀잉 연출
+        const btn = document.getElementById(`btn-${u.id}`);
+        if (btn) {
+            btn.classList.remove('click-animate'); 
+            void btn.offsetWidth; // 애니메이션 리셋 매직 코드
+            btn.classList.add('click-animate'); 
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('budget').innerText = Math.floor(state.money).toLocaleString();
+        state.upgrades.forEach(u => { const btn = document.getElementById(`btn-${u.id}`); if(btn) btn.disabled = state.money < u.price; });
+        state.residents.forEach((r, i) => { const fill = document.getElementById(`stress-${i}`); if(fill) fill.style.width = r.stress + '%'; });
+        const currentProgress = state.totalUniquePurchased % 5;
+        const displayRankName = `Rank.${state.currentSelectedRank} ${rankNames[state.currentSelectedRank-1]}`;
+        const displayProgress = (currentProgress * 20) + '%';
+        const displayCount = `${currentProgress} / 5`;
+        if(document.getElementById('dev-bar-fill')) document.getElementById('dev-bar-fill').style.width = displayProgress;
+        if(document.getElementById('dev-count')) document.getElementById('dev-count').innerText = displayCount;
+        if(document.getElementById('city-name-display')) document.getElementById('city-name-display').innerText = displayRankName;
+        if(document.getElementById('mob-dev-bar-fill')) document.getElementById('mob-dev-bar-fill').style.width = displayProgress;
+        if(document.getElementById('mob-dev-count')) document.getElementById('mob-dev-count').innerText = displayCount;
+        if(document.getElementById('mob-city-name-display')) document.getElementById('mob-city-name-display').innerText = displayRankName;
+        document.getElementById('desk-clicker').src = rankImages[state.currentSelectedRank-1];
+        const artCount = state.artifacts.filter(x=>x).length;
+        if (document.getElementById('artifact-boost')) document.getElementById('artifact-boost').innerText = artCount > 0 ? `(遺物バフ +${artCount*10}%)` : "";
+    }
+
+    function talkToResident(idx) {
+        const res = state.residents[idx];
+        if(!res) return;
+        let pool = res.dialogues['Solo'];
+        if (res.stress > 80) pool = res.dialogues['Stress'];
+        const msg = pool[Math.floor(Math.random()*pool.length)];
+        
+        spawnMessage(`${res.name}: "${msg}"`, 'talk');
+    }
+
+    function randomDailyEvent() {
+        if (state.residents.length < 2) return;
+
+        // 랜덤하게 두 명 뽑기
+        const p1 = Math.floor(Math.random() * state.residents.length);
+        let p2 = Math.floor(Math.random() * state.residents.length);
+        while(p1 === p2) { p2 = Math.floor(Math.random() * state.residents.length); } 
+        
+        const charA = state.residents[p1];
+        const charB = state.residents[p2];
+        const rand = Math.random();
+
+        // 1. 대화 및 호감도 변화
+        if (rand < 0.45) {
+            charA.affection += 5; charB.affection += 5;
+            addHistory(`💬 <b>会話:</b> ${charA.name}と${charB.name}は楽しくおしゃべりをした。<span style="color:var(--heart)">(❤️+5)</span>`);
+        } else if (rand < 0.65) {
+            charA.affection -= 10; charB.affection -= 10; // 싸우면 호감도 더 많이 깎임
+            addHistory(`⚡ <b>口論:</b> ${charA.name}と${charB.name}は些細な誤解で言い争った。<span style="color:#888">(💔-10)</span>`);
+        }
+
+        // 호감도 0~100 제한
+        state.residents.forEach(r => { r.affection = Math.max(0, Math.min(100, r.affection)); });
+
+        // 2. 관계 변화 로직
+        
+        // A. [이별] 커플인데 호감도가 30 미만으로 떨어지면 헤어짐
+        if (charA.partnerId === charB.id && (charA.affection < 30 || charB.affection < 30)) {
+            charA.relType = '솔로'; charB.relType = '솔로';
+            charA.partnerId = null; charB.partnerId = null;
+            
+            showCenterPopup("💔", "決別", `${charA.name} ⚡ ${charB.name}`);
+            addHistory(`💔 <b>別れ:</b> ${charA.name}と${charB.name}は性格の不一致を克服できず他人になった。`);
+            saveGame();
+        }
+
+        // B. [커플 탄생] 둘 다 솔로이고 호감도가 90 이상일 때
+        else if (charA.affection >= 90 && charB.affection >= 90) {
+            if (charA.relType === '솔로' && charB.relType === '솔로') {
+                charA.relType = '커플'; charB.relType = '커플';
+                charA.partnerId = charB.id; charB.partnerId = charA.id;
+                
+                showCenterPopup("💖", "カップル誕生！", `${charA.name} ♥ ${charB.name}`);
+                addHistory(`💖 <b>おめでとう！</b> ${charA.name}と${charB.name}は恋人になった！`);
+                saveGame();
+            }
+            
+            // C. [불륜] 한 명이라도 파트너가 있는데 호감도가 높을 때
+            else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
+                if (charA.relType !== '불륜' || charB.relType !== '불륜') {
+                    charA.relType = '불륜'; charB.relType = '불륜';
+                    showCenterPopup("😈", "危険な関係", `${charA.name} & ${charB.name}`);
+                    addHistory(`😈 <b>衝撃！</b> ${charA.name}と${charB.name}は禁断の愛に落ちてしまった...`);
+                    saveGame();
+                }
+            }
+        }
+
+        render(); // 화면 갱신
+    }
+
+    document.getElementById('desk-clicker').onclick = (e) => { 
+        state.money += state.clickPower; 
+        const star = document.createElement('div'); star.className = 'hit-effect'; star.innerText = '🌟';
+        star.style.left = (e.clientX - 32) + 'px'; star.style.top = (e.clientY - 32) + 'px';
+        document.body.appendChild(star); setTimeout(() => star.remove(), 300);
+        updateUI(); 
+    };
+
+    function resetGame() {
+        if (confirm("本当にすべてのデータを削除して入居申込書からやり直しますか？\n(注意: データが永久に削除されます。)")) {
+            localStorage.removeItem('midnight_cottage_v30_JP');
+            alert("データが削除されました。ページを更新します。");
+            location.reload();
+        }
+    }
+
+    function openGallery() {
+        const grid = document.getElementById('gallery-grid');
+        grid.innerHTML = rankNames.map((name, i) => {
+            const unlocked = i < state.rank;
+            const isSelected = (i + 1) === state.currentSelectedRank;
+            return `<div class="gallery-item ${unlocked ? 'unlocked' : 'locked'} ${isSelected ? 'active' : ''}" onclick="${unlocked ? `selectRoom(${i+1})` : ''}"><img src="${rankImages[i]}" loading="lazy"><div style="background:rgba(0,0,0,0.6); color:#fff; font-size:12px; font-weight:700;">${i+1}. ${name} ${isSelected ? ' (使用中)' : ''}</div></div>`;
+        }).join('');
+        toggleModal('gallery-modal');
+    }
+</script>
+</body>
+</html>
