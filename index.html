@@ -205,6 +205,7 @@
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+            
             /* 🛠️ [모바일 수정] 직업과 관계(솔로/커플) 모두 표시 */
             .res-job { 
                 display: block !important; 
@@ -283,15 +284,6 @@
         <div class="start-form">
             <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 입주 신청서</h2>
             
-            <div style="background:rgba(66, 133, 244, 0.1); border:1px solid rgba(66, 133, 244, 0.3); border-radius:12px; padding:10px; margin-bottom:15px; text-align:center;">
-                <p style="font-size:12px; color:#ccc; margin:0 0 8px 0;">이미 미드나잇 코티지에 살고 계신가요?</p>
-                <div style="display:flex; gap:5px; justify-content:center;">
-                    <button id="btn-login-start" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:8px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px; width: 100%;">
-                        G 구글 로그인 (불러오기 / 계정연동)
-                    </button>
-                </div>
-            </div>
-
             <div id="char-count">1 / 5</div>
             <div class="form-group">
                 <label>이름 (닉네임)</label>
@@ -459,18 +451,6 @@
                 3. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
             </p>
             
-            <div style="margin-bottom: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <h3 style="margin-top:0; font-size:16px; color:var(--neon-blue); margin-bottom: 10px;">☁️ 데이터 백업</h3>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button id="btn-login-help" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
-                        G 구글 계정 연동
-                    </button>
-                </div>
-                <p id="cloud-status-msg" style="font-size:11px; color:#888; margin-top:8px;">
-                    * 로그인 시 4초마다 자동으로 클라우드에 저장됩니다.
-                </p>
-            </div>
-
             <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
                 ⚠️ 데이터 초기화 (처음부터)
             </button>
@@ -478,28 +458,7 @@
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
-    // 2. Firebase 설정 및 초기화
-    const firebaseConfig = {
-        apiKey: "AIzaSyDAS2-ax-ORpsnGoG6XNsMx3rlQ9yJMkUc",
-        authDomain: "midnight-cottage-server.firebaseapp.com",
-        projectId: "midnight-cottage-server",
-        storageBucket: "midnight-cottage-server.firebasestorage.app",
-        messagingSenderId: "680262922046",
-        appId: "1:680262922046:web:bd79062e2bf1f20464866f"
-    };
-
-    // Firebase 실행
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    let currentUser = null; // 현재 로그인한 유저 정보
-
     // 3. 전역 변수 선언
     const state = {
         money: 0, clickPower: 1, autoIncome: 1, 
@@ -507,96 +466,6 @@
         rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
         residents: [], achievements: [], endingSeen: false
     };
-
-    // 4. Firebase 로그인 및 클라우드 함수들
-    function googleLogin() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                alert(`반가워요, ${result.user.displayName}님! 계정이 연동되었습니다.`);
-            })
-            .catch((error) => {
-                console.error(error);
-                alert("로그인 실패: " + error.message);
-            });
-    }
-
-    // 🌟 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
-    function updateAuthUI(user) {
-        const loginBtnStart = document.getElementById('btn-login-start');
-        const loginBtnHelp = document.getElementById('btn-login-help');
-        const msg = document.getElementById('cloud-status-msg');
-
-        if (user) {
-            // 로그인 되었을 때: 버튼 비활성화 및 텍스트 변경
-            if(loginBtnStart) {
-                loginBtnStart.innerText = `✅ 연동됨 (${user.displayName})`;
-                loginBtnStart.disabled = true;
-                loginBtnStart.style.opacity = "0.7";
-                loginBtnStart.style.cursor = "default";
-            }
-            if(loginBtnHelp) {
-                loginBtnHelp.innerText = `✅ 연동 완료: ${user.displayName}`;
-                loginBtnHelp.disabled = true;
-                loginBtnHelp.style.opacity = "0.7";
-                loginBtnHelp.style.cursor = "default";
-            }
-            if(msg) msg.innerText = `* ${user.displayName}님의 계정에 안전하게 자동 저장되고 있습니다.`;
-        } else {
-            // 로그아웃 상태일 때: 원래대로 복구
-            if(loginBtnStart) { loginBtnStart.innerText = "G 구글 로그인으로 데이터 불러오기"; loginBtnStart.disabled = false; }
-            if(loginBtnHelp) { loginBtnHelp.innerText = "G 구글 계정 연동"; loginBtnHelp.disabled = false; }
-        }
-    }
-
-    // [수정] 데이터 불러오기 (신규 유저 안내 추가)
-    function loadDataFromCloud() {
-        if (!currentUser) return;
-        
-        db.collection("users").doc(currentUser.uid).get()
-            .then((doc) => {
-                if (doc.exists) {
-                    // 1. 저장된 데이터가 있는 경우 (기존 유저)
-                    const data = doc.data();
-                    Object.assign(state, data);
-                    
-                    render(); 
-                    updateUI();
-                    renderAchievements();
-                    
-                    showCenterPopup("🔄", "데이터 로드 완료", "클라우드에서 불러왔습니다.");
-                    addHistory("☁️ <b>클라우드:</b> 저장된 데이터를 성공적으로 불러왔습니다.");
-
-                    // 게임 화면으로 바로 진입
-                    document.getElementById('start-screen').style.display = 'none';
-                } else {
-                    // 2. 저장된 데이터가 없는 경우 (신규 유저)
-                    // 오류가 아니라, 이제부터 이 계정에 저장하겠다는 뜻임을 알림
-                    alert(`반갑습니다, ${currentUser.displayName}님!\n아직 저장된 데이터가 없습니다.\n\n이 계정으로 '새로운 입주'를 시작합니다.\n(이제부터 자동으로 클라우드에 백업됩니다.)`);
-                    
-                    // 버튼 상태 갱신 (✅ 연동됨 표시)
-                    updateAuthUI(currentUser);
-                }
-            })
-            .catch((error) => {
-                console.error("불러오기 실패: ", error);
-                alert("데이터 확인 중 문제가 발생했습니다.\n" + error.message);
-            });
-    }
-    
-    // 로그인 상태 감지 리스너
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            currentUser = user;
-            console.log("로그인 됨:", user.displayName);
-            updateAuthUI(user);
-            loadDataFromCloud();
-        } else {
-            currentUser = null;
-            updateAuthUI(null);
-            console.log("로그아웃 상태");
-        }
-    });
 
     // 5. 게임 데이터 및 로직
     const jobEmojis = {
@@ -721,19 +590,12 @@
         init();
     };
 
-    // [수정] 1. 저장 기능 (로컬 + 클라우드 동시에 처리)
+    // [수정] 1. 저장 기능 (오직 로컬 저장소만 사용)
     function saveGame() {
-        // A. 브라우저 캐시(로컬) 저장 - 로그인 안 해도 작동함
         try {
             localStorage.setItem('midnight_cottage_v30_hardcore', JSON.stringify(state));
         } catch (e) {
             console.error("로컬 저장 실패", e);
-        }
-
-        // B. 클라우드 저장 - 로그인했을 때만 작동함
-        if (currentUser) {
-            db.collection("users").doc(currentUser.uid).set(state, { merge: true })
-                .catch((error) => console.error("클라우드 자동 저장 실패:", error));
         }
     }
 
@@ -1253,30 +1115,10 @@
     };
 
     function resetGame() {
-        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 클라우드에 저장된 백업 데이터도 영구 삭제됩니다.)")) {
-            // 1. 로컬 저장소 데이터 삭제
+        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 데이터가 영구 삭제됩니다.)")) {
             localStorage.removeItem('midnight_cottage_v30_hardcore');
-
-            // 2. 구글 로그인이 되어있다면, 서버 데이터 삭제 + 로그아웃 수행
-            if (currentUser) {
-                // A. 서버 데이터 삭제
-                db.collection("users").doc(currentUser.uid).delete()
-                    .then(() => {
-                        // B. 삭제 성공 시 로그아웃 (연동 끊기)
-                        auth.signOut().then(() => {
-                            alert("모든 데이터가 삭제되고 계정 연동이 해제되었습니다.");
-                            location.reload(); // 깨끗한 상태로 새로고침
-                        });
-                    })
-                    .catch((error) => {
-                        console.error("클라우드 삭제 실패:", error);
-                        // 에러가 나더라도 로컬은 지웠으니 일단 새로고침
-                        location.reload(); 
-                    });
-            } else {
-                // 로그인 안 한 상태면 바로 새로고침
-                location.reload();
-            }
+            alert("데이터가 삭제되었습니다. 새로고침합니다.");
+            location.reload();
         }
     }
 
