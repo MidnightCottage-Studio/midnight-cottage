@@ -183,7 +183,7 @@
             body { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
             #app { height: 100%; width: 100%; border-radius: 0; display: flex; flex-direction: column; }
 
-            /* 헤더 여백 줄이기 */
+            /* 🛠️ [모바일 수정] 헤더 여백 줄이기 */
             .app-header { display: flex; flex-direction: column; padding: 5px 15px 0px 15px; gap: 0px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
             
             .header-left { width: 100%; order: 1; align-items: flex-start; margin-bottom: 0px; }
@@ -191,21 +191,22 @@
             #news-banner { display: none; }
             #pc-city-status { display: none; }
 
-            /* 상단 메뉴 아이콘 가로 중앙 정렬 */
+            /* 🛠️ [모바일 수정] 상단 메뉴 아이콘 가로 중앙 정렬 */
             .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
             .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
             .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
             
+            /* [모바일] 이벤트 로그 텍스트 숨김 */
             #event-log { display: none !important; }
 
-            /* 주민 목록 가로 중앙 정렬 */
+            /* 🛠️ [모바일 수정] 주민 목록 여백 축소 */
             .res-area { order: 3; width: 100%; margin-top: 5px; padding-bottom: 5px; overflow-x: auto; justify-content: center; display: flex; }
             .res-card { min-width: 55px; margin-right: 5px; transform: none !important; transition: none !important; }
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
             
-            /* 직업과 관계(솔로/커플) 모두 표시 */
+            /* 🛠️ [모바일 수정] 직업과 관계(솔로/커플) 모두 표시 */
             .res-job { 
                 display: block !important; 
                 font-size: 8px; 
@@ -223,10 +224,9 @@
 
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-            /* 방 화면 확대 */
-            /* [모바일] 방 화면 높이 축소 */
+            /* 🛠️ [모바일 수정] 방 화면 높이 확대 (35% -> 45%) - 일본어판과 동일하게 */
             .main-panel { 
-                flex: 0 0 35%; /* 45% -> 35%로 변경 */
+                flex: 0 0 45%; 
                 padding: 0; 
                 order: 1; 
                 position: relative; 
@@ -236,20 +236,33 @@
                 align-items: center; 
                 overflow: hidden; 
             }
-            #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(5px); }
             
+            /* 🛠️ [모바일 수정] 방 이미지 확대 (100% -> 130%) - 일본어판과 동일하게 */
+            #desk-clicker { 
+                width: 130%; 
+                height: 130%; 
+                object-fit: contain; 
+                margin: 0; 
+                /* 위치도 일본어판(15px)과 똑같이 맞춤 */
+                transform: translateY(15px); 
+            }
+            
+            /* 대화창 위치 조정 */
             #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
             .dialogue-bubble { font-size: 13px; padding: 10px; }
 
+            /* 🛠️ [모바일] 사이드 메뉴(정보창) 여백 타이트하게 조정 */
             .side-menu { flex: 1; order: 2; height: auto; overflow-y: auto; border-top: 2px solid var(--border); background: rgba(0,0,0,0.9); padding: 10px 15px 80px 15px; }
             #mobile-city-status { display: flex; margin-bottom: 5px; padding: 8px; } 
             
+            /* 🔥 [수정] 1. 개발일지 왼쪽 정렬 */
             .menu-title { margin-bottom: 5px; text-align: left; border-left: none; padding-left: 0; }
             
+            /* 🔥 [수정] 2. 업그레이드 카드 세로 정렬 및 버튼 하단 배치 */
             .up-card { flex-direction: column; align-items: flex-start; padding: 12px; min-height: auto; margin-bottom: 8px; gap: 8px; }
             .up-info { width: 100%; margin-right: 0; }
-            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } 
-            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } 
+            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } /* 텍스트 줄바꿈 허용 */
+            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } /* 버튼 하단 꽉 채우기 */
 
             .evo-toast { width: 85%; min-width: unset; white-space: nowrap; font-size: 16px; padding: 12px 10px; bottom: 35%; border-width: 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
@@ -271,16 +284,6 @@
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
-        }
-
-        @keyframes boing {
-            0% { transform: scale(1); }
-            40% { transform: scale(0.9); }  
-            60% { transform: scale(1.1); }  
-            100% { transform: scale(1); }   
-        }
-        .click-animate {
-            animation: boing 0.3s ease-out forwards;
         }
 
         /* 🔘 [추가] 버튼 클릭 뽀잉 애니메이션 */
@@ -485,6 +488,12 @@
         residents: [], achievements: [], endingSeen: false
     };
 
+    // ============================================================
+    // ⚠️ 중요: 여기에 기존의 데이터 배열들을 꼭 넣어주세요! ⚠️
+    // jobsData, artifactsData, uniqueInfra, rankNames, rankImages, upgrades, achievements
+    // (기존 코드에서 복사해서 여기에 붙여넣으세요)
+    // ============================================================
+    
     // 5. 게임 데이터 및 로직
     const jobEmojis = {
         "화가": "🎨", "소설가": "✍️", "교수": "📚", "리퍼닥": "🛠️",
@@ -608,16 +617,17 @@
         init();
     };
 
-    // [수정] 1. 저장 기능 (오직 로컬 저장소만 사용)
+    // [수정] 1. 저장 기능 (오직 브라우저 로컬 저장만!)
     function saveGame() {
         try {
             localStorage.setItem('midnight_cottage_v30_hardcore', JSON.stringify(state));
+            // console.log("자동 저장됨"); 
         } catch (e) {
-            console.error("로컬 저장 실패", e);
+            console.error("저장 실패", e);
         }
     }
 
-    // [수정] 2. 불러오기 기능 (시작할 때 자동 실행됨)
+    // [수정] 2. 불러오기 기능
     function loadGame() {
         const saved = localStorage.getItem('midnight_cottage_v30_hardcore');
         if (saved) {
@@ -635,15 +645,19 @@
 
     // [수정] 3. 게임 초기화
     function init() {
-        state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
+        // 업그레이드 데이터가 없다면(데이터 누락 방지)
+        if(typeof upgrades !== 'undefined') {
+            state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
+        }
 
-        // 로컬 데이터를 먼저 찾아보고, 있으면 바로 게임 시작!
+        // 로컬 데이터가 있으면 바로 시작
         if (loadGame()) {
-            console.log("📂 브라우저 자동 저장 데이터 로드됨");
+            console.log("📂 저장된 데이터 로드됨");
             document.getElementById('start-screen').style.display = 'none';
             startGame();
             addHistory("💻 <b>시스템:</b> 지난번 작업을 이어서 시작합니다.");
         } else {
+            // 없으면 입주 신청서 띄움
             loadSetupUI(0);
         }
     }
@@ -704,18 +718,15 @@
         if (setupIndex > 0) loadSetupUI(setupIndex - 1);
     }
 
-    // [수정] 4. 입주 시작 (가장 중요!)
+    // [수정] 4. 입주 시작
     function finishSetup() {
         saveCurrentInput(); 
         state.residents = [...tempResidents]; 
         document.getElementById('start-screen').style.display = 'none';
         
-        // 게임 시작
         startGame();
-
-        // 🔥 입주하자마자 즉시 강제 저장!
-        saveGame(); 
-        console.log("✅ 입주 완료 및 즉시 저장됨");
+        saveGame(); // 즉시 저장
+        console.log("✅ 입주 완료");
     }
 
     function startGame() {
@@ -736,16 +747,20 @@
             updateUI(); 
             checkAchievements();
         }, 100);
+        
+        // 5초마다 자동 저장 (로컬)
+        setInterval(saveGame, 5000);
+        
         setInterval(randomDailyEvent, 25000);
         setInterval(generateSNSPost, 60000); 
-
-        // 💾 4초마다 자동 저장 실행
-        setInterval(saveGame, 4000);
 
         if (window.innerWidth <= 768) {
             spawnMessage('💻작업 화이팅! 미드나잇 코티지가 너를 반겨.', 'event');
         }
     }
+
+    // ... (이 아래로 toggleModal, endingDialogues, startEndingSequence 등 나머지 함수들은 그대로 두셔도 됩니다) ...
+    // ... (기존 코드의 나머지 함수들을 유지하세요) ...
 
     function toggleModal(id) { 
         const m = document.getElementById(id); 
@@ -759,23 +774,6 @@
             }
         }
     }
-
-    const endingDialogues = {
-        "화가": "이 방의 색채는 내 캔버스보다 아름다웠어. 영원히 기억할게.",
-        "소설가": "우리의 챕터는 여기서 끝나지만, 네 이야기는 계속 써 내려가길.",
-        "교수": "이곳의 기록은 역사에 남을 걸세. 자네 덕분이야.",
-        "리퍼닥": "내 심장 엔진도 벅차오르는군. 완벽한 수리였어.",
-        "ASMR DJ": "오늘 밤은 가장 평온한 빗소리를 들려줄게. 잘 자.",
-        "모델": "화려한 조명보다 이 방의 은은한 네온이 더 좋았어.",
-        "형사": "사건 종료. 범인은... 우리가 찾던 행복이었군.",
-        "넷러너": "로그아웃하고 싶지 않은 서버는 여기가 처음이야.",
-        "라멘노점상": "언제든 와. 따뜻한 국물 한 그릇은 평생 공짜니까.",
-        "온천주인": "마음의 때까지 씻겨나가는 기분이었어. 고마워.",
-        "LP바 사장님": "마지막 곡은 너를 위해 틀게. 이 리듬을 잊지 마.",
-        "뮤지션": "내 최고의 명곡은 이 코티지에서 탄생했어. 땡큐!",
-        "고양이": "야옹. (잘 있어라, 최고의 집사. 츄르 잊지 말고.)",
-        "VIP": "이 정도 가치 있는 투자는 처음이군. 훌륭했어."
-    };
 
     function startEndingSequence() {
         const screen = document.getElementById('ending-sequence');
