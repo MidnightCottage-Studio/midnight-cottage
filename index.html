@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>미드나잇 코티지 Midnight Cottage</title>
     <style>
@@ -50,40 +49,14 @@
         .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px; transition: 0.3s; position: relative; }
         .icon-btn:hover { background: var(--border); transform: scale(1.1); }
         .noti-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg); display: none; }
-        /* 🔻 [수정] PC에서는 이벤트 로그가 보이도록 display: none 제거 및 flex 설정 */
-#event-log { 
-    font-size: 19px; 
-    color: var(--accent); 
-    font-weight: 800; 
-    text-align: right; 
-    line-height: 1.3; 
-    width: 100%; 
-    
-    /* 🔥 [수정] 텍스트가 아래쪽(하단)부터 쌓이도록 설정 */
-    display: flex; 
-    flex-direction: column; 
-    align-items: flex-end; 
-    justify-content: flex-end; /* center 대신 flex-end를 쓰면 아래로 붙습니다 */
-    
-    word-break: keep-all; 
-    min-height: 50px; 
-}
+        
+        /* PC 이벤트 로그 */
+        #event-log { 
+            font-size: 19px; color: var(--accent); font-weight: 800; text-align: right; line-height: 1.3; width: 100%; 
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; 
+            word-break: keep-all; min-height: 50px; 
+        }
 
-/* 모바일 숨김 유지 */
-@media (max-width: 768px) {
-    #event-log { display: none !important; }
-}
-
-/* 모바일에서는 숨김 유지 */
-@media (max-width: 768px) {
-    #event-log { display: none; }
-}
-
-/* 🔻 [수정] 모바일에서만 이벤트 로그 텍스트를 숨김 (스택으로 대체되므로) */
-@media (max-width: 768px) {
-    #event-log { display: none; }
-    /* ... 기존 모바일 스타일 ... */
-}
         .content-container { flex: 1; display: flex; overflow: hidden; }
         .main-panel { flex: 1.8; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; }
         #desk-clicker { width: 100%; max-width: 480px; cursor: pointer; transition: transform 0.1s ease, filter 0.3s ease; filter: drop-shadow(0 0 30px rgba(187, 154, 247, 0.2)); margin-top: 40px; margin-bottom: 20px; }
@@ -91,7 +64,7 @@
         .hit-effect { position: absolute; pointer-events: none; font-size: 65px; z-index: 100; animation: hit-star 0.3s ease-out forwards; }
         @keyframes hit-star { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.1); opacity: 0; } }
         
-        /* 🔥 [수정] 대화창 컨테이너 및 메시지 스타일 (벽돌쌓기용) */
+        /* 대화창 컨테이너 */
         #dialogue-stack { 
             position: absolute; bottom: 120px; z-index: 50; width: 90%; max-width: 500px; 
             display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; pointer-events: none; 
@@ -113,7 +86,7 @@
         .side-menu { flex: 1.1; background: rgba(0,0,0,0.4); padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; border-left: 1px solid var(--border); }
         .menu-title { font-size: 17px; font-weight: 800; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 12px; margin-bottom: 10px; }
         
-        /* 🔧 카드 레이아웃 */
+        /* 카드 레이아웃 */
         .up-card { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px 15px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03); width: 100%; box-sizing: border-box; min-height: 80px; }
         .up-info { flex: 1; min-width: 0; margin-right: 10px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
         .up-info h4 { margin: 0; font-size: 15px; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -147,6 +120,7 @@
         .artifact-slot.found { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 158, 100, 0.3); }
         #artifact-desc { pointer-events: auto; color:#aaa; font-style:italic; font-size: 18px; margin-top: 20px; }
         #history-list li { margin-bottom: 12px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; color: #ccc; }
+        
         #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050507; z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text); }
         .start-form { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); width: 400px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
@@ -212,20 +186,9 @@
             .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
             .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
             .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
-            /* [수정] display: none 제거 및 원래 스타일 복구 */
-#event-log { 
-    font-size: 19px; 
-    color: var(--accent); 
-    font-weight: 800; 
-    text-align: right; 
-    line-height: 1.3; 
-    width: 100%; 
-    display: flex; /* 원래대로 flex로 변경 */
-    flex-direction: column; 
-    align-items: flex-end; 
-    word-break: keep-all; 
-    min-height: 50px; 
-}
+            
+            /* [모바일] 이벤트 로그 텍스트 숨김 */
+            #event-log { display: none !important; }
 
             /* 🛠️ [모바일] 주민 목록 가로 중앙 정렬 */
             .res-area { order: 3; width: 100%; margin-top: 10px; padding-bottom: 2px; overflow-x: auto; justify-content: center; display: flex; }
@@ -277,18 +240,12 @@
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
         }
-
-        /* 📱 [모바일 수정] 모바일 화면에서는 오른쪽 상단 문구(#event-log)를 절대 표시하지 않음 */
-@media (max-width: 768px) {
-    #event-log { 
-        display: none !important; 
-    }
-}
     </style>
 </head>
 <body>
 
-<div id="start-screen" style="display:flex;">
+<div id="app">
+    <div id="start-screen" style="display:flex;">
         <div class="start-form">
             <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 입주 신청서</h2>
             
@@ -338,49 +295,6 @@
                 <button class="start-btn" onclick="nextChar()" id="btn-next">추가 (1/5)</button>
                 <button class="finish-btn" onclick="finishSetup()" id="btn-finish">입주 시작</button>
             </div>
-        </div>
-    </div>
-
-            <div id="char-count">1 / 5</div>
-            <div class="form-group">
-                <label>이름 (닉네임)</label>
-                <input type="text" id="input-name" placeholder="이름을 정해주세요">
-            </div>
-            <div class="form-group">
-                <label>성별</label>
-                <select id="input-gender">
-                    <option value="남">남성</option>
-                    <option value="여">여성</option>
-                    <option value="무">무성/기타</option>
-                </select>
-
-### 2. HTML 수정: 가이드 창 (`#help-modal`)
-`<div id="help-modal" ...>` 안쪽의 내용을 아래 코드로 교체해 주세요. **[클라우드 저장하기(수동)]** 버튼을 삭제했습니다.
-
-<div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
-        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
-            <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
-            <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
-                1. <b>🏺 유물 박물관</b>에서 유물을 복원해 수익을 뻥튀기하세요.<br>
-                2. <b>📱 미드나잇 톡</b>에서 주민들의 속마음을 엿보세요.<br>
-                3. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
-            </p>
-            
-            <div style="margin-bottom: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <h3 style="margin-top:0; font-size:16px; color:var(--neon-blue); margin-bottom: 10px;">☁️ 데이터 백업</h3>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button id="btn-login-help" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
-                        G 구글 계정 연동
-                    </button>
-                </div>
-                <p id="cloud-status-msg" style="font-size:11px; color:#888; margin-top:8px;">
-                    * 로그인 시 4초마다 자동으로 클라우드에 저장됩니다.
-                </p>
-            </div>
-
-            <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
-                ⚠️ 데이터 초기화 (처음부터)
-            </button>
         </div>
     </div>
 
@@ -517,9 +431,6 @@
                     <button id="btn-login-help" onclick="googleLogin()" style="background:#4285F4; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
                         G 구글 계정 연동
                     </button>
-                    <button id="btn-save-help" onclick="saveDataToCloud()" style="background:#34A853; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
-                        ☁️ 클라우드 저장하기 (수동)
-                    </button>
                 </div>
                 <p id="cloud-status-msg" style="font-size:11px; color:#888; margin-top:8px;">
                     * 로그인 시 4초마다 자동으로 클라우드에 저장됩니다.
@@ -531,7 +442,7 @@
             </button>
         </div>
     </div>
-
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -555,7 +466,7 @@
 
     let currentUser = null; // 현재 로그인한 유저 정보
 
-    // 3. 전역 변수 선언 (가장 먼저 해야 함)
+    // 3. 전역 변수 선언
     const state = {
         money: 0, clickPower: 1, autoIncome: 1, 
         upgrades: [], history: [], artifacts: Array(20).fill(false),
@@ -577,20 +488,13 @@
     }
 
     function saveDataToCloud() {
-        if (!currentUser) {
-            alert("구글 로그인이 필요합니다!");
-            return;
+        if (currentUser) {
+            db.collection("users").doc(currentUser.uid).set(state, { merge: true })
+                .catch((error) => console.error("클라우드 자동 저장 실패:", error));
         }
-        db.collection("users").doc(currentUser.uid).set(state)
-            .then(() => {
-                showCenterPopup("☁️", "클라우드 저장 완료", "데이터가 안전하게 보관되었습니다.");
-            })
-            .catch((error) => {
-                console.error("저장 실패: ", error);
-            });
     }
 
-    // 🌟 [수정] 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
+    // 🌟 로그인 상태에 따라 버튼 모양을 바꿔주는 함수
     function updateAuthUI(user) {
         const loginBtnStart = document.getElementById('btn-login-start');
         const loginBtnHelp = document.getElementById('btn-login-help');
@@ -618,17 +522,46 @@
         }
     }
 
+    // 데이터 불러오기
+    function loadDataFromCloud() {
+        if (!currentUser) return;
+        db.collection("users").doc(currentUser.uid).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    Object.assign(state, data); // 데이터 덮어쓰기
+                    
+                    // UI 갱신
+                    render(); 
+                    updateUI();
+                    renderAchievements();
+                    
+                    showCenterPopup("🔄", "데이터 동기화", "클라우드 데이터를 불러왔습니다.");
+                    addHistory("☁️ <b>클라우드:</b> 저장된 데이터를 불러왔습니다.");
+
+                    // 저장된 데이터가 있으면 바로 시작
+                    document.getElementById('start-screen').style.display = 'none';
+                    // 중복 실행 방지
+                    // (init에서 이미 실행되었다면 건너뛰어야 하지만, 여기선 덮어쓰기 로직이므로 괜찮음)
+                } else {
+                    console.log("저장된 데이터가 없습니다.");
+                }
+            })
+            .catch((error) => {
+                console.error("불러오기 실패: ", error);
+            });
+    }
     
-    // [수정] 로그인 상태 감지 리스너 (UI 업데이트 연결)
+    // 로그인 상태 감지 리스너
     auth.onAuthStateChanged((user) => {
         if (user) {
             currentUser = user;
             console.log("로그인 됨:", user.displayName);
-            updateAuthUI(user); // 🌟 버튼 상태 즉시 변경
+            updateAuthUI(user);
             loadDataFromCloud();
         } else {
             currentUser = null;
-            updateAuthUI(null); // 버튼 상태 초기화
+            updateAuthUI(null);
             console.log("로그아웃 상태");
         }
     });
@@ -756,7 +689,7 @@
         init();
     };
 
-   function saveGame() {
+    function saveGame() {
         // 1. 로컬 저장 (기본)
         try {
             localStorage.setItem('midnight_cottage_v30_hardcore', JSON.stringify(state));
@@ -767,10 +700,24 @@
         // 2. 클라우드 자동 저장 (로그인 상태라면)
         if (currentUser) {
             // set(state, { merge: true }) 옵션을 써서 안전하게 덮어씌웁니다.
-            // .then()을 비워두어 팝업 없이 조용히 저장합니다.
             db.collection("users").doc(currentUser.uid).set(state, { merge: true })
                 .catch((error) => console.error("클라우드 자동 저장 실패:", error));
         }
+    }
+
+    function loadGame() {
+        const saved = localStorage.getItem('midnight_cottage_v30_hardcore');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                Object.assign(state, parsed);
+                return true;
+            } catch (e) {
+                console.error("세이브 파일 오류", e);
+                return false;
+            }
+        }
+        return false;
     }
 
     function init() {
@@ -890,23 +837,6 @@
             }
         }
     }
-
-    const endingDialogues = {
-        "화가": "이 방의 색채는 내 캔버스보다 아름다웠어. 영원히 기억할게.",
-        "소설가": "우리의 챕터는 여기서 끝나지만, 네 이야기는 계속 써 내려가길.",
-        "교수": "이곳의 기록은 역사에 남을 걸세. 자네 덕분이야.",
-        "리퍼닥": "내 심장 엔진도 벅차오르는군. 완벽한 수리였어.",
-        "ASMR DJ": "오늘 밤은 가장 평온한 빗소리를 들려줄게. 잘 자.",
-        "모델": "화려한 조명보다 이 방의 은은한 네온이 더 좋았어.",
-        "형사": "사건 종료. 범인은... 우리가 찾던 행복이었군.",
-        "넷러너": "로그아웃하고 싶지 않은 서버는 여기가 처음이야.",
-        "라멘노점상": "언제든 와. 따뜻한 국물 한 그릇은 평생 공짜니까.",
-        "온천주인": "마음의 때까지 씻겨나가는 기분이었어. 고마워.",
-        "LP바 사장님": "마지막 곡은 너를 위해 틀게. 이 리듬을 잊지 마.",
-        "뮤지션": "내 최고의 명곡은 이 코티지에서 탄생했어. 땡큐!",
-        "고양이": "야옹. (잘 있어라, 최고의 집사. 츄르 잊지 말고.)",
-        "VIP": "이 정도 가치 있는 투자는 처음이군. 훌륭했어."
-    };
 
     function startEndingSequence() {
         const screen = document.getElementById('ending-sequence');
@@ -1042,17 +972,14 @@
         state.history.unshift(timeMsg);
         if (state.history.length > 50) state.history.pop();
         
-        // 1. 기록창(모달) 업데이트
         const list = document.getElementById('history-list');
         if (list) list.innerHTML = state.history.map(h => `<li>${h}</li>`).join('');
         
-        // 2. PC 버전: 우측 상단에 텍스트로 표시
         const eventLog = document.getElementById('event-log');
         if (eventLog) eventLog.innerHTML = msg; 
 
-        // 3. 모바일 버전: 화면이 768px 이하일 때만 스택(벽돌) 메시지 띄우기
         if (window.innerWidth <= 768) {
-            let cleanMsg = msg.replace(/<[^>]*>?/gm, ''); // 태그 제거
+            let cleanMsg = msg.replace(/<[^>]*>?/gm, ''); 
             if(cleanMsg.includes(']')) cleanMsg = cleanMsg.split(']')[1].trim(); 
             spawnMessage(cleanMsg, 'event');
         }
@@ -1156,34 +1083,6 @@
         document.getElementById('desk-clicker').src = rankImages[state.currentSelectedRank-1];
         const artCount = state.artifacts.filter(x=>x).length;
         if (document.getElementById('artifact-boost')) document.getElementById('artifact-boost').innerText = artCount > 0 ? `(유물 버프 +${artCount*10}%)` : "";
-    }
-
-    function talkToResident(idx) {
-        const res = state.residents[idx];
-        if(!res) return;
-        let pool = res.dialogues['Solo'];
-        if (res.stress > 80) pool = res.dialogues['Stress'];
-        const msg = pool[Math.floor(Math.random()*pool.length)];
-        
-        spawnMessage(`${res.name}: "${msg}"`, 'talk');
-    }
-
-    function randomDailyEvent() {
-        if (state.residents.length < 2) return;
-        const p1 = Math.floor(Math.random() * state.residents.length);
-        let p2 = Math.floor(Math.random() * state.residents.length);
-        while(p1 === p2) { p2 = Math.floor(Math.random() * state.residents.length); } 
-        const charA = state.residents[p1], charB = state.residents[p2];
-        const rand = Math.random();
-        if (rand < 0.45) {
-            charA.affection += 5; charB.affection += 5;
-            addHistory(`💬 <b>대화:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 즐거운 대화를 나눴어. <span style="color:var(--heart)">(❤️+5)</span>`);
-        } else if (rand < 0.65) {
-            charA.affection -= 5; charB.affection -= 5;
-            addHistory(`⚡ <b>논쟁:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 사소한 오해로 다퉜어. <span style="color:#888">(💔-5)</span>`);
-        }
-        state.residents.forEach(r => { r.affection = Math.max(0, Math.min(100, r.affection)); });
-        render();
     }
 
     document.getElementById('desk-clicker').onclick = (e) => { 
