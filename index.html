@@ -288,8 +288,7 @@
 </head>
 <body>
 
-<div id="app">
-    <div id="start-screen" style="display:flex;">
+<div id="start-screen" style="display:flex;">
         <div class="start-form">
             <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 입주 신청서</h2>
             
@@ -307,13 +306,58 @@
                 <label>이름 (닉네임)</label>
                 <input type="text" id="input-name" placeholder="이름을 정해주세요">
             </div>
-            ```
+            <div class="form-group">
+                <label>성별</label>
+                <select id="input-gender">
+                    <option value="남">남성</option>
+                    <option value="여">여성</option>
+                    <option value="무">무성/기타</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>직업 (선택)</label>
+                <select id="input-job">
+                    <option value="화가">🎨 화가</option>
+                    <option value="소설가">✍️ 소설가</option>
+                    <option value="교수">📚 교수</option>
+                    <option value="리퍼닥">🛠️ 리퍼닥</option>
+                    <option value="ASMR DJ">🎧 ASMR DJ</option>
+                    <option value="모델">👠 모델</option>
+                    <option value="형사">🕵️ 형사</option>
+                    <option value="넷러너">💻 넷러너</option>
+                    <option value="라멘노점상">🍜 라멘노점상</option>
+                    <option value="온천주인">♨️ 온천주인</option>
+                    <option value="LP바 사장님">💿 LP바 사장님</option>
+                    <option value="뮤지션">🎸 뮤지션</option>
+                    <option value="고양이">🐱 고양이</option>
+                    <option value="VIP">👑 VIP</option>
+                </select>
+            </div>
+            <div class="nav-btns">
+                <button class="prev-btn" onclick="prevChar()" id="btn-prev" style="display:none;">이전</button>
+                <button class="start-btn" onclick="nextChar()" id="btn-next">추가 (1/5)</button>
+                <button class="finish-btn" onclick="finishSetup()" id="btn-finish">입주 시작</button>
+            </div>
+        </div>
+    </div>
+
+            <div id="char-count">1 / 5</div>
+            <div class="form-group">
+                <label>이름 (닉네임)</label>
+                <input type="text" id="input-name" placeholder="이름을 정해주세요">
+            </div>
+            <div class="form-group">
+                <label>성별</label>
+                <select id="input-gender">
+                    <option value="남">남성</option>
+                    <option value="여">여성</option>
+                    <option value="무">무성/기타</option>
+                </select>
 
 ### 2. HTML 수정: 가이드 창 (`#help-modal`)
 `<div id="help-modal" ...>` 안쪽의 내용을 아래 코드로 교체해 주세요. **[클라우드 저장하기(수동)]** 버튼을 삭제했습니다.
 
-```html
-    <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
+<div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
             <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
             <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
