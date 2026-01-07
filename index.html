@@ -408,7 +408,7 @@
             <div id="dialogue-stack"></div>
         </div>
         <div class="side-menu">
-            <div class="menu-title">미드나잇 시티 개발일지 <span id="artifact-boost" style="font-size:11px; color:var(--gold)"></span></div>
+            <div class="menu-title">🌃 미드나잇 시티 개발일지 <span id="artifact-boost" style="font-size:11px; color:var(--gold)"></span></div>
             
             <div id="mobile-city-status">
                 <div id="mob-city-name-display">소박하고 아늑한 사이버펑크 방</div>
@@ -503,13 +503,14 @@
             </div>
         </div>
     </div>
-    <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
+    <div id="help-modal" class="modal" onclick="if(event.target === this) toggleModal('help-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
             <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
             <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
                 1. <b>🏺 유물 박물관</b>에서 유물을 복원해 수익을 뻥튀기하세요.<br>
                 2. <b>📱 미드나잇 톡</b>에서 주민들의 속마음을 엿보세요.<br>
-                3. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
+                3. <b>🌿 스트레스 해소</b> 태그가 달려있는 건물을 구입 시 스트레스가 감소됩니다. (70%이상 초과시 스트레스용 대사를 말합니다)<br>
+                4. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
             </p>
             
             <div style="display:flex; gap:15px; margin: 25px 0; flex-wrap:wrap;">
@@ -1394,7 +1395,8 @@
     function closeModalByBg(e, id) {
         if (id === 'museum-modal') { if (!e.target.closest('.artifact-slot')) { toggleModal(id); } return; }
         // 모달 배경(바깥쪽 div)을 클릭했을 때 닫기
-        if (e.target.id === id || e.target.classList.contains('modal')) {
+        // e.target이 모달 자체이거나, 모달의 직접 자식이 아닌 경우 (내부 컨텐츠가 아닌 경우)
+        if (e.target.id === id || (e.target.classList.contains('modal') && e.target === e.currentTarget)) {
             toggleModal(id);
         }
     }
