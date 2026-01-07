@@ -111,7 +111,7 @@
         
         .toast { background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: 900; font-size: 18px; box-shadow: 0 0 30px var(--gold); animation: toast-pop 3s forwards; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .evo-toast { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: var(--accent); color: #000; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: 900; z-index: 2000; animation: evo-pop 4s forwards; box-shadow: 0 0 50px var(--accent); text-align: center; border: 4px solid #fff; }
-        .center-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(10, 10, 15, 0.95); border: 2px solid var(--accent); color: var(--accent); padding: 25px 50px; border-radius: 20px; font-size: 22px; font-weight: 900; z-index: 2000; animation: fade-in-out 3s forwards; box-shadow: 0 0 40px rgba(187, 154, 247, 0.4); text-align: center; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .center-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(10, 10, 15, 0.95); border: 2px solid var(--gold); color: var(--gold); padding: 25px 50px; border-radius: 20px; font-size: 22px; font-weight: 900; z-index: 2000; animation: fade-in-out 3s forwards; box-shadow: 0 0 40px rgba(255, 158, 100, 0.4); text-align: center; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         @keyframes fade-in-out { 0% { opacity:0; transform:translate(-50%, -40%); } 15% { opacity:1; transform:translate(-50%, -50%); } 85% { opacity:1; transform:translate(-50%, -50%); } 100% { opacity:0; transform:translate(-50%, -60%); } }
         @keyframes evo-pop { 0% { opacity:0; transform:translate(-50%, -30%) scale(0.8); } 10% { opacity:1; transform:translate(-50%, -50%) scale(1.1); } 20% { transform:translate(-50%, -50%) scale(1); } 90% { opacity:1; } 100% { opacity:0; transform:translate(-50%, -70%) scale(0.8); } }
         @keyframes toast-pop { 0% { opacity:0; transform:translateY(20px); } 15% { opacity:1; transform:translateY(0); } 85% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-20px); } }
@@ -226,7 +226,7 @@
 
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-            /* [モバイル] 部屋画面の高さ (45%) */
+            /* [モバイル] 部屋画面の高さ (45%) - 日本語版最適化 */
             .main-panel { 
                 flex: 0 0 45%; 
                 padding: 0; 
@@ -239,7 +239,7 @@
                 overflow: hidden; 
             }
             
-            /* [モバイル] 画像拡大 (130%) & 位置調整 */
+            /* [モバイル] 画像拡大 (130% + 15px) - 日本語版最適化 */
             #desk-clicker { 
                 width: 130%; 
                 height: 130%; 
@@ -653,7 +653,7 @@
         { id: 'cat', name: 'ニャンコワールド', icon: '🐱', desc: 'すべての住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '猫') },
         { id: 'drama', name: '愛と戦争', icon: '💔', desc: '不倫関係が発生しました。', unlocked: false, check: s => s.residents.some(r => r.relType === '불륜') },
         { id: 'rich', name: '億万長者', icon: '💰', desc: '所持金1,000,000突破。', unlocked: false, check: s => s.money >= 1000000 },
-        { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === '솔로') },
+        { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === 'ソロ') },
         { id: 'stress', name: '燃え尽き症候群', icon: '🔥', desc: '住民の平均ストレスが90%以上。', unlocked: false, check: s => s.residents.length > 0 && (s.residents.reduce((a,b)=>a+b.stress,0)/s.residents.length) > 90 },
         { id: 'collector', name: '歴史学者', icon: '📜', desc: 'すべての遺物(20種)の収集完了。', unlocked: false, check: s => s.artifacts.every(a => a === true) }
     ];
@@ -666,7 +666,7 @@
         init();
     };
 
-    // [修正] 1. 保存機能 (日本語版キー値分離)
+    // [修正] 1. 保存機能
     function saveGame() {
         try {
             localStorage.setItem('midnight_cottage_v30_JP', JSON.stringify(state));
@@ -748,7 +748,7 @@
             stress: 0, 
             affection: 50, 
             partnerId: null, 
-            relType: '솔로',
+            relType: 'ソロ',
             dialogues: selectedDialogues
         };
     }
@@ -781,24 +781,19 @@
         setInterval(changeNews, 300000);
         render(); updateUI(); renderAchievements();
         
-        setInterval(() => { 
-            let boost = 1 + (state.artifacts.filter(x=>x).length * 0.1);
-            let income = state.autoIncome * boost;
-            if (state.residents.length > 0) {
-                let avgStress = state.residents.reduce((a,b)=>a+b.stress, 0) / state.residents.length;
-                if (avgStress > 80) income *= 0.5;
-            }
+        // 👇 [修正] ゲーム開始時にSNS投稿を3つ生成 (日本語版も速く)
+        setTimeout(generateSNSPost, 500); 
+        setTimeout(generateSNSPost, 1000); 
+        setTimeout(generateSNSPost, 1500); 
 
-            state.money += income / 10; 
-            state.residents.forEach(r => r.stress = Math.min(100, r.stress + 0.007));
-            updateUI(); 
-            checkAchievements();
-        }, 100);
+        // 5秒ごとに自動保存
+        setInterval(saveGame, 5000);
+        
+        // イベント発生 (25秒)
         setInterval(randomDailyEvent, 25000);
-        setInterval(generateSNSPost, 60000); 
-
-        // 💾 4秒ごとに自動保存実行
-        setInterval(saveGame, 4000);
+        
+        // 👇 [修正] SNS更新頻度を5秒に短縮
+        setInterval(generateSNSPost, 5000); 
 
         if (window.innerWidth <= 768) {
             spawnMessage('💻作業ファイト！ミッドナイト・コテージへようこそ。', 'event');
@@ -956,7 +951,7 @@
                 "下僕に隠れておやつ盗み食い。", "爪とぎカリカリ。", "あくび...", "蝶々捕まえに行く。"
             ][Math.floor(Math.random()*20)]; 
         } 
-        else if (char.relType === '불륜') { 
+        else if (char.relType === '不倫') { 
             text = [
                 "裏アカです。", "今夜も...", "しーっ。", "誰にも内緒で。", "心臓がうるさい。", 
                 "危険だけど止められない。", "こんなのダメなのに...", "会いたい。", "深夜2時の密会。", 
@@ -1073,7 +1068,7 @@
 
     function render() {
         document.getElementById('res-grid').innerHTML = state.residents.map((r, i) => {
-            let relText = r.relType === '솔로' ? 'ソロ' : (r.relType === '커플' ? 'カップル' : '不倫');
+            let relText = r.relType === 'ソロ' ? 'ソロ' : (r.relType === 'カップル' ? 'カップル' : '不倫');
             if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}と${relText}`; }
             const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
             return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
@@ -1176,9 +1171,9 @@
         let pool = latestDialogues['Solo'];
         
         // 3. 関係ステータスのチェック
-        if (res.relType === '커플') { // データ値は韓国語維持
+        if (res.relType === 'カップル') { // 日本語キー
             pool = latestDialogues['Love'];
-        } else if (res.relType === '불륜') { // データ値は韓国語維持
+        } else if (res.relType === '不倫') { // 日本語キー
             pool = latestDialogues['Affair'];
         }
 
@@ -1275,10 +1270,10 @@
 
         addHistory(`${typeLabel} ${evt.m} <span style="color:${valColor}">(${heartIcon}${evt.v > 0 ? '+' : ''}${evt.v})</span>`);
 
-        // 関係変化ロジック (한국어 Logic과 동일)
+        // 関係変化ロジック (日本語キー)
         // A. [破局]
         if (charA.partnerId === charB.id && (charA.affection < 30 || charB.affection < 30)) {
-            charA.relType = '솔로'; charB.relType = '솔로'; // Logic state uses Korean keys
+            charA.relType = 'ソロ'; charB.relType = 'ソロ';
             charA.partnerId = null; charB.partnerId = null;
             showCenterPopup("💔", "決別", `${charA.name} ⚡ ${charB.name}`);
             addHistory(`💔 <b>別れ:</b> ${charA.name}と${charB.name}は、性格の不一致を克服できず他人になりました。`);
@@ -1287,8 +1282,8 @@
         
         // B. [カップル誕生]
         else if (charA.affection >= 90 && charB.affection >= 90) {
-            if (charA.relType === '솔로' && charB.relType === '솔로') {
-                charA.relType = '커플'; charB.relType = '커플';
+            if (charA.relType === 'ソロ' && charB.relType === 'ソロ') {
+                charA.relType = 'カップル'; charB.relType = 'カップル';
                 charA.partnerId = charB.id; charB.partnerId = charA.id;
                 showCenterPopup("💖", "カップル誕生！", `${charA.name} ♥ ${charB.name}`);
                 addHistory(`💖 <b>おめでとう！</b> ${charA.name}と${charB.name}は恋人になりました！`);
@@ -1296,14 +1291,14 @@
             } 
             
             // C. [不倫] および既存の恋人の整理
-            else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
-                if (charA.relType !== '불륜' || charB.relType !== '불륜') {
+            else if (charA.partnerId !== charB.id && (charA.relType === 'カップル' || charB.relType === 'カップル')) {
+                if (charA.relType !== '不倫' || charB.relType !== '不倫') {
                     
                     // 1. Aの既存パートナー整理
                     if (charA.partnerId !== null) {
                         const exA = state.residents[charA.partnerId];
                         if (exA && exA.id !== charB.id) { 
-                            exA.relType = '솔로'; 
+                            exA.relType = 'ソロ'; 
                             exA.partnerId = null; 
                             exA.stress += 30; 
                         }
@@ -1313,14 +1308,14 @@
                     if (charB.partnerId !== null) {
                         const exB = state.residents[charB.partnerId];
                         if (exB && exB.id !== charA.id) { 
-                            exB.relType = '솔로'; 
+                            exB.relType = 'ソロ'; 
                             exB.partnerId = null; 
                             exB.stress += 30; 
                         }
                     }
 
                     // 3. 不倫関係の成立
-                    charA.relType = '불륜'; charB.relType = '불륜';
+                    charA.relType = '不倫'; charB.relType = '不倫';
                     charA.partnerId = charB.id; charB.partnerId = charA.id;
 
                     showCenterPopup("😈", "危険な関係", `${charA.name} & ${charB.name}`);
