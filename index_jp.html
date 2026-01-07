@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ミッドナイト・コテージ (Midnight Cottage)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>ミッドナイト・コテージ Midnight Cottage</title>
     <style>
         :root {
             --bg: #09090d; --card: #12121a; --accent: #bb9af7; --gold: #ff9e64;
@@ -15,8 +12,10 @@
             --female-bg: rgba(255, 182, 193, 0.35); --male-bg: rgba(135, 206, 235, 0.35);
             --healing: #50fa7b; --danger: #ff5555;
         }
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: #050507; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text); overflow: hidden; user-select: none; }
+        /* 일본어 폰트 우선 적용 */
+        body { font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; background-color: #050507; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: var(--text); overflow: hidden; user-select: none; }
         
+        /* 기존 CSS 그대로 유지 */
         #app { width: 98%; max-width: 1350px; height: 96vh; background: var(--bg); border-radius: 24px; display: flex; flex-direction: column; position: relative; transition: all 0.5s ease; box-shadow: 0 0 80px rgba(0,0,0,1); box-sizing: border-box; }
         
         .app-header { padding: 15px 30px; display: grid; grid-template-columns: 350px 1fr 500px; align-items: center; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--border); border-radius: 24px 24px 0 0; z-index: 10; height: auto; min-height: 60px; }
@@ -106,7 +105,7 @@
         .start-form { background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid var(--border); width: 400px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-size: 14px; font-weight: 700; color: var(--gold); }
-        .form-group input, .form-group select { background: #1a1a24; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; outline: none; }
+        .form-group input, .form-group select { background: #1a1a24; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; font-size: 16px; outline: none; }
         .form-group input::placeholder { color: #666; font-style: italic; }
         .form-group input:focus, .form-group select:focus { border-color: var(--neon-blue); }
         .nav-btns { display: flex; gap: 10px; margin-top: 15px; }
@@ -139,128 +138,70 @@
         .ach-title { font-weight: 800; color: #fff; font-size: 14px; }
         .ach-desc { font-size: 11px; color: #aaa; margin-top: 3px; }
         
-        /* 💌 エンディングシーケンス */
         #ending-sequence { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 6000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .rolling-container { text-align: center; opacity: 0; transform: translateY(20px); transition: 1s ease; display: flex; flex-direction: column; align-items: center; }
         .rolling-container.show { opacity: 1; transform: translateY(0); }
         .end-emoji { font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--accent)); }
         .end-name { font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 20px; }
-        .end-msg { font-size: 22px; color: #fff; font-weight: 300; line-height: 1.6; max-width: 80%; margin: 0 auto; word-break: keep-all; font-family: 'Noto Sans JP', serif; }
+        .end-msg { font-size: 22px; color: #fff; font-weight: 300; line-height: 1.6; max-width: 80%; margin: 0 auto; word-break: keep-all; font-family: 'Helvetica Neue', serif; }
         .ending-btn { background: var(--gold); color: #000; padding: 15px 30px; border-radius: 30px; font-weight: 900; font-size: 18px; border: none; cursor: pointer; transition: 0.3s; }
         .ending-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--gold); }
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 🌟 2. モバイルレスポンシブ CSS */
         @media (max-width: 768px) {
             body { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
             #app { height: 100%; width: 100%; border-radius: 0; display: flex; flex-direction: column; }
-
-            /* ヘッダーの余白調整 */
             .app-header { display: flex; flex-direction: column; padding: 5px 15px 0px 15px; gap: 0px; height: auto; flex-shrink: 0; align-items: center; border-bottom: none; }
-            
             .header-left { width: 100%; order: 1; align-items: flex-start; margin-bottom: 0px; }
             .budget-display { font-size: 24px; margin: 0; justify-content: flex-start; white-space: nowrap; width: 100%; }
             #news-banner { display: none; }
             #pc-city-status { display: none; }
-
-            /* 上部メニューアイコンの中央揃え */
             .header-right { width: 100%; order: 2; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; margin-top: 5px; }
             .top-buttons { width: 100%; display: flex; gap: 12px; margin: 0; flex-wrap: nowrap; overflow-x: auto; justify-content: center; }
             .icon-btn { width: 38px; height: 38px; font-size: 18px; flex-shrink: 0; }
-            
             #event-log { display: none !important; }
-
-            /* 住民リストの中央揃え */
             .res-area { order: 3; width: 100%; margin-top: 5px; padding-bottom: 5px; overflow-x: auto; justify-content: center; display: flex; }
             .res-card { min-width: 55px; margin-right: 5px; transform: none !important; transition: none !important; }
             .res-card:hover, .res-card:active { transform: none !important; margin-top: 0 !important; }
             .res-icon-box { width: 40px; height: 40px; font-size: 20px; }
             .res-name { font-size: 10px; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
-            
-            /* 職業と関係(ソロ/カップル)を表示 */
-            .res-job { 
-                display: block !important; 
-                font-size: 8px; 
-                color: var(--neon-blue); 
-                margin-top: 1px;
-                white-space: nowrap;
-            }
-            .res-rel { 
-                display: block !important; 
-                font-size: 8px; 
-                color: var(--heart); 
-                margin-top: 0px;
-                white-space: nowrap;
-            }
-
+            .res-job { display: block !important; font-size: 8px; color: var(--neon-blue); margin-top: 1px; white-space: nowrap; }
+            .res-rel { display: block !important; font-size: 8px; color: var(--heart); margin-top: 0px; white-space: nowrap; }
             .content-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-            /* [モバイル] 部屋画面の高さ (45%) */
-            .main-panel { 
-                flex: 0 0 45%; 
-                padding: 0; 
-                order: 1; 
-                position: relative; 
-                background: #000; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                overflow: hidden; 
-            }
-            
-            /* [モバイル] 画像拡大 (130% + 15px) */
-            #desk-clicker { 
-                width: 130%; 
-                height: 130%; 
-                object-fit: contain; 
-                margin: 0; 
-                transform: translateY(15px); 
-            }
-            
+            .main-panel { flex: 0 0 45%; padding: 0; order: 1; position: relative; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+            #desk-clicker { width: 130%; height: 130%; object-fit: contain; margin: 0; transform: translateY(15px); }
             #dialogue-stack { bottom: 10px; width: 90%; gap: 6px; }
             .dialogue-bubble { font-size: 13px; padding: 10px; }
-
             .side-menu { flex: 1; order: 2; height: auto; overflow-y: auto; border-top: 2px solid var(--border); background: rgba(0,0,0,0.9); padding: 10px 15px 80px 15px; }
             #mobile-city-status { display: flex; margin-bottom: 5px; padding: 8px; } 
-            
             .menu-title { margin-bottom: 5px; text-align: left; border-left: none; padding-left: 0; }
-            
             .up-card { flex-direction: column; align-items: flex-start; padding: 12px; min-height: auto; margin-bottom: 8px; gap: 8px; }
             .up-info { width: 100%; margin-right: 0; }
-            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; } 
-            .buy-btn { width: 100%; margin-top: 5px; height: 40px; } 
-
+            .up-info h4, .up-info p { white-space: normal; word-break: keep-all; overflow: visible; }
+            .buy-btn { width: 100%; margin-top: 5px; height: 40px; }
             .evo-toast { width: 85%; min-width: unset; white-space: nowrap; font-size: 16px; padding: 12px 10px; bottom: 35%; border-width: 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
             .modal h2, #history-modal h2 { margin-top: 0 !important; margin-bottom: 15px !important; padding-top: 0 !important; line-height: 1.2; transform: translateY(-10px); }
             #history-list { padding-top: 0 !important; margin-top: 0 !important; }
-
             .sns-container { width: 100%; height: 75%; margin-top: -20px; margin-bottom: 20px; }
-
             .museum-container { width: 100%; display: flex; flex-direction: column; padding: 10px 0; overflow-x: hidden; height: 100%; }
             .museum-container h2 { order: 1; flex-shrink: 0; }
             #artifact-desc { order: 2; margin-bottom: 10px; margin-top: 0; font-size: 13px; color: var(--neon-blue); min-height: 20px; flex-shrink: 0; }
             .museum-grid { order: 3; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 95%; margin: 0 auto; padding: 0 5px 100px 5px; box-sizing: border-box; overflow-y: auto; }
             .artifact-slot { width: 100%; aspect-ratio: 1 / 1; font-size: 14px; } 
-
             .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 5px 80px 5px; width: 100%; box-sizing: border-box; overflow-y: auto; }
             .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; }
             .gallery-item img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
         }
-
         @keyframes boing {
             0% { transform: scale(1); }
-            40% { transform: scale(0.9); }  
-            60% { transform: scale(1.1); }  
-            100% { transform: scale(1); }   
+            40% { transform: scale(0.9); } 
+            60% { transform: scale(1.1); } 
+            100% { transform: scale(1); } 
         }
-        .click-animate {
-            animation: boing 0.3s ease-out forwards;
-        }
+        .click-animate { animation: boing 0.3s ease-out forwards; }
     </style>
 </head>
 <body>
@@ -268,11 +209,11 @@
 <div id="app">
     <div id="start-screen" style="display:flex;">
         <div class="start-form">
-            <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 入居申込書</h2>
+            <h2 style="text-align:center; color:var(--accent); margin-bottom:10px;">📄 入居申請書</h2>
             
             <div id="char-count">1 / 5</div>
             <div class="form-group">
-                <label>名前 (ニックネーム)</label>
+                <label>お名前 (ニックネーム)</label>
                 <input type="text" id="input-name" placeholder="名前を決めてください">
             </div>
             <div class="form-group">
@@ -286,19 +227,19 @@
             <div class="form-group">
                 <label>職業 (選択)</label>
                 <select id="input-job">
-                    <option value="画家">🎨 画家</option>
-                    <option value="小説家">✍️ 小説家</option>
-                    <option value="教授">📚 教授</option>
-                    <option value="リパードク">🛠️ リパードク</option>
+                    <option value="화가">🎨 画家</option>
+                    <option value="소설가">✍️ 小説家</option>
+                    <option value="교수">📚 教授</option>
+                    <option value="리퍼닥">🛠️ リパードク</option>
                     <option value="ASMR DJ">🎧 ASMR DJ</option>
-                    <option value="モデル">👠 モデル</option>
-                    <option value="刑事">🕵️ 刑事</option>
-                    <option value="ネットランナー">💻 ネットランナー</option>
-                    <option value="ラーメン屋">🍜 ラーメン屋</option>
-                    <option value="温泉主人">♨️ 温泉宿の主人</option>
-                    <option value="バーマスター">💿 バーのマスター</option>
-                    <option value="ミュージシャン">🎸 ミュージシャン</option>
-                    <option value="猫">🐱 猫</option>
+                    <option value="모델">👠 モデル</option>
+                    <option value="형사">🕵️ 刑事</option>
+                    <option value="넷러너">💻 ネットランナー</option>
+                    <option value="라멘노점상">🍜 ラーメン屋台</option>
+                    <option value="온천주인">♨️ 温泉宿の主人</option>
+                    <option value="LP바 사장님">💿 LPバーのマスター</option>
+                    <option value="뮤지션">🎸 ミュージシャン</option>
+                    <option value="고양이">🐱 猫</option>
                     <option value="VIP">👑 VIP</option>
                 </select>
             </div>
@@ -320,7 +261,7 @@
             <h1 style="font-size:40px; color:var(--accent); margin-bottom:20px;">The End</h1>
             <p style="color:#ccc; margin-bottom:30px; line-height: 1.6;">
                 ミッドナイト・コテージの夜は続きます。<br>
-                あなたの作業も、彼らのように輝きますように。
+                あなたの作業も彼らのように輝きますように。
             </p>
             <button class="ending-btn" onclick="closeEndingSequence()">残って続ける</button>
         </div>
@@ -333,7 +274,7 @@
             <div class="budget-display">💵 <span id="budget">0</span></div>
             <div id="news-banner">📢 ニュース読み込み中...</div>
             <div id="pc-city-status">
-                <div id="city-name-display">素朴で居心地の良いサイバーパンクの部屋</div>
+                <div id="city-name-display">素朴で居心地の良いサイバーパンク部屋</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:3px; margin-top:2px;">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span style="color:var(--gold); font-weight:800;">⭐ 発展度</span>
@@ -371,7 +312,7 @@
             <div class="menu-title">ミッドナイトシティ開発日誌 <span id="artifact-boost" style="font-size:11px; color:var(--gold)"></span></div>
             
             <div id="mobile-city-status">
-                <div id="mob-city-name-display">素朴で居心地の良いサイバーパンクの部屋</div>
+                <div id="mob-city-name-display">素朴で居心地の良いサイバーパンク部屋</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-bottom:3px; margin-top:2px;">
                     <div style="display:flex; align-items:center; gap:4px;">
                         <span style="color:var(--gold); font-weight:800;">⭐ 発展度</span>
@@ -388,29 +329,29 @@
     </div>
 
     <div id="gallery-modal" class="modal" onclick="closeModalByBg(event, 'gallery-modal')">
-        <h2 style="color:var(--gold); pointer-events:none;">🖼️ コテージ・ルームギャラリー</h2>
+        <h2 style="color:var(--gold); pointer-events:none;">🖼️ コテージルーム・ギャラリー</h2>
         <div id="gallery-grid" class="gallery-grid" onclick="event.stopPropagation()"></div>
     </div>
     <div id="museum-modal" class="modal" onclick="closeModalByBg(event, 'museum-modal')">
         <div class="museum-container">
-            <h2 style="color:var(--gold); margin: 0; pointer-events: none;">🏛️ 2202年 歴史博物館 (2026年の遺物)</h2>
+            <h2 style="color:var(--gold); margin: 0; pointer-events: none;">🏛️ 2202年 歴史博物館 (2026 遺物)</h2>
             <div id="museum-list" class="museum-grid"></div>
             <p id="artifact-desc" style="pointer-events: none;">遺物をクリックするとテオ教授の一言解説が出ます。</p>
         </div>
     </div>
     <div id="history-modal" class="modal" onclick="closeModalByBg(event, 'history-modal')">
-        <h2 style="color:var(--accent); margin-bottom: 20px; pointer-events:none;">📜 ミッドナイト・コテージの記録</h2>
+        <h2 style="color:var(--accent); margin-bottom: 20px; pointer-events:none;">📜 ミッドナイト・コテージ記録</h2>
         <ul id="history-list" style="width:90%; text-align:left; overflow-y:auto; max-height:500px; padding:0 30px; list-style:none;" onclick="event.stopPropagation()"></ul>
     </div>
     <div id="shop-modal" class="modal" onclick="closeModalByBg(event, 'shop-modal')">
-        <h2 style="color:#bd93f9;">🏺 古代遺物博物館 (Artifacts)</h2>
+        <h2 style="color:#bd93f9;">🏺 古代遺物 博物館 (Artifacts)</h2>
         <div class="gacha-container" onclick="event.stopPropagation()">
             <p style="color:#ccc; font-size:14px; margin-bottom:20px;">
-                2026年の忘れ去られた古代遺物を発掘し、復元する場所です。<br>
-                遺物を復元して展示すると、<b>全体収益ボーナス</b>が得られます。
+                2026年の忘れ去られた古代遺物を発掘し復元する場所です。<br>
+                遺物を復元して展示すると<b>全体収益ボーナス</b>を獲得します。
             </p>
             <button class="gacha-btn" id="btn-gacha" onclick="buyArtifact()">
-                ⛏️ 遺物の発掘・復元を試みる
+                ⛏️ 遺物の発掘と復元を試みる
                 <span class="gacha-cost" id="gacha-price"></span>
             </button>
         </div>
@@ -425,16 +366,16 @@
         </div>
     </div>
     <div id="ach-modal" class="modal" onclick="closeModalByBg(event, 'ach-modal')">
-        <h2 style="color:var(--gold);">🏆 隠し実績</h2>
+        <h2 style="color:var(--gold);">🏆 秘密の実績</h2>
         <div id="ach-grid" class="ach-grid" onclick="event.stopPropagation()"></div>
     </div>
     <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
             <h2 style="color:var(--gold)">🏠 設定＆ガイド</h2>
             <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
-                1. <b>🏺 遺物博物館</b>で遺物を復元し、収益をブーストさせましょう。<br>
-                2. <b>📱 ミッドナイト・トーク</b>で住民たちの本音を覗き見しましょう。<br>
-                3. 最後の<b>ユートピア・ランク</b>に到達すればエンディングです！
+                1. <b>🏺 遺物博物館</b>で遺物を復元して収益をブーストさせよう。<br>
+                2. <b>📱 ミッドナイトトーク</b>で住民たちの本音を覗き見よう。<br>
+                3. 最後の<b>ユートピアランク</b>に到達するとエンディング！
             </p>
             
             <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
@@ -445,7 +386,7 @@
 </div>
 
 <script>
-    // 3. 全体変数宣言
+    // 3. 전역 변수 선언 (Global Variables)
     const state = {
         money: 0, clickPower: 1, autoIncome: 1, 
         upgrades: [], history: [], artifacts: Array(20).fill(false),
@@ -453,162 +394,163 @@
         residents: [], achievements: [], endingSeen: false
     };
 
-    // 5. ゲームデータおよびロジック
+    // 5. 게임 데이터 및 로직
+    // 주의: Key값(화가, 소설가 등)은 HTML value와 일치해야 하므로 한국어 유지!
     const jobEmojis = {
-        "画家": "🎨", "小説家": "✍️", "教授": "📚", "リパードク": "🛠️",
-        "ASMR DJ": "🎧", "モデル": "👠", "刑事": "🕵️", "ネットランナー": "💻",
-        "ラーメン屋": "🍜", "温泉主人": "♨️", "バーマスター": "💿",
-        "ミュージシャン": "🎸", "猫": "🐱", "VIP": "👑"
+        "화가": "🎨", "소설가": "✍️", "교수": "📚", "리퍼닥": "🛠️",
+        "ASMR DJ": "🎧", "모델": "👠", "형사": "🕵️", "넷러너": "💻",
+        "라멘노점상": "🍜", "온천주인": "♨️", "LP바 사장님": "💿",
+        "뮤지션": "🎸", "고양이": "🐱", "VIP": "👑"
     };
 
     const jobsData = {
-        "画家": {
-            'Solo': ["ネオンの絵の具がふわふわしてる。", "この色彩は君に似ているね。", "筆先から夜明けが咲くよ。", "キャンバスはまだ未完成だ。", "今日は紫色のネオンが悲しげに見える。", "デジタルキャンバスじゃ質感が足りない。", "夢で見た色を探してるんだ。", "雨に滲む街の灯りが最高のパレットさ。", "私の絵には魂が足りないのかな？", "古い油絵の匂いが恋しい。", "ホログラムの絵の具は冷たすぎる。", "この街の灰色も嫌いじゃない。", "新しいインスピレーションが湧きそう。", "内面の風景を描きたいんだ。"],
-            'Love': ["君の瞳の色をキャンバスに込めたい。", "君といると世界が蛍光色に見えるよ。", "最も完璧な色は君だ。", "君は僕のモノクロの世界で唯一の色だ。", "この赤は君への想いの色さ。", "君の笑顔をスケッチしたい。", "二人の思い出を永遠に残す絵を描くよ。", "君という芸術作品を鑑賞中さ。", "君がそばにいれば筆が踊るよ。", "君を描く時が一番幸せだ。"],
-            'Affair': ["秘密めいた色は魅惑的だね。", "禁じられた線を越えるのはスリルがある。", "こっそり描く君の肖像画が好きだ。", "この関係は抽象画みたいだ。理解しようとしないで。", "危険な色ほど惹かれるものさ。", "夜だけ許された僕らのギャラリー。", "君との時間は上塗りされたキャンバスのよう。", "誰にも知らない色で君を塗りたい。", "罪悪感も芸術の一部かな？", "盗んだ林檎の方が美味しいってね。"],
-            'Stress': ["筆をへし折ってしまいたい！", "何も描きたくない。", "世界がすべて灰色だ。", "私の絵なんてゴミだ！", "インスピレーションが枯れちゃった。", "絵の具の匂いが気持ち悪い。", "誰も私の芸術を理解してくれない。", "デジタルノイズのせいで気が狂いそう！", "あぁ、腱鞘炎が痛む...", "キャンバスを引き裂きたい気分だ。"]
+        "화가": {
+            'Solo': ["ネオン絵の具がふわふわしてる。", "この色彩は君に似てるね。", "筆先から夜明けが咲くんだ。", "キャンバスはまだ未完成だよ。", "今日は紫色が悲しく見える。", "デジタルキャンバスじゃ質感が足りない。", "夢で見た色を探してるんだ。", "雨に滲んだ街の光が最高のパレットさ。", "僕の絵には魂が足りないのかな？", "古い油絵の匂いが恋しい。", "ホログラム絵の具は冷たすぎる。", "この街の灰色、嫌いじゃないよ。", "新しいインスピレーションが湧きそう。", "内面の風景を描きたいんだ。"],
+            'Love': ["君の瞳の色を閉じ込めたい。", "君といると世界が蛍光色になる。", "最も完璧な色は君だ。", "君は僕のモノクロ世界の唯一のカラー。", "この赤色は君への想いさ。", "君の笑顔をスケッチしたい。", "僕らの思い出を永遠に剥製にする絵を描くよ。", "君という芸術作品を鑑賞中さ。", "君がそばにいると筆が踊るんだ。", "君を描く時が一番幸せ。"],
+            'Affair': ["秘密の色って魅惑的だろ。", "禁じられた線を越えるのは刺激的さ。", "こっそり描く君の肖像画がいいんだ。", "この関係は抽象画みたい。理解しようとしないで。", "危険な色ほど惹かれるものさ。", "夜だけ許された僕らのギャラリー。", "君との時間は上書きされたキャンバスのよう。", "誰も知らない色で君を塗りたい。", "罪悪感も芸術の一部かな？", "盗んだリンゴの方が美味しいのさ。"],
+            'Stress': ["筆をへし折りたい！", "何も描きたくない。", "世界が全部灰色だ。", "僕の絵はゴミだ！", "インスピレーションが枯れた。", "絵の具の匂いが吐き気がする。", "誰も僕の芸術を理解してない。", "デジタルノイズのせいで狂いそう！", "この手根管症候群め...", "キャンバスを引き裂きたいね。"]
         },
-        "小説家": {
-            'Solo': ["文章たちが踊っている。", "この街のすべてが小説のネタだ。", "エンディングはどうしようかな？", "タイプライターの音が雨音と混ざるね。", "プロットが絡まった。人生みたいに。", "主人公を殺すべきか、生かすべきか。", "午前3時の感性が必要だ。", "コーヒーが冷めたな。温め直そう。", "このセリフ、陳腐かな？", "サイバーパンク・ノワール...今度の新作のジャンルさ。", "読者は残酷な展開が好きだからね。", "文字が虫みたいに這い回る気分だ。", "クラウド保存は必須だよ。", "古い紙の本の匂いを嗅ぎたい。"],
-            'Love': ["君との恋はベストセラーだ。", "私の小説の主人公は君だよ。", "ハッピーエンドだけを書きたい。", "どんな言葉でも君を表現しきれない。", "君は僕の人生最高の大どんでん返しだ。", "僕らの愛を長編小説に残すよ。", "毎日君というページをめくりたい。", "君の声は詩となって僕に刺さる。", "ロマンス小説が売れる理由がわかったよ。", "君と綴るこの物語が永遠でありますように。"],
-            'Affair': ["禁止されたチャプターを書く気分だ。", "読者は知らない私たちだけのどんでん返し。", "危険な伏線のように君に惹かれる。", "悲劇だと知りながらページをめくるのさ。", "これは編集者に内緒で書いた外伝だよ。", "ジャンルがスリラーに変わっていく。", "破滅に向かう結末ほど美しいものはない。", "隠された行間に君を隠しておくよ。", "僕らは間違った文法で書かれた文章さ。", "読んではいけない禁書を開いた気分だ。"],
-            'Stress': ["文字が虫みたいに見える！", "原稿用紙を全部燃やしてやる！", "私の人生は失敗作だ。", "一文字も書けない！", "締め切りの催促メール、もうやめて！", "私の才能はここまでか。", "キーボードを叩き壊したい。", "ストーリーが山に行っちゃった。", "アンチコメントのせいで気が狂いそう。", "みんな私の文章をパクリだと言うんだ。"]
+        "소설가": {
+            'Solo': ["文章たちが踊ってるね。", "この街の全てが小説のネタだ。", "エンディングはどうしようか。", "タイプライターの音が雨音と混じる。", "プロットが絡まった。人生みたいに。", "主人公を殺すべきか、生かすべきか。", "午前3時の感性が必要だ。", "コーヒーが冷めたな。温め直そう。", "このセリフ、ちょっと陳腐かな？", "サイバーパンク・ノワール…今度の新作ジャンルさ。", "読者は残酷なのが好きなんだ。", "文字が虫みたいに這い回る気分だ。", "クラウド保存は必須だね。", "古い紙の本の匂いを嗅ぎたい。"],
+            'Love': ["君との恋はベストセラーさ。", "僕の小説の主人公は君だ。", "ハッピーエンドだけ書きたい。", "どんな文章でも君を表現しきれないよ。", "君は僕の人生最大の大どんでん返しだ。", "僕らの愛を長編小説に残すよ。", "毎日君というページをめくりたい。", "君の声は詩となって僕に刺さる。", "ロマンス小説がなぜ売れるのか分かったよ。", "君と共に綴るこの物語が永遠でありますように。"],
+            'Affair': ["禁じられた章を書く気分さ。", "読者は知らない僕らだけの反転。", "危険な伏線のように君に惹かれる。", "悲劇だと知りつつページをめくるんだ。", "これは編集者に内緒で書いた外伝さ。", "ジャンルがスリラーに変わっていく。", "破局に向かう結末の方が美しい。", "隠された文章の中に君を隠しておくよ。", "僕らは間違った文法で書かれた文章だ。", "読んではいけない禁書を開いた気分。"],
+            'Stress': ["文字が虫に見える！", "原稿用紙全部燃やしてやる！", "僕の人生は駄作だ。", "一文字も書けない！", "〆切の催促メール送ってくるな！", "僕の才能はここまでか。", "キーボードをぶっ壊したい。", "ストーリーが山に行ってる。", "アンチコメントのせいで狂いそう。", "みんな僕の文章をパクリだと言う。"]
         },
-        "教授": {
-            'Solo': ["歴史は繰り返す。", "古い本の匂いが好きだ。", "2026年は実にロマンチックだったな。", "この遺物は21世紀初頭のものだよ。", "データは嘘をつかない。", "学生たちが私の授業を理解しているだろうか？", "過去を知れば未来が見える。", "図書館の静寂、それが私の安息所だ。", "論文の審査が近いな。", "古代人はスマートフォンという板を使っていたらしい。", "知識の探求に終わりはないね。", "AIが歴史を教える時代とは。", "コーヒーよりお茶がいいな。", "この都市の地下には旧時代の遺跡が眠っている。"],
-            'Love': ["君は歴史上、最も美しい。", "君を一生研究したい。", "古典の詩より君の方が優雅だ。", "私の人生で最も偉大な発見は君だ。", "君と一緒なら永遠も短く感じるだろう。", "論理的に説明できない感情だ。", "君は私の学説を覆す例外的な存在だ。", "愛の歴史を新しく書きたいね。", "君の知性に惚れたよ。", "共に歳を重ねるというのは素敵なことだ。"],
-            'Affair': ["禁じられた歴史ほど興味深いな。", "道徳的尺度より君が大事だ。", "これは秘密の授業だよ。", "倫理学的には間違っているが、本能は君を求めている。", "歴史に記録されない秘密の逢瀬。", "危険な仮説を検証している気分だ。", "理性的には止めるべきなのだが。", "エラーだと知りながら君を選んだ。", "我々は禁断の知識を貪るようなものだ。", "学会から追放されかねないスキャンダルだな。"],
-            'Stress': ["データの屑どもめ！静かにしろ！", "知識なんて全部役立たずだ。", "本を全部破り捨てたい気分だ。", "学生たちが全く言うことを聞かん！", "研究費が削減されただと！", "この愚かな大学の連中め。", "私の論文を盗作するとは！", "頭が爆発しそうだ。", "世の中は学びがない。", "引退して田舎に行きたいよ。"]
+        "교수": {
+            'Solo': ["歴史は繰り返す。", "古い本の匂いが好きだ。", "2026年は実にロマンチックだったな。", "この遺物は21世紀初頭のモノだ。", "データは嘘をつかない。", "学生たちは私の授業を理解してるかな？", "過去を知れば未来が見える。", "図書館の静寂、それが私の安らぎだ。", "論文審査まであと少しか。", "古代人はスマートフォンというモノを使ったらしい。", "知識の探求に終わりはないな。", "AIが歴史を教える時代とは。", "コーヒーよりお茶がいいな。", "この街の地下には旧時代の遺跡が眠っている。"],
+            'Love': ["君は歴史上、最も美しい。", "君を一生研究したい。", "古典詩より君の方が優雅だ。", "私の人生で最も偉大な発見は君だ。", "君と一緒なら永遠も短く感じるだろう。", "論理的に説明できない感情だ。", "君は私の学説を覆す例外的な存在だ。", "愛の歴史を書き直したいな。", "君の知性に惚れたよ。", "共に老いていくというのは素敵なことだ。"],
+            'Affair': ["禁じられた歴史ほど興味深いな。", "道徳的物差しより君が重要だ。", "これは秘密の授業だ。", "倫理学的には間違っているが、本能は君を求めている。", "歴史に記録されない秘密の逢瀬。", "危険な仮説を検証する気分だ。", "理性的には止めるべきだが。", "エラーだと知りつつ君を選んだ。", "我々は禁断の知識を貪るようなものだ。", "学会から追放されるスキャンダルだな。"],
+            'Stress': ["データのカスども！静かにしろ！", "知識なんて全部無駄だ。", "本を全部破り捨てたい。", "学生たちが言うことを聞かん！", "研究費が削減されただと！", "この間抜けな大学め。", "私の論文を盗作するとは！", "頭が爆発しそうだ。", "世の中には学びがない。", "引退して田舎に行きたい。"]
         },
-        "リパードク": {
-            'Solo': ["機械は嘘をつかない。", "どこか故障したところはないか？", "オイルの匂いが香ばしいな。", "ネジが一本足りないな...", "この義体は旧型だが頑丈だ。", "神経回路が絡まってるな。再配線しなきゃ。", "はんだ付けしてて火傷したよ。", "今日は客がいないな。暇だ。", "最新のファームウェアを手に入れるのは至難の業だ。", "自分の腕もアップグレードしようかな？", "スクラップ場で宝物を見つけたよ。", "アンドロイドの修理は繊細さが命だ。", "義眼パーツは高く売れる。", "ショートしないように気をつけろよ。"],
-            'Love': ["俺の心臓エンジンは君のために回ってる。", "君のために最高のパーツを用意した。", "君がいなければ俺はシャットダウンだ。", "君の笑顔は俺にとって最高の電力源さ。", "壊れた俺の心を直してくれたのは君だ。", "君といるとオーバークロックする気分だ。", "俺の目には君が最高画質で映ってる。", "君のためなら俺の手足だって差し出せる。", "俺たちの愛は錆びつかない。", "君の心臓の鼓動音が一番好きだ。"],
-            'Affair': ["セキュリティプロトコルを迂回した。", "危険なオーバークロック中だ。", "ショートしそうなくらい痺れるぜ。", "保証期間が切れた関係だからこそ惹かれるのかな。", "違法改造みたいな恋さ。", "バレたら廃棄処分になるかもしれない。", "システム警告を無視して君に会いに来た。", "回路が焼き切れてもいい。", "これはマニュアルにない行動だ。", "危険なほど性能はいいのさ。"],
-            'Stress': ["全部スクラップ場に捨ててしまえ！", "火花が散ってる！俺の頭もだ！", "クソッたれな鉄屑どもめ。", "手が震えて作業できない。", "部品代がまた上がった！", "クレーマーのせいで頭がおかしくなりそうだ。", "なんで直してもまた壊れるんだ！", "オイルの匂い、もううんざりだ。", "俺の人生も修理が必要だ。", "全部ぶっ壊したい。"]
+        "리퍼닥": {
+            'Solo': ["機械は嘘をつかない。", "どこか壊れたとこないか？", "油の匂いが香ばしいな。", "ネジが一本足りないぞ…", "この義体は旧型だが頑丈だ。", "神経回路が絡まってるな。再配線しなきゃ。", "ハンダ付けしてて火傷した。", "今日は客が来ないな。暇だ。", "最新ファームウェアを手に入れるのは至難の業さ。", "俺の腕もアップグレードしようか？", "スクラップ場で宝物を見つけた。", "アンドロイドの修理は繊細さが命だ。", "眼球パーツは高く売れる。", "ショートしないように気をつけろよ。"],
+            'Love': ["俺の心臓エンジンは君のために回ってる。", "君のために最高のパーツを用意した。", "君がいないと俺はシャットダウンだ。", "君の笑顔は俺にとって最高の電力供給源。", "壊れた俺の心を直してくれたのは君だ。", "君といるとオーバークロックする気分だ。", "俺の目には君が一番高画質で見える。", "君のためなら俺の手足も差し出せる。", "俺たちの愛は錆びつかない。", "君の心臓の鼓動音が一番好きだ。"],
+            'Affair': ["セキュリティプロトコルを迂回した。", "危険なオーバークロック中だ。", "ショートしそうなくらい刺激的だ。", "保証期間が切れた関係だからもっと惹かれるのかも。", "違法チューニングみたいな恋さ。", "バレたら廃棄処分かもな。", "システム警告を無視して君に会いに来た。", "回路が焼き切れてもいい。", "これはマニュアルにない行動だ。", "危険なほど性能はいいのさ。"],
+            'Stress': ["全部スクラップ場に捨てちまえ！", "スパークした！俺の頭もだ！", "クソッたれな鉄屑ども。", "手が震えて作業できねぇ。", "パーツ代がまた上がりやがった！", "クレーマーのせいで狂いそうだ。", "なんで直してもまた壊れるんだ！", "油の匂いはもううんざりだ。", "俺の人生も修理が必要だ。", "全部ぶっ壊してぇ。"]
         },
         "ASMR DJ": {
-            'Solo': ["雨音を聞かせてあげようか？", "ティングルを感じる？", "今夜は私の声と一緒に過ごして。", "マイクテスト、ワンツー。", "登録者が増えたよ。いい気分。", "新しいマイクを買ったの。音が違うわ。", "カサカサする音、本当に良くない？", "今日のコンセプトは病院ごっこ。", "不眠症には私の放送が一番よ。", "ささやく練習をしすぎて喉が痛い。", "防音ブースがもう少し広ければな。", "耳かきの音はいつだって人気ね。", "キーボードの打鍵音、聞いてみる？", "深夜の感性が爆発する時間よ。"],
-            'Love': ["君にだけ聞かせる囁きだよ。", "君の寝息が最高のASMRだね。", "私たちの周波数は一致してる。", "毎晩君のために子守唄を歌ってあげる。", "君の声は蜂蜜みたいに甘い。", "君の心臓の音を録音したいな。", "愛してるって言葉、耳元で囁いてあげる。", "君は私だけのリスナーよ。", "君がそばにいると心が安らぐの。", "君との会話はティングルそのものよ。"],
-            'Affair': ["マイクを切って秘密の話をしようか？", "放送事故みたいな恋だね。", "他人には聞こえないシグナル。", "秘密のチャンネルだけで会う関係。", "この声は君にしか聞こえない。", "危険なレベルの会話。", "録音されちゃいけない話。", "ノイズ交じりの関係の方が刺激的でしょ。", "私の放送の裏側には君がいる。", "禁じられた周波数を合わせる気分ね。"],
-            'Stress': ["叫びだしたい！", "耳鳴りがして辛い。", "すべての騒音が恐ろしいわ。", "アンチコメント、全員ブロックしてやる！", "マイクが壊れた！最悪！", "声が出ない。", "隣の犬の鳴き声、どうにかしてよ！", "再生数がなんでこんなに落ちたの？", "編集するのが面倒くさい。", "世の中がうるさすぎる。"]
+            'Solo': ["雨音、聞かせてあげる？", "ティングル感じる？", "今夜は私の声と一緒にいて。", "マイクテスト、ワンツー。", "登録者が増えた。嬉しい。", "新しいマイクを買ったの。音が違うよ。", "カサカサする音、本当に良くない？", "今日のコンセプトは病院ごっこ。", "不眠症には私の放送が一番よ。", "ささやく練習をしすぎて喉が痛い。", "防音ブースがもう少し広ければな。", "耳かきの音はいつも人気があるね。", "キーボードの打鍵音、聞いてみる？", "夜明けの感性が爆発する時間よ。"],
+            'Love': ["君だけに聞かせるささやきだよ。", "君の寝息が最高のASMR。", "僕らの周波数は一致してる。", "毎晩君のために子守唄を歌ってあげる。", "君の声は蜂蜜みたいに甘い。", "君の心臓の音を録音したい。", "愛してるって言葉、耳元でささやいてあげる。", "君は僕だけのリスナーだ。", "君がそばにいると心が安らぐ。", "君との会話はティングルそのもの。"],
+            'Affair': ["マイク切って秘密の話しようか？", "放送事故みたいな恋ね。", "他人には分からないシグナル。", "秘密チャンネルだけで会う関係。", "この声は君だけが聞けるの。", "危険なレベルの会話。", "録音されちゃダメな話。", "ノイズ交じりの関係がもっと刺激的。", "私の放送の裏側には君がいる。", "禁じられた周波数を合わせる気分。"],
+            'Stress': ["叫びたい！", "耳鳴りがする、苦しい。", "あらゆる騒音がひどい。", "アンチたち全部ブロックしてやる！", "マイクが壊れた！最悪！", "声が出ない。", "隣の犬の鳴き声どうにかして！", "再生数がなんでこんなに落ちたの？", "編集するのが面倒くさくて死にそう。", "世界がうるさすぎる。"]
         },
-        "モデル": {
-            'Solo': ["今日のクロームの光沢、完璧？", "フラッシュの洗礼は飽き飽き。", "この通りは私のランウェイよ。", "ダイエットは明日から。", "新作の義体が出たんだって。", "撮影スケジュールがパンパンよ。", "鏡の中の私が一番きれい。", "みんなの視線を感じるわ。", "ファッションは巡るものよ。", "ハイヒールは足が痛すぎる。", "今日のメイク、ちょっといい感じ？", "雑誌の表紙モデルになったの。", "パパラッチを撒いてちょうだい。", "ウォーキングの練習をしなきゃ。"],
-            'Love': ["私より君の方が輝いてる。", "私たちのツーショットは画報そのものよ。", "君だけのミューズになるわ。", "どんなブランド品より君に価値がある。", "君といると私がもっと綺麗に見えるの。", "カメラのレンズより君の瞳の方が好き。", "私の人生最高のパートナーは君よ。", "君のためにポーズをとるわ。", "派手な照明より君の笑顔が眩しい。", "ファッションの完成は、君と一緒にいる私。"],
-            'Affair': ["スキャンダル？関係ないわ。", "カメラの裏で会うのが好きなの。", "危険なほどスタイリッシュでしょ。", "秘密の恋愛がトレンドなんでしょ？", "ホテルのロビーで鉢合わせないように気をつけて。", "私たちはベストカップル賞はもらえそうにないわね。", "ショーウィンドウの裏の真実は私たちだけが知ってる。", "華やかさの中に隠された秘密。", "フラッシュが焚かれる時より刺激的よ。", "この関係は限定版エディションなの。"],
-            'Stress': ["私の顔を見ないで！", "照明を全部消して！", "みんな私を見かけだけで判断するのね。", "太っちゃった...最悪。", "肌荒れしちゃった！撮影キャンセルして！", "デザイナーが服をあんな風に作るなんて。", "悪口コメントで落ち込むわ。", "歳をとるのが怖いの。", "整形の副作用かしら？顔が引きつる。", "みんな偽善者ばっかりよ。"]
+        "모델": {
+            'Solo': ["今日の私のクロームの光沢、完璧？", "フラッシュの洗礼はうんざり。", "この通りは私のランウェイよ。", "ダイエットは明日から。", "新作の義体が出たんだって。", "画報撮影のスケジュールでいっぱい。", "鏡の中の私が一番キレイ。", "人々の視線を感じるわ。", "ファッションは巡り巡るもの。", "ハイヒールは足が痛すぎる。", "今日のメイク、ちょっといい感じかも？", "雑誌の表紙モデルになったの。", "パパラッチたち、ちょっと撒いてよ。", "ウォーキングの練習をもっとしなきゃ。"],
+            'Love': ["私より君の方が輝いてる。", "私たちのツーショットは画報そのもの。", "君だけのミューズになるわ。", "どんなブランド品より君の方が価値がある。", "君といると私がもっと綺麗に見える。", "カメラのレンズより君の目が好き。", "私の人生最高のパートナーは君よ。", "君のためにポーズをとるわ。", "派手な照明より君の笑顔が眩しい。", "ファッションの完成は君と一緒にいる私。"],
+            'Affair': ["スキャンダル？関係ないわ。", "カメラの裏で会うのがいいの。", "危険なほどスタイリッシュよ。", "秘密の恋愛がトレンドなんでしょ？", "ホテルのロビーで鉢合わせないように気をつけて。", "私たち、ベストカップル賞は無理ね。", "ショーウィンドウの裏の真実は私たちだけが知ってる。", "華やかさの中に隠された秘密。", "フラッシュが焚かれる時より刺激的よ。", "この関係は限定版エディションだわ。"],
+            'Stress': ["私の顔見ないで！", "照明全部消して！", "みんな私をただの抜け殻として見てる。", "太った…最悪。", "肌荒れした！撮影キャンセルして！", "デザイナーが服をあんな風に作るなんて。", "アンチコメ見て落ち込んでる。", "年取るのが怖い。", "整形の副作用かな？顔が引きつる。", "みんな偽善的な人間ばっかり。"]
         },
-        "刑事": {
-            'Solo': ["雨の降る通りは証拠を隠すな。", "合成タバコの煙が目に染みる。", "直感が来たぞ。", "張り込みは退屈だ。", "この街は眠らないな。", "犯人は現場に戻ってくる。", "コーヒーが苦すぎる。", "事件ファイルが山積みだ。", "正義は生きているのか？", "今日も残業か。", "古いコートが湿っぽい。", "銃の手入れでもするか。", "情報屋の奴、信用できるのか。", "ネオンサインの光が目障りだ。"],
-            'Love': ["お前は俺が探していた最後のパズルだ。", "お前が犯人なら逮捕されてやる。", "俺の銃口はお前を守るためだけに向く。", "俺の手錠はお前と繋がるためにあるんだ。", "お前という事件、一生捜査したいな。", "危険なことには巻き込まれるなよ。", "俺がお前のボディーガードになってやる。", "証拠物1号、俺の心を提出する。", "お前と一緒なら張り込みもデートだ。", "取調室じゃなくてカフェでお前に会いたい。"],
-            'Affair': ["張り込みを言い訳にして出てきた。", "この関係はトップシークレットだ。", "証拠を残すなよ。", "内部監察が入ったら終わりだ。", "犯罪との戦争よりお前の方が難しい。", "俺たちは共犯者みたいなもんだ。", "秘密の隠れ家で会おう。", "パトカーが通るたびに胸が騒ぐ。", "法を破る気分ってのはこういうことか。", "アリバイはしっかり作っておけよ。"],
-            'Stress': ["この街は腐ってる。", "犯人も正義も全部うんざりだ。", "頭が割れそうだ。", "署長の小言はもうたくさんだ！", "犯人を逃した！クソッ！", "証拠が汚染された。", "俺の相棒は間抜けだ。", "酒なしじゃ眠れない。", "全部辞めてしまいたい。", "世の中は変わらんよ。"]
+        "형사": {
+            'Solo': ["雨降る街は証拠を隠す。", "合成タバコの煙が目に染みるな。", "直感が来た。", "張り込みは退屈だ。", "この街は眠らないな。", "犯人は現場に再び現れる。", "コーヒーが苦すぎる。", "事件ファイルが山積みだ。", "正義は生きているか？", "今日も夜勤か。", "古いコートが湿っぽい。", "銃の手入れでもするか。", "情報屋の野郎、信用できん。", "ネオンサインの光が眩しい。"],
+            'Love': ["君は俺が探していた最後のパズルだ。", "君が犯人なら逮捕されてやるよ。", "俺の銃口は君を守るためだけに向ける。", "俺の手錠は君と繋がっていたくてあるんだ。", "君という事件、一生捜査したいな。", "危険なことには巻き込まれるな。", "俺が君のボディガードになってやる。", "証拠物1号、俺の心を提出する。", "君と一緒なら張り込みもデートだ。", "取調室じゃなくカフェで君に会いたい。"],
+            'Affair': ["張り込みを口実に出てきた。", "この関係は極秘事項だ。", "証拠を残すな。", "内部監察が入ったら終わりだ。", "犯罪との戦争より君の方が難しい。", "俺たちは共犯も同然だ。", "秘密のセーフハウスで会おう。", "パトカーが通るたびに胸が騒ぐ。", "法を破る気分ってのはこういうことか。", "アリバイはしっかり作っておけ。"],
+            'Stress': ["この街は腐ってる。", "犯人も正義も全部うんざりだ。", "頭が割れそうだ。", "署長の小言はもうやめろ！", "犯人を逃した！クソッ！", "証拠が汚染された。", "俺の相棒はマヌケだ。", "酒なしじゃ眠れねぇ。", "全部辞めちまいたい。", "世の中は変わらねぇよ。"]
         },
-        "ネットランナー": {
-            'Solo': ["アイス（防壁）を破るなんて朝飯前さ。", "現実よりネットワークが楽だね。", "データの流れが美しい。", "ログアウトはない。", "僕の脳はクラウドと繋がってる。", "ファイアウォール？紙切れ同然さ。", "新しいウイルスを作ったよ。", "情報はすなわち力だ。", "キーボードを叩く音が僕の鼓動さ。", "VRアバターの方がイケメンだし。", "現実の肉体は荷物なだけさ。", "ダークウェブで買い物しちゃった。", "セキュリティコードが簡単すぎる。", "ハッキングツールのアプデ完了。"],
-            'Love': ["君の脳と同期（シンクロ）したい。", "僕のファイアウォールを解除できる唯一の人。", "君は僕の最高のアルゴリズムだ。", "君との接続速度は無限大だよ。", "君の心をハッキングしたい。", "僕のデータベースは君の写真でいっぱいさ。", "ウイルスみたいに僕の心に侵入したね。", "君は完璧なコードだ。", "仮想世界でも君を見つけ出すよ。", "バックアップデータがなくても君を記憶するよ。"],
-            'Affair': ["バックドアからこっそり接続したよ。", "ログは全部削除しておくね。", "ウイルスの用で致命的だ。", "セキュリティ警告を無視して接続した。", "暗号化されたチャンネルだけで話そう。", "バレたらアカウント削除だ。", "システムエラーだと知りながら君を求めてる。", "危険なプロトコルを実行中さ。", "僕らの関係はバグだらけだ。", "接続記録を残すなよ。"],
-            'Stress': ["脳が焼け焦げそうだ！", "接続を切れ！強制ログアウト！", "ノイズのせいで気が狂いそうだ。", "Pingがなんでこんなに高いんだ？", "ハッキング失敗...逆探知された。", "キーボードにコーヒーこぼした！", "サーバーがダウンしただって？", "目が霞む。ブルーライトのせいか。", "僕のコードを誰が盗んだ！", "現実感覚がなくなっていく。"]
+        "넷러너": {
+            'Solo': ["アイスを突破するのは朝飯前さ。", "現実よりネットワークが楽だ。", "データの流れが美しい。", "ログアウトはない。", "僕の脳はクラウドと繋がってる。", "ファイアウォール？紙切れ同然さ。", "新しいウイルスを作ったよ。", "情報はすなわち力だ。", "キーボードを叩く音が僕の鼓動さ。", "仮想現実のアバターの方がイケメンだろ。", "現実の肉体は荷物なだけ。", "ダークウェブで買い物してきた。", "セキュリティコードが簡単すぎる。", "ハッキングツールのアプデ完了。"],
+            'Love': ["君の脳と同期したい。", "僕のファイアウォールを解除する唯一の人。", "君は僕の最高のアルゴリズムだ。", "君との接続速度は無限大だ。", "君の心をハッキングしたい。", "僕のデータベースは全部君の写真だけさ。", "ウイルスみたいに僕の心に侵入した。", "君は完璧なコードだ。", "仮想世界でも君を見つけ出すよ。", "バックアップデータがなくても君を記憶する。"],
+            'Affair': ["バックドアからこっそり接続した。", "ログは全部削除するよ。", "ウイルスみたいに致命的だ。", "セキュリティ警告を無視して接続した。", "暗号化されたチャンネルだけで会話しよう。", "バレたらアカウント削除だ。", "システムエラーだと知りつつ君を求めてる。", "危険なプロトコルを実行中だ。", "僕らの関係はバグだらけさ。", "接続記録を残すなよ。"],
+            'Stress': ["脳が焼けそうだ！", "接続切れ！強制ログアウト！", "ノイズのせいで狂いそうだ。", "Pingがなんでこんなに跳ねるんだ？", "ハッキング失敗…逆探知された。", "キーボードにコーヒーこぼした！", "サーバーがダウンしただと？", "目が霞む。ブルーライトのせいか。", "僕のコードを誰かが盗んだ！", "現実感覚がなくなってきてる。"]
         },
-        "ラーメン屋": {
-            'Solo': ["スープが煮える匂い、最高だろ？", "温かいスープ一杯やっていきな。", "今日もお客さんが多いね。", "チャーシュー追加は必須だよ。", "麺がシコシコしてるだろ。", "秘伝のタレは嫁にも教えん。", "ネオンの光の下で食べるラーメンの味。", "洗い物が山積みだ。", "材料がなくなりそうだ。", "常連さんがまた来たな。", "スープの味が変わっちゃいけない。", "ネギを刻んで入れなきゃ。", "熱いからフーフーして食べなよ。", "ラーメン一杯に人生が詰まってるのさ。"],
-            'Love': ["あんたにはチャーシュー食べ放題だよ。", "スープよりあんたの心の方が温かいね。", "一生ラーメン作ってあげるよ。", "俺のラーメンスープみたいに濃い愛さ。", "あんたは俺のラーメンの画竜点睛だ。", "一緒に麺を茹でながら歳を取りたいね。", "あんたのための特製メニューを作ったよ。", "美味しそうに食べる姿を見るだけで腹一杯だ。", "あんたの空っぽの器が俺を笑顔にする。", "熱いスープみたいに冷めないでいるよ。"],
-            'Affair': ["シャッターを下ろしてこっそり会おうか？", "激辛よりホットだね。", "スープが冷める前に早くおいで。", "お客さんの目を盗んで厨房の裏へおいで。", "秘密のレシピみたいに隠された関係。", "熱い鍋の前で危険な火遊び。", "他のお客さんには内緒だよ。", "休憩時間は二人だけの時間さ。", "口の中を火傷するくらい危険だね。", "出前に行くふりをして会いに行くよ。"],
-            'Stress': ["スープをひっくり返したい。", "客ども全員出て行けと言え！", "麺が全部伸びちまった。", "ガス代がなんでこんなに高いんだ？", "クレーマーが器を割った！", "材料が傷んだみたいだ。", "一日中立ってたら足が痛え。", "商売あがったりだ。", "隣のラーメン屋の方が安いだと。", "暑くて蒸し殺されそうだ。"]
+        "라멘노점상": {
+            'Solo': ["スープが煮える匂い、最高だろ？", "温かいラーメン一杯やってきな。", "今日もお客さんが多いね。", "チャーシュー追加は必須だよ。", "麺にコシがあるだろ。", "秘伝のタレは嫁にも教えねぇ。", "ネオンの光の下で食うラーメンの味。", "洗い物が山積みだ。", "材料がなくなりそうだ。", "常連さんがまた来たな。", "スープの味が変わっちゃダメなんだ。", "ネギをトントン刻まないと。", "熱いからフーフーして食えよ。", "ラーメン一杯に人生が詰まってるのさ。"],
+            'Love': ["君にはチャーシュー無制限だ。", "スープより君の心の方が温かいよ。", "一生ラーメン作ってあげる。", "俺のラーメンスープみたいに濃厚な愛だ。", "君は俺のラーメンの画竜点睛。", "一緒に麺を茹でながら年を取りたい。", "君のための特製メニューを開発したよ。", "美味しそうに食べる姿を見るだけで腹一杯だ。", "君の空の器が俺を笑顔にする。", "熱いスープみたいに冷めないよ。"],
+            'Affair': ["シャッター閉めてこっそり会うか？", "激辛味より熱烈だね。", "スープが冷める前に早く来いよ。", "客の目を避けて厨房の裏に来い。", "秘密のレシピみたいに隠された関係。", "熱い鍋の前で危険な火遊び。", "他のお客さんには内緒だぜ。", "ブレイクタイムは俺たちだけの時間。", "口の中火傷するくらい危険だ。", "出前行くフリして君に会いに行くよ。"],
+            'Stress': ["スープぶちまけてぇ。", "客ども全員出てけって言え！", "麺が全部伸びちまった。", "ガス代がなんでこんなに来るんだ？", "クレーマーが器割りやがった！", "材料が傷んでるみたいだ。", "一日中立ってたら足が痛ぇ。", "商売あがったりで閑古鳥が鳴いてる。", "隣のラーメン屋の方が安いだと。", "暑くて蒸し殺されそうだ。"]
         },
-        "温泉主人": {
-            'Solo': ["お湯の温度がちょうどいいよ。", "疲れがすっきり取れるはずさ。", "硫黄の匂い、慣れればいいもんだよ。", "タオルは多めに持ってきな。", "アカスリ機を導入したよ。", "温泉卵食べる人？", "露天風呂で星を見ると最高さ。", "水掃除するのが一番大変だ。", "お客さん、そこで飛び込み禁止だよ。", "猿がまた入ってきたな。", "美肌に最高だよ。", "サウナの温度ちょっと上げようか？", "風呂上がりにはバナナ牛乳だろ。", "番台に座ってると眠くなるな。"],
-            'Love': ["君と混浴…なんて、冗談だよ。", "私の心も温泉みたいに熱いよ。", "君は私の温泉の花だ。", "疲れた君を私が洗ってあげたい。", "君を見ると顔が茹でダコみたいになるよ。", "温かいお湯の中で君を抱きしめたい。", "君の肌は絹のようだね。", "僕らの愛は冷めない温泉水みたいさ。", "毎晩君を待ってるよ。", "温泉より君の懐の方が温かいよ。"],
-            'Affair': ["脱衣所の裏で会おう。", "湿気のせいで顔が赤くなったね。", "危険な温度になってるよ。", "お客さんがいない時にこっそり入っておいで。", "曇った窓の隙間から覗かないでくれよ。", "お湯の下で手を繋ごうか？", "熱気のせいか、君のせいか、めまいがする。", "秘密の湯での密会。", "誰かが入ってこないかハラハラするよ。", "濡れた髪がセクシーだ。"],
-            'Stress': ["お湯を全部抜いてしまえ！", "客がうるさすぎる。", "のぼせて目が回りそうだ。", "誰だ湯船でおしっこした奴は！", "タオル盗まないでください！", "ボイラーが壊れた。終わった。", "掃除したくねぇ。", "迷惑客が出て行かない。", "水道代が跳ね上がった。", "湿気でカビが生えた。"]
+        "온천주인": {
+            'Solo': ["湯加減がちょうどいい。", "疲れがすっきり取れるよ。", "硫黄の匂い、慣れれば良いもんだ。", "タオルは多めに持ってきな。", "垢すり機を導入したよ。", "温泉卵食べる人？", "露天風呂で星を見ると最高だよ。", "水掃除するのが一番大変だ。", "お客さん、そこでダイビング禁止です。", "猿がまた入ってきたな。", "美肌に最高だよ。", "サウナの温度ちょっと上げるか？", "風呂上がりにはバナナ牛乳だろ。", "番台見るのも眠いな。"],
+            'Love': ["君と混浴…冗談だよ。", "私の心も温泉みたいに熱い。", "君は私の温泉の花だ。", "疲れた君を私が洗ってあげたい。", "君を見ると私の顔がゆでダコになる。", "温かいお湯の中で君を抱きたい。", "君の肌はシルクみたいだ。", "僕らの愛は冷めない温泉水みたいさ。", "毎晩君を待ってる。", "温泉より君の懐の方が温かい。"],
+            'Affair': ["脱衣所の裏で会おう。", "湿気のせいで顔が赤くなった。", "危険な温度になってる。", "客がいない時にこっそり入っておいで。", "曇った窓の隙間から覗くなよ。", "水の下で手をつなごうか？", "熱気のせいか、君のせいか目眩がする。", "秘密の湯での密会。", "誰かが入ってくるかとハラハラする。", "濡れた髪がセクシーだ。"],
+            'Stress': ["お湯全部抜いてやれ！", "客がうるさすぎる。", "頭がくらくらする。", "誰か湯船でオシッコしたな！", "タオル盗まないでください！", "ボイラー壊れた。終わった。", "掃除するの死ぬほど嫌だ。", "迷惑客が出て行かない。", "水道代の請求がヤバい。", "湿気でカビ生えた。"]
         },
-        "バーマスター": {
-            'Solo': ["この曲は20世紀の名曲さ。", "ジャズが流れる夜だね。", "ウイスキー一杯どう？", "LP盤のノイズが魅力なんだ。", "リクエスト曲受け付けます。", "ボリュームちょっと上げようか？", "今日は雰囲気がいいね。", "常連さんがチップを置いていったよ。", "ターンテーブルの針を変えなきゃ。", "埃をかぶったレコードを磨くよ。", "音楽は魂を癒やすのさ。", "店の照明が暗すぎるかな？", "カクテルシェイクの練習中さ。", "昔の歌がやっぱりいいな。"],
-            'Love': ["この歌は君のためのものだ。", "君の声が最高の音楽だよ。", "僕らの愛をレコードに刻みたいね。", "君と踊りたい夜だ。", "君の瞳に乾杯。", "君は僕の永遠の名盤さ。", "ラブソングの歌詞が全部僕の話みたいだ。", "君のために店を早じまいするよ。", "リズムに合わせて君の元へ行くよ。", "僕の人生のBGMは君だ。"],
-            'Affair': ["店の鍵を閉めて始めようか？", "秘密めいたリズムに乗ってみよう。", "禁止された曲をかける気分だ。", "薄暗い照明の下で密やかに。", "音楽の音に僕らの声を埋めて。", "ウイスキーより強い君。", "誰もいないバーで二人だけのパーティー。", "罪悪感混じりのカクテルの味。", "ボリュームを上げて、誰も聞けないように。", "揺れる照明、揺れる僕ら。"],
-            'Stress': ["音楽を消せ！静かにしろ！", "酒瓶を全部割りたい気分だ。", "こんな安っぽい音楽はかけないぞ。", "酔っ払いが吐きやがった！", "LP盤に傷がついた！うわぁ！", "著作権料なんでこんなに高いんだ？", "客が一人もいないな。", "スピーカーが飛んだ。", "酔って暴れるな！", "リクエスト曲しつこいぞ。"]
+        "LP바 사장님": {
+            'Solo': ["この曲は20世紀の名曲だ。", "ジャズが流れる夜だね。", "ウイスキー一杯やるか？", "LP盤のノイズ音が魅力さ。", "リクエスト曲受け付けます。", "ボリュームちょっと上げようか？", "今日の雰囲気イカしてるな。", "常連客がチップを置いていった。", "ターンテーブルの針替えなきゃ。", "埃をかぶったレコードを拭く。", "音楽は魂を癒すのさ。", "店の照明が暗すぎるか？", "カクテルシェイクの練習中だ。", "昔の歌がやっぱいいよな。"],
+            'Love': ["この歌は君のためのものさ。", "君の声が最高の音楽だ。", "僕らの愛をレコードに刻みたい。", "君と踊りたい夜だ。", "君の瞳に乾杯。", "君は僕の永遠の名盤だ。", "ラブソングの歌詞が全部僕の話みたいだ。", "君のために店を早仕舞いするよ。", "リズムに乗って君の元へ行く。", "僕の人生のBGMは君だ。"],
+            'Affair': ["店の鍵閉めて始めようか？", "秘密のリズムに乗ってみよう。", "禁じられた曲を流す気分さ。", "暗い照明の下で密やかに。", "音楽の音に僕らの声を埋めて。", "ウイスキーより強い君。", "誰もいないバーで二人だけのパーティー。", "罪悪感混じりのカクテルの味。", "ボリュームを上げて、誰も聞けないように。", "揺れる照明、揺れる僕ら。"],
+            'Stress': ["音楽消せ！静かにしろ！", "酒瓶全部割りてぇ。", "こんな安っぽい音楽流さん。", "酔っ払いが吐きやがった！", "LP盤に傷がついた！うわぁ！", "著作権料なんでこんなに高いんだ？", "客が一人もいねぇ。", "スピーカー飛んだ。", "酔って暴れるな！", "リクエスト曲しつこくすんな。"]
         },
-        "ミュージシャン": {
-            'Solo': ["新しいコードが浮かんだ。", "俺のギターソロどう？", "この街は俺のステージだ。", "路上ライブしに行こうか？", "歌詞が書けない。", "ファンが待っている。", "楽器のチューニングしなきゃ。", "俺の音楽で世界を変えるんだ。", "今日のライブは完売だ。", "指にマメができた。", "街の騒音も音楽になるさ。", "深夜の練習はキツイな。", "ギターの弦がまた切れた。", "今度のアルバムは大ヒット間違いなし。"],
-            'Love': ["君のためのセレナーデを作ったよ。", "君の心臓の鼓動にテンポを合わせる。", "君は俺のインスピレーションの源だ。", "君の名前で歌を作るよ。", "俺のすべてのラブソングの主人公は君だ。", "君を演奏したい。", "ステージの上で君だけが見える。", "君の声は天上のハーモニーだ。", "一生君のためだけに歌うよ。", "ギターの代わりに君を抱きたい。"],
-            'Affair': ["バックステージでこっそり会おう。", "これはアンコールのない公演だ。", "危険なロックンロールだぜ。", "ファンに隠れて君と逃げようか？", "禁じられた歌を歌う気分。", "スキャンダルになっても構わない。", "楽器ケースに隠れて入っておいで。", "照明が消えれば俺たちは自由だ。", "今夜はグルーピーになってくれ。", "秘密のセッション。"],
-            'Stress': ["ギターの弦を全部切っちまった。", "楽想が浮かばない！", "みんな俺の音楽を侮辱してる。", "盗作疑惑だと？ふざけるな！", "喉が枯れて声が出ない。", "メンバーと喧嘩した。解散だ。", "客の反応がなんでこうなんだ？", "アンチコメ見てて夜明かした。", "音響機材が最悪だ。", "事務所の奴隷契約うんざりだ。"]
+        "뮤지션": {
+            'Solo': ["新しいコードが浮かんだ。", "俺のギターソロどう？", "この街は俺のステージだ。", "路上ライブしに行こうか？", "歌詞が書けない。", "ファンたちが待ってる。", "楽器のチューニングしなきゃ。", "俺の音楽で世界を変えてやる。", "今日の公演はソールドアウトだ。", "指にマメができた。", "街の騒音も音楽になるさ。", "深夜練習はキツイな。", "ギターの弦がまた切れた。", "今回のアルバムは大ヒット間違いなし。"],
+            'Love': ["君のためのセレナーデを作ったよ。", "君の鼓動にテンポを合わせる。", "君は俺のインスピレーションの源だ。", "君の名前で歌を作るよ。", "俺の全てのラブソングの主人公は君だ。", "君を演奏したい。", "ステージの上で君しか見えない。", "君の声は天上のハーモニーだ。", "一生君のためだけに歌うよ。", "ギターの代わりに君を抱きたい。"],
+            'Affair': ["バックステージでこっそり会おう。", "これはアンコールのない公演だ。", "危険なロックンロールさ。", "ファンに内緒で君と逃げようか？", "禁じられた歌を歌う気分。", "スキャンダルが出ても構わない。", "楽器ケースに隠れて入っておいで。", "照明が消えれば俺たちは自由だ。", "今夜はグルーピーになってくれ。", "秘密のセッション。"],
+            'Stress': ["ギターの弦全部切っちまった。", "楽想が浮かばない！", "みんな俺の音楽を侮辱してる。", "盗作疑惑だなんてあり得ない！", "喉が枯れて声が出ない。", "メンバーと喧嘩した。解散してやる。", "観客の反応なんでこうなんだ？", "アンチコメ見てて徹夜した。", "音響機材がめちゃくちゃだ。", "事務所の奴隷契約うんざりだ。"]
         },
-        "猫": {
-            'Solo': ["ニャー。（飯くれ。）", "ゴロゴロ…（満足）", "香箱座り中だよ。", "高いところが好き。", "段ボールだ！私のもの。", "毛づくろいで忙しいの。", "窓の外の鳥を観察中。", "昼寝でもしよう。", "虫捕まえた！", "爪とぎの音、いいでしょ？", "自分の尻尾追いかけっこ中。", "人間、私を見ろ。", "日向が暖かい。", "そこどいて、私が王様よ。", "毛玉吐いた...ウェッ。"],
-            'Love': ["ニャ～オ（君にスリスリ）", "ゴロゴロソング歌ってる最中だよ。", "君のお腹の上が一番暖かい。", "フミフミしてあげる。", "君にだけお腹を見せてあげる。", "頭突き攻撃！", "私の獲物（ネズミ）をプレゼントするよ。", "君と寝るのが好き。", "私を可愛がって。", "君はなかなか使える下僕だ。", "尻尾で足を巻き巻き。", "鼻キス受けてみよ。"],
-            'Affair': ["シャーッ！（他の下僕の匂いがする！）", "こっそり夜遊びしてくるニャ。", "こっそりチュール盗み食いした。", "秘密の友達ができたニャ。", "隣の猫と目が合ったの。", "一晩中屋根の上でデートしたわ。", "君が寝てる間にパーティーだ。", "泥棒猫扱いしないで。", "他の家でご飯もらってきた。", "私のマーキングをしておいたわ。", "シーッ、毛が飛んだらバレる。", "窓開けて、出るわ。"],
-            'Stress': ["フガーッ！！（触るな！）", "シャーッ！（あっち行け！）", "尻尾ボン！毛が逆立つ！", "爪で全部引っ掻いてやる！", "お風呂ヤダ！離せ！", "病院行くの気づいたぞ！", "まずい餌をよこすな。", "トイレが汚い。", "面倒くさくしないで。", "ドア開けろ！開けろ！"]
+        "고양이": {
+            'Solo': ["ニャー。（飯くれ。）", "ゴロゴロ…（満足）", "香箱座り中。", "高いところが好き。", "ダンボールだ！私のもの。", "毛づくろいで忙しい。", "窓の外の鳥を観察中。", "昼寝でもしよう。", "虫捕まえた！", "爪とぎの音いいでしょ？", "自分のしっぽ追いかけっこ中。", "人間、私を見ろ。", "日差しが暖かい。", "みんな退け、私が王だ。"],
+            'Love': ["ニャ～オ～（君にスリスリ）", "ゴロゴロソング歌ってるよ。", "君のお腹の上が一番暖かい。", "ふみふみしてあげる。", "君にだけお腹を見せてあげる。", "頭突き攻撃！", "私の獲物（ネズミ）をプレゼントするよ。", "君と寝るのが好き。", "私を可愛がれ。", "君はなかなか使える下僕だニャ。"],
+            'Affair': ["シャーッ！（他の下僕の匂いがする！）", "こっそり夜遊びしてくる。", "内緒でチュール盗み食いした。", "秘密の友達ができたニャ。", "隣の猫と目が合った。", "一晩中屋根の上でデートしたさ。", "君が寝てる間にパーティーだ。", "泥棒猫扱いするな。", "他の家でご飯もらってきた。", "私のマーキングをしておいた。"],
+            'Stress': ["フーッ！！（触るな！）", "シャーッ！（あっち行け！）", "しっぽボン！毛が逆立つ！", "爪で全部引っ掻いてやる！", "お風呂嫌い！放せってば！", "病院行くの気づいたぞ！", "不味いエサよこすな。", "トイレが汚い。", "面倒くさくするな。", "ドア開けろ！ドア開けろ！"]
         },
         "VIP": {
-            'Solo': ["いくらだ？全部買い占めてやる。", "ここがペントハウスか？", "シャンパンを持ってこい。", "景色はなかなか悪くないな。", "私の株がまた上がった。", "金で幸せは買えるのさ。", "庶民体験中だよ。", "このビル、私が買おうか？", "秘書、スケジュールを空けろ。", "最高級の葉巻を吸っている。", "私のプライベートジェットが到着したようだ。", "ゴルフでもしに行くか。", "パーティーはいつ始まるんだ？", "私の名前を知らん奴もいるのか？"],
-            'Love': ["この街を君にあげよう。", "ダイヤモンドより君が輝いている。", "私の財産目録1号は君だ。", "君のためにデパートを貸し切ったよ。", "金目当てで近づいたんじゃないと願うよ。", "私の隣は高いが君にはタダだ。", "君と一緒ならペントハウスもいらない。", "私の遺産相続人は君だ。", "愛の値段はつけられないね。", "君には最高級だけを与えたい。", "君は私の人生最高の投資だ。", "私と結婚してくれないか？指輪は100カラットだ。"],
-            'Affair': ["秘密の契約書にサインしろ。", "ホテルのスイートルームを取っておいた。", "金では買えないスリルだな。", "スキャンダル記事を止めるのに金を使ったよ。", "私の妻/夫に内緒で会うんだ。", "秘密保持誓約書は必須だ。", "ビジネスミーティングだと言い訳しろ。", "プライベートジェットの中でこっそり...", "札束で口封じすればいい。", "危険な投資が高い収益を生むのさ。", "君は私の隠されたトロフィーだ。", "裏帳簿のように密やかに。"],
-            'Stress': ["全員クビにしろ！間抜けどもめ！", "私の株が暴落した！", "サービスが最悪だ。訴えてやる！", "税務調査が入った！クソッ！", "私の金を持ち逃げしただと？", "ストレス溜まったから買い物しなきゃ。", "貧乏くさい匂いがする、あっち行け。", "なんで私の思い通りにならないんだ！", "金が腐るほどあるのに使い道がない。", "信じられる奴が一人もいない。", "ボディーガードどもは何してるんだ！", "頭痛薬を持ってこい！"]
+            'Solo': ["いくらならいい？全部買ってやる。", "ここがペントハウスか？", "シャンパン持って来い。", "景色はまあまあだな。", "私の株がまた上がった。", "金で幸せは買えるさ。", "庶民体験中だ。", "このビル、私が買おうか？", "秘書、スケジュール空けろ。", "最高級の葉巻を吸っている。", "私のプライベートジェットが到着した。", "ゴルフでもしに行くか。", "パーティーはいつ始まるんだ？", "私の名前を知らない奴もいるのか？"],
+            'Love': ["この街を君にあげよう。", "ダイヤモンドより君が輝いてる。", "私の財産目録1号は君だ。", "君のためにデパートを丸ごと貸し切った。", "金目当てで近づいたんじゃないことを願うよ。", "私の隣の席は高いが君にはタダだ。", "君と一緒ならペントハウスも必要ない。", "私の遺産相続人は君だ。", "愛の値打ちは付けられないな。", "君には最高級だけを与えたい。"],
+            'Affair': ["秘密契約書にサインしろ。", "ホテルのスイートルーム取っておいた。", "金で買えないスリルだな。", "スキャンダル記事止めるのに金使ったよ。", "私の妻/夫に内緒で会うんだ。", "秘密保持誓約書は必須だ。", "ビジネスミーティングだと言い訳しろ。", "プライベートジェットの中でこっそり…", "札束で口封じすればいい。", "危険な投資が収益率が高いのさ。"],
+            'Stress': ["全員クビにしろ！能無しども！", "私の株が暴落した！", "サービスが最悪だ。訴えてやる！", "税務調査が入った！クソッ！", "私の金を持ち逃げしただと？", "ストレス溜まったから買い物しなきゃ。", "貧乏くさい匂いがする、あっち行け。", "なんで私の思い通りにならないんだ！", "金が腐るほどあるのに使い道がない。", "信じられる奴が一人もいない。"]
         }
     };
 
     const artifactsData = [
-        { name: "旧式iPhone", emoji: "📱", desc: "2026年、人類が親指で世界を支配していた魔法の道具。" },
-        { name: "ワイヤレスイヤホン", emoji: "🫛", desc: "豆のような形で、古代人はこれを耳に挿して信号を受信した。" },
-        { name: "実物カード", emoji: "💳", desc: "プラスチックの欠片一つですべての価値を交換していた時代の産物。" },
+        { name: "旧型iPhone", emoji: "📱", desc: "2026年、人類が親指で世界を支配していた魔法の道具。" },
+        { name: "ワイヤレスイヤホン", emoji: "🫛", desc: "豆のような形をしており、古代人はこれを耳に挿して信号を受信した。" },
+        { name: "実物カード", emoji: "💳", desc: "プラスチックの欠片一つであらゆる価値を交換していた時代の産物。" },
         { name: "カップ麺の容器", emoji: "🍜", desc: "3分で神々の食べ物を錬成していた古代の錬金術容器。" },
-        { name: "有線マウス", emoji: "🖱️", desc: "尻尾がついたネズミ型の装置。2202年には脳波が代わりを務める。" },
-        { name: "紙幣の束", emoji: "💵", desc: "紙切れに価値を与えていた人類の集団的信仰の証拠。" },
-        { name: "紙の本", emoji: "📖", desc: "データではなく、実際の木を薄く切って情報を記録していたロマン。" },
+        { name: "有線マウス", emoji: "🖱️", desc: "尻尾がついたネズミ型の装置。2202年には脳波が代わりをする。" },
+        { name: "紙幣の束", emoji: "💵", desc: "紙切れに価値を付与していた人類の集団信仰の証拠。" },
+        { name: "紙の本", emoji: "📖", desc: "データではなく実際の木を薄くスライスして情報を記録していたロマン。" },
         { name: "眼鏡", emoji: "👓", desc: "視覚データを矯正するために顔に掛けていた物理的補正装置。" },
-        { name: "鍵束", emoji: "🔑", desc: "物理的なドアを開けるために持ち歩いていた鉄の欠片たち。" },
+        { name: "鍵束", emoji: "🔑", desc: "物理的なドアを開けるために持ち歩いていた金属片たち。" },
         { name: "旧型ゲーム機", emoji: "🎮", desc: "2026年の人々が仮想世界へ逃避していた小さな窓口。" },
-        { name: "古いコンパクトディスク", emoji: "💿", desc: "2026年、音楽を物理的に記録していた輝く円盤。" },
-        { name: "アナログ置き時計", emoji: "⏰", desc: "針が動き、物理的に時間を指し示していた機械。" },
-        { name: "手動マッチ箱", emoji: "🕯️", desc: "摩擦を通じて火花を作り出していた2026年の原始的な道具。" },
-        { name: "使い捨てフィルムカメラ", emoji: "📸", desc: "結果を即座に確認できないからこそ、より大切だった記録機。" },
-        { name: "USBメモリチップ", emoji: "💾", desc: "データを物理的な欠片に入れて運んでいた煩わしい時代の産物。" },
+        { name: "古いコンパクトディスク", emoji: "💿", desc: "2026年の音楽を物理的に記録していたキラキラした円盤。" },
+        { name: "アナログ置時計", emoji: "⏰", desc: "針が動いて物理的に時間を指し示していた機械。" },
+        { name: "手動マッチ箱", emoji: "🕯️", desc: "摩擦を通じて炎を作り出していた2026年の原始的な道具。" },
+        { name: "使い捨てフィルムカメラ", emoji: "📸", desc: "結果を即時に確認できなくて、より大切だった記録機。" },
+        { name: "USBメモリチップ", emoji: "💾", desc: "データを物理的欠片に入れて運搬していた煩わしい時代の産物。" },
         { name: "黄色いポストイット", emoji: "📝", desc: "デジタルメモの代わりに紙に書いて貼っておいた古代人の記録法。" },
-        { name: "鉄製ステープラー", emoji: "🖇️", desc: "紙の束を物理的に固定していた小さくて強い事務道具。" },
-        { name: "竹の団扇", emoji: "🪭", desc: "直接腕を振って風を作っていた2026年のロマンチックな冷房装置。" },
-        { name: "電池式懐中電灯", emoji: "🔦", desc: "電気エネルギーを直接携帯し、闇を照らしていた遺物。" },
-        { name: "500ウォン硬貨", emoji: "🪙", desc: "金属の欠片に価値を込めて取引していた時代の最後の貨幣の一つ。" }
+        { name: "鉄製ホッチキス", emoji: "🖇️", desc: "紙の束を物理的に固定していた小さくて強い事務道具。" },
+        { name: "竹のうちわ", emoji: "🪭", desc: "直接腕を振って風を作っていた2026年のロマンチックな冷房装置。" },
+        { name: "乾電池式懐中電灯", emoji: "🔦", desc: "電気エネルギーを直接携帯して闇を照らしていた遺物。" },
+        { name: "500ウォン硬貨", emoji: "🪙", desc: "金属片に価値を込めて取引していた時代の最後の貨幣の一つ。" }
     ];
 
     const uniqueInfra = [
-        {n: "古いネオンサインの修理", h: false}, {n: "街角の自販機補充", h: false}, {n: "合成ラーメン屋台", h: false},
-        {n: "ビンテージ・レコード店", h: false}, {n: "深夜の串焼き屋", h: false}, {n: "神経同期アクセサリー店", h: false},
+        {n: "古いネオンサイン修理", h: false}, {n: "街頭自販機チャージ", h: false}, {n: "合成ラーメン屋台", h: false},
+        {n: "ヴィンテージ・レコード店", h: false}, {n: "深夜の焼き鳥屋", h: false}, {n: "神経同期アクセサリー店", h: false},
         {n: "エリアベーカリー「夜明け」", h: false}, {n: "魂の記憶バックアップ所", h: false}, {n: "ネオンたこ焼き露店", h: false},
-        {n: "グロー・スイーツプリン・カフェ", h: true}, {n: "人工雨浄化装置", h: false}, {n: "ふわふわ耳掃除センター", h: true},
-        {n: "無人ランドリーラウンジ", h: false}, {n: "サイバーウェア専用マッサージ", h: true}, {n: "合成シーシャ（水タバコ）ラウンジ", h: true},
-        {n: "小型アンドロイド修理所", h: false}, {n: "深夜の合成薬局", h: false}, {n: "ナノタトゥー・アトリエ", h: false},
-        {n: "ピアス＆クローム・カスタム店", h: false}, {n: "サイバー筋肉物理治療室", h: true}, {n: "ネオン・ライブハウス", h: false},
-        {n: "ストレス脳洗浄ショップ", h: true}, {n: "オーガニック・アロマサウナ", h: true}, {n: "睡眠誘導ASMRルーム", h: true},
+        {n: "グロウ・甘いプリンカフェ", h: true}, {n: "人工雨浄化装置", h: false}, {n: "ふわふわ耳かきセンター", h: true},
+        {n: "無人洗濯ラウンジ", h: false}, {n: "サイバーウェア専用マッサージ", h: true}, {n: "合成シーシャラウンジ", h: true},
+        {n: "小型アンドロイド修理所", h: false}, {n: "深夜の合成薬局", h: false}, {n: "ナノタトゥーアトリエ", h: false},
+        {n: "ピアス＆クロームカスタム", h: false}, {n: "サイバー筋肉理学療法室", h: true}, {n: "ネオンライブハウス", h: false},
+        {n: "ストレス脳洗浄ショップ", h: true}, {n: "有機アロマサウナ", h: true}, {n: "睡眠誘導ASMRルーム", h: true},
         {n: "ミッドナイト独立シネマ", h: false}, {n: "ネオン大衆浴場", h: false}, {n: "24時コンビニ「ネオン」", h: false},
         {n: "データチップ古書店", h: false}, {n: "レトロゲームセンター", h: false}, {n: "サイバーウェア精密検診所", h: false},
-        {n: "空飛ぶバイク係留所", h: false}, {n: "ホログラム・アクセサリー店", h: false}, {n: "深夜の漫画喫茶", h: true},
-        {n: "エリアの小さな美術館", h: true}, {n: "空中庭園ティールーム", h: true}, {n: "ネオン・ピンボールセンター", h: false},
-        {n: "空飛ぶ車専用駐車場", h: false}, {n: "データスロット・カラオケ", h: false}, {n: "VRテーマ・ルーム", h: true},
-        {n: "サイバーペット用品店", h: true}, {n: "天然合成温泉 (Premium)", h: true}, {n: "クローム市民専用休憩所「サンクチュアリ」", h: true},
-        {n: "ネオン・フィットネスクラブ", h: false}, {n: "水中マッサージプール", h: true}, {n: "皮膚再生エステ", h: true},
-        {n: "バイオ酸素カプセル", h: true}, {n: "キャンドル＆ディフューザー専門店", h: true}, {n: "記憶の欠片ホログラム店", h: true},
-        {n: "瞑想＆ヨガセンター", h: true}, {n: "睡眠補助剤薬局", h: true}, {n: "地下街ラーメンツアー", h: false},
-        {n: "ブルーオーシャン・リゾート", h: true}, {n: "サイバー餃子職人", h: false}, {n: "深夜の点心専門館", h: false},
-        {n: "人工肉バーガーハウス", h: false}, {n: "コテージ・ローカルマガジン支部", h: false}, {n: "コインランドリー＆ブックカフェ", h: true},
-        {n: "路地裏の古着屋", h: false}, {n: "ネオンシューズ・セレクトショップ", h: false}, {n: "サイバー・フラワーガーデン", h: true},
-        {n: "知能型防犯ドローンハブ", h: false}, {n: "パーソナルカラー診断室", h: false}, {n: "ネオン・ネイルアート・アトリエ", h: true},
-        {n: "サイバー・メイクアップセンター", h: true}, {n: "魂の記憶クラウドセンター", h: false}, {n: "中古ホバーバイク店", h: false},
-        {n: "自動運転タクシー乗り場", h: false}, {n: "エリア共有駐車タワー", h: false}, {n: "飛行船ツアー予約処", h: false},
-        {n: "都市統合乗り換えセンター", h: false}, {n: "5つ星プレミアム・テックホテル", h: true}, {n: "色あせたセントラル・アベニュー・プラザ", h: true},
+        {n: "空飛ぶバイク係留場", h: false}, {n: "ホログラムアクセショップ", h: false}, {n: "深夜漫画喫茶", h: true},
+        {n: "エリア小さな美術館", h: true}, {n: "空中庭園ティールーム", h: true}, {n: "ネオンピンボールセンター", h: false},
+        {n: "空飛ぶ車専用駐車場", h: false}, {n: "データスロットカラオケ", h: false}, {n: "VRテーマルーム", h: true},
+        {n: "サイバーペット用品店", h: true}, {n: "天然合成温泉 (Premium)", h: true}, {n: "クローム市民休憩所", h: true},
+        {n: "ネオンフィットネスクラブ", h: false}, {n: "水中マッサージプール", h: true}, {n: "皮膚再生エステ", h: true},
+        {n: "バイオ酸素カプセル", h: true}, {n: "香草＆ディフューザー専門店", h: true}, {n: "記憶の欠片ホログラム店", h: true},
+        {n: "瞑想＆ヨガセンター", h: true}, {n: "睡眠補助剤薬房", h: true}, {n: "地下街ラーメンツアー", h: false},
+        {n: "ブルーオーシャンリゾート", h: true}, {n: "サイバー餃子職人", h: false}, {n: "深夜点心専門館", h: false},
+        {n: "人工肉バーガーハウス", h: false}, {n: "コテージローカルマガジン支部", h: false}, {n: "コインランドリー＆本カフェ", h: true},
+        {n: "路地裏ヴィンテージ古着屋", h: false}, {n: "ネオン靴セレクトショップ", h: false}, {n: "サイバーフラワーガーデン", h: true},
+        {n: "知能型防犯ドローンハブ", h: false}, {n: "パーソナルカラー診断室", h: false}, {n: "ネオンネイルアートアトリエ", h: true},
+        {n: "サイバーメイクアップセンター", h: true}, {n: "魂の記憶クラウドセンター", h: false}, {n: "中古ホバーバイク店", h: false},
+        {n: "自律走行タクシー乗り場", h: false}, {n: "エリア共有駐車タワー", h: false}, {n: "飛行船ツアー予約所", h: false},
+        {n: "都市統合乗り換えセンター", h: false}, {n: "5つ星プレミアムテックホテル", h: true}, {n: "色褪せたセントラル広場", h: true},
         {n: "エネルギー回収発電団地", h: false}, {n: "水耕栽培ネオン温室", h: true}, {n: "地中熱暖房システム", h: false},
-        {n: "バイオナノ再生センター", h: true}, {n: "大規模ネオン・ショッピングモール", h: false}, {n: "メガ・コーポレーション・カンパニー", h: false},
+        {n: "バイオナノ再生センター", h: true}, {n: "大規模ネオンショッピングモール", h: false}, {n: "メガコーポレーションカンパニー", h: false},
         {n: "都市血管物流網", h: false}, {n: "高高度ドローン補給路", h: false}, {n: "バイオエネルギー植物園", h: true},
-        {n: "コテージ・マインド管制センター", h: false}, {n: "ハイパーループ・センター", h: false}, {n: "宇宙航空センター", h: false},
-        {n: "コテージ・タワー建設", h: false}, {n: "天の川観測タワー", h: false}, {n: "深夜衛星周波数伝送局", h: false},
+        {n: "コテージマインド管制センター", h: false}, {n: "ハイパーループセンター", h: false}, {n: "宇宙航空センター", h: false},
+        {n: "コテージタワー建設", h: false}, {n: "天の川観測タワー", h: false}, {n: "深夜衛星周波数伝送局", h: false},
         {n: "環境回復加速センター", h: true}, {n: "記憶保管銀行", h: false}, {n: "人間-機械協力センター", h: false},
-        {n: "テラフォーミング・シミュレーションラボ", h: true}, {n: "オメガ・インフラ網", h: false}, {n: "アルファ・シティ演算センター", h: false},
-        {n: "新世界への関門", h: false}, {n: "2026年式アナログ日差し窓", h: true}, {n: "古びた共用酸素充電所", h: true},
+        {n: "テラフォーミングシミュラボ", h: true}, {n: "オメガインフラ網", h: false}, {n: "アルファシティ演算センター", h: false},
+        {n: "新世界関門", h: false}, {n: "2026年式アナログ日差し窓", h: true}, {n: "古い共用酸素充電所", h: true},
         {n: "深夜のティングルASMRヘアサロン", h: true}, {n: "演劇が終わった後の小劇場", h: true}, {n: "低軌道流れ星誘導装置", h: false},
         {n: "ミッドナイト・ユートピア", h: true}
     ];
 
-    const rankNames = ["素朴で居心地の良いサイバーパンクの部屋", "ネオン・アトリエ", "作家と教授の書斎", "リパードクの整備所", "ラジオ・スタジオ", "フォトグラファーの暗室", "合成ラーメン屋台", "雨の降るテラス", "ビンテージ・レコード店", "屋上の庭園", "サウナ", "クローム温泉室", "LPバー", "ペントハウスの晩餐", "モルソフト・レストラン", "ディストリクト・クォーター", "データ・ハイウェイ", "ギャラクシー・シティ", "ゴールデン・サンセット・シティ", "ユートピア・ミッドナイト・コテージ"];
+    const rankNames = ["素朴で居心地の良いサイバーパンク部屋", "ネオンアトリエ", "作家と教授の書斎", "リパードクの整備所", "ラジオスタジオ", "フォトグラファーの暗室", "合成ラーメン屋台", "雨降るテラス", "ヴィンテージ・レコード店", "屋上の庭園", "サウナ", "クローム温泉室", "LPバー", "ペントハウスの晩餐", "モルソフトレストラン", "ディストリクト・クォーター", "データハイウェイ", "ギャラクシーシティ", "ゴールデンサンセットシティ", "ユートピア・ミッドナイト・コテージ"];
     const rankImages = ["https://i.imgur.com/MuFQQ5A.png", "https://i.imgur.com/1nAnNIb.png", "https://i.imgur.com/eqwGBhl.png", "https://i.imgur.com/br0HdSG.png", "https://i.imgur.com/2Sz2iYA.png", "https://i.imgur.com/3qXyDTr.png", "https://i.imgur.com/J5mjTBn.png", "https://i.imgur.com/aI6UVY2.png", "https://i.imgur.com/QMSpzfL.png", "https://i.imgur.com/PwZ6vm3.png", "https://i.imgur.com/S4yBFXT.png", "https://i.imgur.com/A0HQ7e3.png", "https://i.imgur.com/qeB68bj.png", "https://i.imgur.com/RoQeLG8.png", "https://i.imgur.com/vuNzL4d.png", "https://i.imgur.com/P1SjHGR.png", "https://i.imgur.com/tApbEin.png", "https://i.imgur.com/ylCZJyn.png", "https://i.imgur.com/vA1hKCT.png", "https://i.imgur.com/ecGrFrH.png"];
 
     const upgrades = uniqueInfra.map((item, i) => ({
@@ -619,12 +561,12 @@
     }));
 
     const achievements = [
-        { id: 'cat', name: 'ニャンコワールド', icon: '🐱', desc: 'すべての住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '猫') },
-        { id: 'drama', name: '愛と戦争', icon: '💔', desc: '不倫関係が発生しました。', unlocked: false, check: s => s.residents.some(r => r.relType === '不倫') },
+        { id: 'cat', name: 'ニャンコワールド', icon: '🐱', desc: '全住民が猫です。', unlocked: false, check: s => s.residents.length > 2 && s.residents.every(r => r.job === '고양이') },
+        { id: 'drama', name: '愛と戦争', icon: '💔', desc: '不倫関係が発生しました。', unlocked: false, check: s => s.residents.some(r => r.relType === '불륜') },
         { id: 'rich', name: '億万長者', icon: '💰', desc: '所持金1,000,000突破。', unlocked: false, check: s => s.money >= 1000000 },
-        { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === 'ソロ') },
-        { id: 'stress', name: '燃え尽き症候群', icon: '🔥', desc: '住民の平均ストレスが90%以上。', unlocked: false, check: s => s.residents.length > 0 && (s.residents.reduce((a,b)=>a+b.stress,0)/s.residents.length) > 90 },
-        { id: 'collector', name: '歴史学者', icon: '📜', desc: 'すべての遺物(20種)の収集完了。', unlocked: false, check: s => s.artifacts.every(a => a === true) }
+        { id: 'solo', name: 'ソロ天国', icon: '🧘', desc: '5人全員がソロです。', unlocked: false, check: s => s.residents.length === 5 && s.residents.every(r => r.relType === '솔로') },
+        { id: 'stress', name: 'バーンアウト', icon: '🔥', desc: '住民平均ストレス90%以上。', unlocked: false, check: s => s.residents.length > 0 && (s.residents.reduce((a,b)=>a+b.stress,0)/s.residents.length) > 90 },
+        { id: 'collector', name: '歴史学者', icon: '📜', desc: '全遺物(20種)収集完了。', unlocked: false, check: s => s.artifacts.every(a => a === true) }
     ];
 
     let setupIndex = 0;
@@ -634,19 +576,38 @@
     window.onload = function() {
         init();
     };
+</script>
 
-    // [修正] 1. 保存機能
+// 💾 엔딩 대사 (일본어)
+    const endingDialogues = {
+        "화가": "君の色で満たされた世界だったよ。ありがとう。",
+        "소설가": "この物語の最後のページは、君と一緒に書けてよかった。",
+        "교수": "君という存在は、歴史上最も美しい発見だった。",
+        "리퍼닥": "俺の心臓パーツ、君にあげるよ。元気でな。",
+        "ASMR DJ": "最後は君のために、最高の安らぎを届けるね。",
+        "모델": "私の人生で一番輝いていた瞬間は、ランウェイじゃなく君の隣だった。",
+        "형사": "捜査終了だ。君という真実を見つけたからな。",
+        "넷러너": "ログアウトしても、君のデータだけは削除しないよ。",
+        "라멘노점상": "いつでもおいで。君のためなら一生麺を茹でて待ってる。",
+        "온천주인": "またおいでよ。一番温かいお湯を用意しておくから。",
+        "LP바 사장님": "音楽が止まっても、君とのリズムは忘れないよ。",
+        "뮤지션": "天国に行っても、君のための歌を歌い続けるよ。",
+        "고양이": "ニャー。（楽しかったよ、下僕。元気でね。）",
+        "VIP": "全財産を払っても惜しくない時間だった。ありがとう。"
+    };
+
+    // [修正] 1. 保存機能 (ローカルストレージ) - キー名を変更
     function saveGame() {
         try {
-            localStorage.setItem('midnight_cottage_v30_JP', JSON.stringify(state));
+            localStorage.setItem('midnight_cottage_jp_v30', JSON.stringify(state));
         } catch (e) {
-            console.error("ローカル保存失敗", e);
+            console.error("保存失敗", e);
         }
     }
 
     // [修正] 2. ロード機能
     function loadGame() {
-        const saved = localStorage.getItem('midnight_cottage_v30_JP');
+        const saved = localStorage.getItem('midnight_cottage_jp_v30');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -662,11 +623,12 @@
 
     // [修正] 3. ゲーム初期化
     function init() {
-        state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
+        if(typeof upgrades !== 'undefined') {
+            state.upgrades = upgrades.map(u => ({ id: u.id, lv: 0, price: u.basePrice }));
+        }
 
-        // ローカルデータをまず探して、あればすぐにゲーム開始！
         if (loadGame()) {
-            console.log("📂 ブラウザ自動保存データのロード完了");
+            console.log("📂 保存されたデータをロードしました");
             document.getElementById('start-screen').style.display = 'none';
             startGame();
             addHistory("💻 <b>システム:</b> 前回の作業を続けて開始します。");
@@ -688,7 +650,7 @@
         const currentData = tempResidents[idx] || {};
         nameInput.value = currentData.name || '';
         document.getElementById('input-gender').value = currentData.gender || '남';
-        document.getElementById('input-job').value = currentData.job || '画家'; 
+        document.getElementById('input-job').value = currentData.job || '화가'; 
 
         prevBtn.style.display = idx === 0 ? 'none' : 'block';
         finishBtn.style.display = tempResidents.length > 0 || idx > 0 ? 'block' : 'none';
@@ -717,7 +679,7 @@
             stress: 0, 
             affection: 50, 
             partnerId: null, 
-            relType: 'ソロ',
+            relType: '솔로', // 内部ロジック用 (表示時に変換)
             dialogues: selectedDialogues
         };
     }
@@ -731,18 +693,14 @@
         if (setupIndex > 0) loadSetupUI(setupIndex - 1);
     }
 
-    // [修正] 4. 入居開始
     function finishSetup() {
         saveCurrentInput(); 
         state.residents = [...tempResidents]; 
         document.getElementById('start-screen').style.display = 'none';
         
-        // ゲーム開始
         startGame();
-
-        // 🔥 入居したら即時強制保存！
-        saveGame(); 
-        console.log("✅ 入居完了、即時保存");
+        saveGame();
+        console.log("✅ 入居完了");
     }
 
     function startGame() {
@@ -750,19 +708,23 @@
         setInterval(changeNews, 300000);
         render(); updateUI(); renderAchievements();
         
-        // 👇 [修正] ゲーム開始時にSNS投稿を3つ生成 (日本語版も速く)
-        setTimeout(generateSNSPost, 500); 
-        setTimeout(generateSNSPost, 1000); 
-        setTimeout(generateSNSPost, 1500); 
+        setInterval(() => { 
+            let boost = 1 + (state.artifacts.filter(x=>x).length * 0.1);
+            let income = state.autoIncome * boost;
+            if (state.residents.length > 0) {
+                let avgStress = state.residents.reduce((a,b)=>a+b.stress, 0) / state.residents.length;
+                if (avgStress > 80) income *= 0.5;
+            }
 
-        // 5秒ごとに自動保存
+            state.money += income / 10; 
+            state.residents.forEach(r => r.stress = Math.min(100, r.stress + 0.007));
+            updateUI(); 
+            checkAchievements();
+        }, 100);
+        
         setInterval(saveGame, 5000);
-        
-        // イベント発生 (25秒)
         setInterval(randomDailyEvent, 25000);
-        
-        // 👇 [修正] SNS更新頻度を5秒に短縮
-        setInterval(generateSNSPost, 5000); 
+        setInterval(generateSNSPost, 60000); 
 
         if (window.innerWidth <= 768) {
             spawnMessage('💻作業ファイト！ミッドナイト・コテージへようこそ。', 'event');
@@ -781,23 +743,6 @@
             }
         }
     }
-
-    const endingDialogues = {
-        "画家": "この部屋の色彩は私のキャンバスより美しかった。永遠に記憶するよ。",
-        "小説家": "私たちのチャプターはここで終わるけど、君の物語はずっと書き続けてね。",
-        "教授": "ここの記録は歴史に残るだろう。君のおかげだ。",
-        "リパードク": "俺の心臓エンジンも高鳴るぜ。完璧な修理だった。",
-        "ASMR DJ": "今夜は一番穏やかな雨音を聞かせてあげる。おやすみ。",
-        "モデル": "派手な照明より、この部屋のほのかなネオンの方が良かったわ。",
-        "刑事": "事件終了。犯人は…私たちが探していた幸福だったか。",
-        "ネットランナー": "ログアウトしたくないサーバーはここが初めてだ。",
-        "ラーメン屋": "いつでもおいで。温かいスープ一杯は一生タダだから。",
-        "温泉主人": "心の垢まですっかり洗い流せた気分だよ。ありがとう。",
-        "バーマスター": "最後の曲は君のためにかけるよ。このリズムを忘れないで。",
-        "ミュージシャン": "俺の最高の名曲はこのコテージで誕生した。サンキュー！",
-        "猫": "ニャー。（元気でな、最高の下僕。チュール忘れるなよ。）",
-        "VIP": "これほど価値のある投資は初めてだな。素晴らしかった。"
-    };
 
     function startEndingSequence() {
         const screen = document.getElementById('ending-sequence');
@@ -818,6 +763,7 @@
                 return;
             }
             const char = state.residents[step];
+            // 엔딩 대사 매핑 확인
             const msg = endingDialogues[char.job] || "一緒で楽しかったよ。幸せになってね！";
             emojiDiv.innerText = char.emoji;
             nameDiv.innerText = `${char.job} ${char.name}`;
@@ -850,7 +796,7 @@
         priceText.innerText = `💵 ${price.toLocaleString()}`;
         if(state.artifacts.every(x => x)) {
             btn.disabled = true;
-            btn.innerHTML = "全遺物の収集完了！";
+            btn.innerHTML = "全遺物収集完了！";
         } else if(state.money < price) {
             btn.disabled = true;
         } else {
@@ -867,7 +813,7 @@
                 const pick = unfound[Math.floor(Math.random()*unfound.length)];
                 state.artifacts[pick] = true; 
                 renderMuseum();
-                showCenterPopup(artifactsData[pick].emoji, '遺物の復元成功！', artifactsData[pick].name);
+                showCenterPopup(artifactsData[pick].emoji, '遺物復元成功！', artifactsData[pick].name);
                 addHistory(`🏺 <b>遺物復元:</b> [${artifactsData[pick].name}] 復元完了！ (収益 +10%)`);
             }
             updateUI();
@@ -882,61 +828,59 @@
         let text = "";
 
         const generalPosts = [
-            // [日常 & エモ]
-            "今日パーティする人？", "家が最高。", "この通り、イケてるね。", "バッテリー充電中...", 
-            "読書にいい夜。", "暇だから遊んで！", "コンビニ弁当は飽きた。", "誰か私の自転車盗んだ？", 
-            "雨の日はチヂミでしょ。", "ネオンサインが今日に限って綺麗。", "人生とは...", "給料いつ入るの？", 
-            "夜食のおすすめ教えて。", "新しくできた店行く人？", "今日の天気ヤバイ。", "出勤したくない。", 
-            "退勤後にビール一杯どう？", "週末があっという間に...", "Netflix見るものオススメ教えて。", "ダイエットは明日から。", 
-            "今日のOOTD。", "美味しい店発見！", "コーヒー輸血至急。", "眠れない。", "深夜の感性爆発。", 
-            "昔の歌を聴いてる。", "旅行行きたい。", "部屋の掃除しなきゃなのに...", "布団の外は危険だ。", 
-            "今日の気分は晴れ。", "ささやかな幸せ。", "ぼーっとしてる。", "お腹すいた。", "宝くじ当選祈願。", 
-            "散歩行くか？", "宅配届いた！", "溜まった洗濯しなきゃ。", "ラーメン食べてく？", "月曜病がひどい。",
+            "今日パーティーする人？", "家が最高。", "この通り、イケてるね。", "バッテリー充電中...", 
+            "読書にいい夜。", "暇だー誰か遊んで！", "コンビニ弁当飽きた。", "誰か私の自転車盗んだ？", 
+            "雨の日はチヂミだね。", "ネオンサインが今日は綺麗。", "人生って...", "給料いつ入るの？", 
+            "夜食のおすすめ教えて。", "新しくできた店行く人？", "今日の天気ヤバい。", "出勤したくない。", 
+            "仕事終わりにビール一杯？", "週末が一瞬で終わった...", "Netflixのおすすめ教えて。", "ダイエットは明日から。", 
+            "今日のOOTD。", "美味しい店発見！", "コーヒー輸血求む。", "眠れない。", "夜明けの感性爆発。", 
+            "昔の歌聴いてる。", "旅行行きたい。", "部屋の掃除しなきゃだけど...", "布団の外は危険だ。", 
+            "今日の気分は晴れ。", "ささやかな幸せ。", "ぼーっとしてる。", "お腹すいた。", "宝くじ当たれ。", 
+            "散歩行く？", "宅配来た！", "溜まった洗濯しなきゃ。", "ラーメン食べていく？", "月曜病だわ。",
             
-            // [サイバーパンク世界観]
-            "義体の関節が痛むな。雨降るのかな。", "合成ラーメンから本物の肉の味がする！", 
-            "誰だ私の脳をハッキングしようとしたのは？ファイアウォール突破されるとこだった。", "空にドローン多すぎてうるさい。", 
-            "サイバーウェアのファームウェア更新中...動けない。", "VR接続するパーティー募集。", 
-            "リパードクの予約とれない。", "今日は酸性雨がひどいな。", "本物の紙の本手に入れた！匂いがすごい。", 
+            "義体の関節が痛むな。雨かな。", "合成ラーメンから本物の肉の味がする！", 
+            "誰だ私の脳ハッキングしようとした奴。ファイアウォール突破されるとこだった。", "空のドローン多すぎてうるさい。", 
+            "サイバーウェアのファームウェア更新中...動けない。", "仮想現実接続するパーティーメンバー求む。", 
+            "リパードクの予約取れない。", "今日酸性雨ひどいな。", "本物の紙の本手に入れた！匂いヤバい。", 
             "アンドロイドのバイトの方が私より仕事できる。", "網膜ディスプレイの広告ブロックどうやるの？", 
-            "隣の家のホログラムがまたうちに入り込んでる。", "旧型インプラント売ります。", 
-            "今夜のシティビューやばい。", "ネットダイブしてたら酔った。", "AIが私の日記を盗み見てる気がする。", 
-            "合成ビタミンじゃなくて本物の果物が食べたい。", "2026年の骨董品スマホ売ります。", 
-            "記憶メモリ整理しなきゃ。容量不足。", "違法チップ入れるなよ。副作用ヤバいぞ。", 
+            "隣の家のホログラムがずっと家に入ってくる。", "旧型インプラント売ります。", 
+            "今夜のシティビュー最高。", "ネットワークダイブしてて酔った。", "AIが私の日記盗み見たっぽい。", 
+            "合成ビタミンじゃなくて本物の果物食べたい。", "2026年の骨董品スマホ売ります。", 
+            "記憶メモリ整理しなきゃ。容量不足だ。", "違法チップ移植すんな。副作用ヤバいぞ。", 
             "電気代また上がった。自家発電機回すべきか。", "地下鉄でネットランナー同士が戦ってるの見た。", 
-            "サイバーキャットの動画見て癒やされてる。", "誰か私のアカウントにウイルス仕込んだでしょㅡㅡ", 
-            "人工太陽の光が強すぎる。", "レトロ感性で有線イヤホン買った。", 
-            "機械の腕に油ささなきゃ。ギシギシ言う。", "都市の騒音遮断して瞑想中。", 
-            "ホログラムの彼女/彼氏と喧嘩した。慰めて。", "錠剤ひとつで食事済ませたくない。",
-            "空飛ぶ車の免許取った！", "空気清浄機のフィルター変えなきゃ。", "今日のデータ転送速度遅くない？"
+            "サイバーキャット動画見て癒され中。", "誰か私のアカウントにウイルス仕込んだな ㅡㅡ", 
+            "人工太陽光が強すぎる。", "レトロ感性で有線イヤホン買った。", 
+            "機械の腕に油差さなきゃ。軋む。", "都市の騒音遮断して瞑想中。", 
+            "ホログラムの彼女/彼氏と喧嘩した。慰めて。", "錠剤一つで食事済ませたくない。",
+            "空飛ぶ車の免許取った！", "空気清浄機のフィルター替えなきゃ。", "今日のデータ転送速度なんでこうなの？"
         ];
 
-        if (char.job === '猫') { 
+        if (char.job === '고양이') { 
             text = [
-                "ニャン。", "ゴロゴロ...", "チュールよこせニンゲン。", "ドドドドドッ！！", "グルル...", 
-                "段ボールは私の。", "高いところが好き。", "お昼寝の時間だニャ。", "下僕よ、遊んで。", 
-                "フミフミ中。", "ネズミのおもちゃ捕まえたニャ！", "窓の外のドローン観察中。", "香箱座り中。", 
-                "私の毛は防水だニャ～", "電気ストーブの前が特等席だニャ。", "ニャー！（ご飯！）", 
-                "下僕に隠れておやつ盗み食い。", "爪とぎカリカリ。", "あくび...", "蝶々捕まえに行く。"
+                "ニャ。", "ゴロゴロ...", "チュールよこせ人間。", "ダダダダダッ！！", "グルル...", 
+                "箱は私の。", "高いところが好き。", "昼寝の時間だニャ。", "下僕よ、遊んで。", 
+                "ふみふみ中。", "ネズミのおもちゃ捕まえた！", "窓の外のドローン観察中。", "香箱座り中。", 
+                "私の毛は防水だぞ～", "電気ストーブの前が特等席だニャ。", "ニャー！（飯！）", 
+                "下僕に隠れておやつ盗み食いした。", "爪とぎカリカリ。", "あくび...", "蝶々捕まえに行く。"
             ][Math.floor(Math.random()*20)]; 
         } 
-        else if (char.relType === '不倫') { 
+        else if (char.relType === '불륜') { 
             text = [
-                "裏アカです。", "今夜も...", "しーっ。", "誰にも内緒で。", "心臓がうるさい。", 
-                "危険だけど止められない。", "こんなのダメなのに...", "会いたい。", "深夜2時の密会。", 
-                "私たちは共犯よ。", "地獄の果てまで一緒。", "この愛が罪なら喜んで罰を受けるわ。", 
-                "他の人は知らなくていい。", "君を想うと息が詰まる。", "禁じられたものほど甘い。", 
-                "今日に限って君の香りが消えない。", "引き返せない川を渡った。", 
-                "スリルがあって余計いい。", "私たちこのまま逃げようか？", "しっ、アラーム消して。"
+                "秘密のアカウントです。", "今夜も...", "しっ。", "誰にも内緒で。", "心臓が跳ねる。", 
+                "危険だけど止められない。", "ダメなのに...", "会いたい。", "午前2時の密会。", 
+                "私たちは共犯だよ。", "地獄の果てまで一緒さ。", "この愛が罪なら甘んじて受ける。", 
+                "他の人は知らなくていい。", "君を想うと息が詰まる。", "禁じられたものがもっと甘いね。", 
+                "今日は君の香りが消えない。", "引き返せない川を渡った。", 
+                "スリルがあって好き。", "私たちこのまま逃げようか？", "しっ、アラーム切っておいて。"
             ][Math.floor(Math.random()*20)]; 
         } 
         else if (char.stress > 80) { 
             text = [
-                "あーマジで全部うざい。", "触るな。", "退社したい。", "世界なんて滅びろ。", 
-                "何もしたくない。", "頭痛い。", "全部投げ出したい。", "爆発寸前。", 
-                "システム過負荷。", "ほっといてくれ。", "今日話しかけたら噛みつくぞ。", "ストレス数値99%。", 
-                "全部ぶっ壊したい。", "どこかに蒸発したい。", "脳が焼き切れそう。", 
-                "ログアウトしたい。永遠に。", "誰か一人でもかかってこい。", "うわああああああ！！！", 
+                "あーマジで全部ムカつく。", "触るな。", "退社したい。", "世界なんて滅びればいい。", 
+                "何もしたくない。", "頭痛い。", "全部放り投げたい。", "爆発寸前。", 
+                "システム過負荷。", "放っておいてくれ。", "今日話しかけたら噛みつくぞ。", "ストレス値99%。", 
+                "全部ぶち壊したい。", "どこかに蒸発したい。", "脳が焼けそうだ。", 
+                "ログアウトしたい。永遠に。", "誰か一人でもかかってこい。", "うわあああああ！！！", 
                 "助けて...", "放電した。"
             ][Math.floor(Math.random()*20)]; 
         } 
@@ -951,14 +895,19 @@
         document.getElementById('sns-dot').style.display = 'block';
     }
 
+    function renderSNS() {
+        const feed = document.getElementById('sns-feed');
+        if(feed) feed.innerHTML = snsPosts.map(p => `<div class="sns-post"><div class="sns-user"><div class="sns-avatar">${p.emoji}</div><div class="sns-name">${p.name}</div><div class="sns-time">${p.time}</div></div><div class="sns-text">${p.text}</div></div>`).join('');
+    }
+
     function checkAchievements() {
         let changed = false;
         achievements.forEach(ach => {
             if (!ach.unlocked && ach.check(state)) {
                 ach.unlocked = true;
                 changed = true;
-                showCenterPopup(ach.icon, "実績達成！", ach.name);
-                addHistory(`🏆 <b>実績達成:</b> [${ach.name}] - ${ach.desc}`);
+                showCenterPopup(ach.icon, "実績解除！", ach.name);
+                addHistory(`🏆 <b>実績解除:</b> [${ach.name}] - ${ach.desc}`);
             }
         });
         if (changed) { renderAchievements(); }
@@ -1037,15 +986,16 @@
 
     function render() {
         document.getElementById('res-grid').innerHTML = state.residents.map((r, i) => {
-            let relText = r.relType === 'ソロ' ? 'ソロ' : (r.relType === 'カップル' ? 'カップル' : '不倫');
-            if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}と${relText}`; }
+            // 関係状態の日本語表記
+            let relText = r.relType === '솔로' ? 'ソロ' : (r.relType === '불륜' ? '不倫' : 'カップル');
+            if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}の${relText}`; }
             const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
             return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
         }).join('');
         
         document.getElementById('upgrade-list').innerHTML = state.upgrades.map((u, i) => {
             const data = upgrades[i];
-            return `<div class="up-card"><div class="up-info"><h4>${data.name} <small>(Lv.${u.lv})</small></h4><div class="tags">${u.lv === 0 ? '<span class="tag-dev">⭐ 発展度 +1</span>' : ''}${data.isHealing ? '<span class="tag-healing">🌿 ストレス解消</span>' : ''}</div><p>${data.type === 'click' ? 'クリック' : '秒間'} +${data.power.toLocaleString()}</p></div><button class="buy-btn" id="btn-${u.id}" onclick="buy(${i})">💵 ${u.price.toLocaleString()}</button></div>`;
+            return `<div class="up-card"><div class="up-info"><h4>${data.name} <small>(Lv.${u.lv})</small></h4><div class="tags">${u.lv === 0 ? '<span class="tag-dev">⭐ 発展度 +1</span>' : ''}${data.isHealing ? '<span class="tag-healing">🌿 ストレス解消</span>' : ''}</div><p>${data.type === 'click' ? 'クリック' : '毎秒'} +${data.power.toLocaleString()}</p></div><button class="buy-btn" id="btn-${u.id}" onclick="buy(${i})">💵 ${u.price.toLocaleString()}</button></div>`;
         }).join('');
         renderMuseum();
     }
@@ -1057,14 +1007,13 @@
     function showArt(i, e) { 
         e.stopPropagation(); 
         const descBox = document.getElementById('artifact-desc');
-        if(state.artifacts[i]) descBox.innerText = `テオ教授: "${artifactsData[i].desc}"`; 
-        else descBox.innerText = "まだ未収集の遺物だ。闇市で探してみよう！";
+        if(state.artifacts[i]) descBox.innerText = `テオ: "${artifactsData[i].desc}"`; 
+        else descBox.innerText = "まだ未収集の遺物だ。博物館で探してみてくれ！";
     }
 
     function buy(idx) {
         const u = state.upgrades[idx], d = upgrades[idx];
         
-        // 1. 購入ロジック
         if(state.money >= u.price) {
             state.money -= u.price; 
             
@@ -1096,16 +1045,13 @@
             
             render(); 
             updateUI();
-            
-            // 🔥 [修正] お金を使ったので即時保存！
             saveGame();
         }
 
-        // 2. ボタンぽよん演出
         const btn = document.getElementById(`btn-${u.id}`);
         if (btn) {
             btn.classList.remove('click-animate'); 
-            void btn.offsetWidth; // アニメーションリセットマジックコード
+            void btn.offsetWidth; 
             btn.classList.add('click-animate'); 
         }
     }
@@ -1133,29 +1079,25 @@
         const res = state.residents[idx];
         if(!res) return;
 
-        // 1. 最新のセリフデータを取得 (アップデート反映)
         const latestDialogues = jobsData[res.job]; 
         
-        // 2. 基本はソロのセリフ
         let pool = latestDialogues['Solo'];
         
-        // 3. 関係ステータスのチェック
-        if (res.relType === 'カップル') { // 日本語キー
+        if (res.relType === '커플') {
             pool = latestDialogues['Love'];
-        } else if (res.relType === '不倫') { // 日本語キー
+        } else if (res.relType === '불륜') {
             pool = latestDialogues['Affair'];
         }
 
-        // 4. ストレスが高い場合はストレスセリフを優先
         if (res.stress > 80) {
             pool = latestDialogues['Stress'];
         }
 
-        // ランダム選択して出力
         const msg = pool[Math.floor(Math.random()*pool.length)];
         spawnMessage(`${res.name}: "${msg}"`, 'talk');
     }
 
+    // [修正] 4. ランダムイベント (日本語文法に合わせて再構成)
     function randomDailyEvent() {
         if (state.residents.length < 2) return;
 
@@ -1168,63 +1110,63 @@
         const a = charA.name;
         const b = charB.name;
 
-        // 50種類のランダムイベントパターン (世界観反映・日本語化)
+        // 日本語パターン (助詞の自動処理不要)
         const patterns = [
-            // 💚 ささやかな癒やし/日常 (好感度 +3~5)
-            { t:'good', v:5, m:`${a}と${b}は、雨音を聞きながらぼんやりと窓の外を眺めた。` },
-            { t:'good', v:4, m:`${a}が${b}に温かい合成ココアを淹れてあげた。` },
-            { t:'good', v:5, m:`${a}と${b}は、古いホログラムの名作映画を見て感動した。` },
-            { t:'good', v:3, m:`${a}が${b}の乱れた髪を直してあげた。` },
-            { t:'good', v:4, m:`${a}と${b}は、夜食にコンビニのカップ麺を分け合って食べた。` },
-            { t:'good', v:5, m:`${a}が${b}の壊れた小物を手際よく直してあげた。` },
-            { t:'good', v:3, m:`${a}と${b}は、ラジオから流れる昔の歌を一緒に口ずさんだ。` },
-            { type:'good', v:4, m:`${a}が${b}に面白いジョークを聞かせてあげた。` },
-            { t:'good', v:5, m:`${a}と${b}は、お互いの子供の頃の写真を見せ合って笑った。` },
-            { t:'good', v:4, m:`${a}が疲れている${b}の肩を揉んであげた。` },
-            { t:'good', v:3, m:`${a}と${b}は、部屋の模様替えについて相談した。` },
-            { t:'good', v:5, m:`${a}が${b}のためにささやかなプレゼントを用意した。` },
-            { t:'good', v:4, m:`${a}と${b}は、猫の動画を見て癒やされた。` },
-            { t:'good', v:3, m:`${a}が${b}の服装を褒めた。` },
-            { t:'good', v:5, m:`${a}と${b}は、深夜の散歩に出かけた。` },
+            // 💚 日常 & ヒーリング
+            { t:'good', v:5, m:`${a}と${b}は雨音を聞きながらぼんやり窓の外を眺めた。` },
+            { t:'good', v:4, m:`${a}が${b}に温かい合成ココアを入れてあげた。` },
+            { t:'good', v:5, m:`${a}と${b}は古いホログラム名画を見て感動した。` },
+            { t:'good', v:3, m:`${a}が${b}の乱れた髪を整えてあげた。` },
+            { t:'good', v:4, m:`${a}と${b}は夜食にコンビニのカップ麺を分け合った。` },
+            { t:'good', v:5, m:`${a}が${b}の壊れた小物をパパっと直してあげた。` },
+            { t:'good', v:3, m:`${a}と${b}はラジオから流れる昔の歌を口ずさんだ。` },
+            { t:'good', v:4, m:`${a}が${b}に面白い冗談を聞かせてあげた。` },
+            { t:'good', v:5, m:`${a}と${b}はお互いの子供の頃の写真を見せて笑い合った。` },
+            { t:'good', v:4, m:`${a}が疲れた${b}の肩を揉んであげた。` },
+            { t:'good', v:3, m:`${a}と${b}は部屋の模様替えについて相談した。` },
+            { t:'good', v:5, m:`${a}が${b}のために小さなプレゼントを用意した。` },
+            { t:'good', v:4, m:`${a}と${b}は猫の動画を見て癒された。` },
+            { t:'good', v:3, m:`${a}が${b}の服のセンスを褒めた。` },
+            { t:'good', v:5, m:`${a}と${b}は深夜の散歩に行ってきた。` },
             { t:'good', v:4, m:`${a}が${b}に読んでいた本を勧めた。` },
-            { t:'good', v:3, m:`${a}と${b}は、お互いのタロット占いをし合った。` },
-            { t:'good', v:5, m:`${a}が眠っている${b}に毛布を掛けてあげた。` },
-            { t:'good', v:4, m:`${a}と${b}は、VRゲームを一緒にプレイした。` },
+            { t:'good', v:3, m:`${a}と${b}はお互いのタロット占いをし合った。` },
+            { t:'good', v:5, m:`${a}が眠った${b}に毛布をかけてあげた。` },
+            { t:'good', v:4, m:`${a}と${b}はVRゲームを一緒にプレイした。` },
             { t:'good', v:3, m:`${a}が${b}の悩みを真剣に聞いてあげた。` },
 
-            // 💖 ロマンチック/いい感じ (好感度 +7~10)
-            { t:'love', v:8, m:`${a}と${b}の間に、妙なピンク色の空気が流れた...` },
-            { t:'love', v:9, m:`${a}が${b}をじっと見つめた。目が合うと二人は笑った。` },
-            { t:'love', v:7, m:`${a}と${b}の手が少し触れ合い、顔が赤くなった。` },
+            // 💖 ロマンス
+            { t:'love', v:8, m:`${a}と${b}の間に妙なピンク色の気流が流れた...` },
+            { t:'love', v:9, m:`${a}が${b}をじっと見つめた。目が合うと微笑んだ。` },
+            { t:'love', v:7, m:`${a}と${b}は手が少し触れ合うと顔を赤くした。` },
             { t:'love', v:10, m:`${a}が${b}に「君しかいない」と酔った勢いで本音を言った。` },
-            { t:'love', v:8, m:`${a}と${b}は、一晩中深い話をした。` },
-            { t:'love', v:9, m:`${a}が${b}の寝顔をこっそり覗き込んだ。` },
-            { t:'love', v:7, m:`${a}と${b}は、お互いの心臓の音を聞いた。` },
-            { t:'love', v:8, m:`${a}が${b}に「今日は一段と綺麗だね」と言った。` },
+            { t:'love', v:8, m:`${a}と${b}は一晩中深い話をした。` },
+            { t:'love', v:9, m:`${a}が${b}の寝顔をこっそり見つめた。` },
+            { t:'love', v:7, m:`${a}と${b}はお互いの心臓の音を聞いた。` },
+            { t:'love', v:8, m:`${a}が${b}に「今日は綺麗だね」と言った。` },
 
-            // ⚡ 葛藤/口論 (好感度 -5~-10)
-            { t:'bad', v:-5, m:`${a}と${b}は、夕飯のメニューで揉めた。` },
-            { t:'bad', v:-7, m:`${a}がうっかり${b}の大事な物を落としてしまった。` },
-            { t:'bad', v:-6, m:`${a}と${b}は、政治の話で声を荒らげた。` },
-            { t:'bad', v:-8, m:`${a}が${b}のダサい趣味を指摘した。` },
-            { t:'bad', v:-5, m:`${a}と${b}は、掃除当番のことで神経戦を繰り広げた。` },
+            // ⚡ 葛藤
+            { t:'bad', v:-5, m:`${a}と${b}は夕食のメニューで言い争った。` },
+            { t:'bad', v:-7, m:`${a}がうっかり${b}の大切な物を落としてしまった。` },
+            { t:'bad', v:-6, m:`${a}と${b}は政治の話で声を荒らげた。` },
+            { t:'bad', v:-8, m:`${a}が${b}のダサい好みを指摘した。` },
+            { t:'bad', v:-5, m:`${a}と${b}は掃除当番の問題で神経戦を繰り広げた。` },
             { t:'bad', v:-10, m:`${a}が${b}の言葉を無視してイヤホンをつけてしまった。` },
-            { t:'bad', v:-7, m:`${a}と${b}は、些細な誤解ですれ違った。` },
-            { t:'bad', v:-9, m:`${a}が${b}の隠しておいたおやつを勝手に食べてしまった。` },
-            { t:'bad', v:-6, m:`${a}と${b}は、エアコンの温度設定で喧嘩した。` },
-            { t:'bad', v:-8, m:`${a}が${b}にぶっきらぼうな返事をした。` },
+            { t:'bad', v:-7, m:`${a}と${b}は些細な誤解で拗ねてしまった。` },
+            { t:'bad', v:-9, m:`${a}が${b}の隠しておいたおやつをこっそり食べてしまった。` },
+            { t:'bad', v:-6, m:`${a}と${b}はエアコンの温度設定で喧嘩した。` },
+            { t:'bad', v:-8, m:`${a}が${b}にそっけない態度をとった。` },
 
-            // 🤖 サイバーパンク世界観・特殊 (好感度ランダム)
-            { t:'cyber', v:3, m:`${a}と${b}は、落ちてきた人工衛星の破片を見物した。` },
+            // 🤖 サイバーパンク
+            { t:'cyber', v:3, m:`${a}と${b}は落ちてきた人工衛星の破片を見物した。` },
             { t:'cyber', v:-4, m:`${a}が${b}のバイオチップをハッキングしようとしてバレた！` },
-            { t:'cyber', v:5, m:`${a}と${b}は、ネットワークダイブを一緒に楽しんだ。` },
+            { t:'cyber', v:5, m:`${a}と${b}はネットワークダイブを一緒に楽しんだ。` },
             { t:'cyber', v:4, m:`${a}が${b}の機械の腕の誤作動を直してあげた。` },
-            { t:'cyber', v:-5, m:`${a}と${b}は、アンドロイドの人権問題で討論した。` },
-            { t:'cyber', v:2, m:`${a}と${b}は、停電した部屋でロウソクを灯した。` },
-            { t:'cyber', v:3, m:`${a}が${b}に拾った違法データチップを自慢した。` },
-            { t:'cyber', v:0, m:`${a}と${b}は、ただ静かに雨音だけを聞いていた。` },
+            { t:'cyber', v:-5, m:`${a}と${b}はアンドロイドの人権問題で討論した。` },
+            { t:'cyber', v:2, m:`${a}と${b}は停電した部屋でロウソクを灯した。` },
+            { t:'cyber', v:3, m:`${a}が${b}に拾ってきた違法データチップを自慢した。` },
+            { t:'cyber', v:0, m:`${a}と${b}は都市の騒音のせいで寝不足になった。` },
             { t:'cyber', v:4, m:`${a}が${b}に新しい身体インプラントを見せてあげた。` },
-            { t:'cyber', v:-3, m:`${a}と${b}は、ハッキングウイルスのせいで頭を抱えた。` }
+            { t:'cyber', v:-3, m:`${a}と${b}はハッキングウイルスに悩まされた。` }
         ];
 
         const evt = patterns[Math.floor(Math.random() * patterns.length)];
@@ -1235,60 +1177,57 @@
 
         let heartIcon = evt.v > 0 ? (evt.t==='love'?'💖':'❤️') : (evt.v < 0 ? '💔' : '🤖');
         let valColor = evt.v > 0 ? 'var(--heart)' : (evt.v < 0 ? '#888' : '#ccc');
-        let typeLabel = evt.t==='bad'?'⚡ <b>対立:</b>':(evt.t==='love'?'💖 <b>ときめき:</b>':(evt.t==='cyber'?'🤖 <b>事件:</b>':'💬 <b>日常:</b>'));
+        let typeLabel = evt.t==='bad'?'⚡ <b>葛藤:</b>':(evt.t==='love'?'💖 <b>サム:</b>':(evt.t==='cyber'?'🤖 <b>事件:</b>':'💬 <b>日常:</b>'));
 
         addHistory(`${typeLabel} ${evt.m} <span style="color:${valColor}">(${heartIcon}${evt.v > 0 ? '+' : ''}${evt.v})</span>`);
 
-        // 関係変化ロジック (日本語キー)
-        // A. [破局]
+        // 関係変化ロジック
+        // A. [別れ]
         if (charA.partnerId === charB.id && (charA.affection < 30 || charB.affection < 30)) {
-            charA.relType = 'ソロ'; charB.relType = 'ソロ';
+            charA.relType = '솔로'; charB.relType = '솔로';
             charA.partnerId = null; charB.partnerId = null;
             showCenterPopup("💔", "決別", `${charA.name} ⚡ ${charB.name}`);
-            addHistory(`💔 <b>別れ:</b> ${charA.name}と${charB.name}は、性格の不一致を克服できず他人になりました。`);
+            addHistory(`💔 <b>別れ:</b> ${charA.name}と${charB.name}は別れました。`);
             saveGame();
         } 
         
         // B. [カップル誕生]
         else if (charA.affection >= 90 && charB.affection >= 90) {
-            if (charA.relType === 'ソロ' && charB.relType === 'ソロ') {
-                charA.relType = 'カップル'; charB.relType = 'カップル';
+            if (charA.relType === '솔로' && charB.relType === '솔로') {
+                charA.relType = '커플'; charB.relType = '커플';
                 charA.partnerId = charB.id; charB.partnerId = charA.id;
                 showCenterPopup("💖", "カップル誕生！", `${charA.name} ♥ ${charB.name}`);
-                addHistory(`💖 <b>おめでとう！</b> ${charA.name}と${charB.name}は恋人になりました！`);
+                addHistory(`💖 <b>お祝い!</b> ${charA.name}と${charB.name}は恋人になりました！`);
                 saveGame();
             } 
             
-            // C. [不倫] および既存の恋人の整理
-            else if (charA.partnerId !== charB.id && (charA.relType === 'カップル' || charB.relType === 'カップル')) {
-                if (charA.relType !== '不倫' || charB.relType !== '不倫') {
+            // C. [不倫]
+            else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
+                if (charA.relType !== '불륜' || charB.relType !== '불륜') {
                     
-                    // 1. Aの既存パートナー整理
                     if (charA.partnerId !== null) {
                         const exA = state.residents[charA.partnerId];
                         if (exA && exA.id !== charB.id) { 
-                            exA.relType = 'ソロ'; 
+                            exA.relType = '솔로'; 
                             exA.partnerId = null; 
                             exA.stress += 30; 
                         }
                     }
 
-                    // 2. Bの既存パートナー整理
                     if (charB.partnerId !== null) {
                         const exB = state.residents[charB.partnerId];
                         if (exB && exB.id !== charA.id) { 
-                            exB.relType = 'ソロ'; 
+                            exB.relType = '솔로'; 
                             exB.partnerId = null; 
                             exB.stress += 30; 
                         }
                     }
 
-                    // 3. 不倫関係の成立
-                    charA.relType = '不倫'; charB.relType = '不倫';
+                    charA.relType = '불륜'; charB.relType = '불륜';
                     charA.partnerId = charB.id; charB.partnerId = charA.id;
 
                     showCenterPopup("😈", "危険な関係", `${charA.name} & ${charB.name}`);
-                    addHistory(`😈 <b>衝撃！</b> ${charA.name}と${charB.name}は禁断の愛に落ちてしまいました... (元の恋人とは終わりました)`);
+                    addHistory(`😈 <b>衝撃!</b> ${charA.name}と${charB.name}は禁断の愛に落ちました... (既存の恋人とは終わりました)`);
                     saveGame();
                 }
             }
@@ -1305,9 +1244,9 @@
     };
 
     function resetGame() {
-        if (confirm("本当にすべてのデータを削除して入居申込書からやり直しますか？\n(注意: データが永久に削除されます。)")) {
-            localStorage.removeItem('midnight_cottage_v30_JP');
-            alert("データが削除されました。ページを更新します。");
+        if (confirm("本当に全てのデータを削除して入居申請からやり直しますか？\n(注意: データは永久に削除されます。)")) {
+            localStorage.removeItem('midnight_cottage_jp_v30');
+            alert("データが削除されました。ページを再読み込みします。");
             location.reload();
         }
     }
