@@ -1303,7 +1303,7 @@
                 charA.partnerId = charB.id; charB.partnerId = charA.id;
                 showCenterPopup("💖", "커플 탄생!", `${charA.name} ♥ ${charB.name}`);
                 addHistory(`💖 <b>축하!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 연인이 되었습니다!`);
-                saveGame();
+                } saveGame();
             // C. [불륜] 한 명이라도 파트너가 있는데 호감도가 높을 때
             else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
                 // 이미 둘 다 불륜 상태가 아닐 때만 발동
