@@ -463,6 +463,14 @@
         <h2 style="color:var(--gold);">🏆 비밀 업적</h2>
         <div id="ach-grid" class="ach-grid" onclick="event.stopPropagation()"></div>
     </div>
+    <div id="dev-info-modal" class="modal" onclick="closeModalByBg(event, 'dev-info-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
+            <h2 style="color:var(--gold)">⭐ 발전도 안내</h2>
+            <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
+                건물 최초 5회 건설 시 새로운 방을 얻을 수 있습니다.
+            </p>
+        </div>
+    </div>
     <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
             <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
@@ -480,6 +488,11 @@
 </div>
 
 <script>
+    // 게임 버전 (업데이트 시 이 값을 변경하면 자동으로 데이터 초기화)
+    const GAME_VERSION = "1.0.0";
+    const SAVE_KEY = 'midnight_cottage_v30_hardcore';
+    const VERSION_KEY = 'midnight_cottage_version';
+    
     // 3. 전역 변수 선언
     const state = {
         money: 0, clickPower: 1, autoIncome: 1, 
@@ -690,27 +703,54 @@
     // [수정] 1. 저장 기능 (오직 브라우저 로컬 저장만!)
     function saveGame() {
         try {
-            localStorage.setItem('midnight_cottage_v30_hardcore', JSON.stringify(state));
+            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            localStorage.setItem(VERSION_KEY, GAME_VERSION);
             // console.log("자동 저장됨"); 
         } catch (e) {
             console.error("저장 실패", e);
         }
     }
 
-    // [수정] 2. 불러오기 기능
+    // [수정] 2. 불러오기 기능 (버전 체크 포함)
     function loadGame() {
-        const saved = localStorage.getItem('midnight_cottage_v30_hardcore');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                Object.assign(state, parsed);
-                return true; 
-            } catch (e) {
-                console.error("세이브 파일 오류", e);
-                return false;
-            }
+        const savedVersion = localStorage.getItem(VERSION_KEY);
+        const saved = localStorage.getItem(SAVE_KEY);
+        
+        if (!saved) {
+            return false;
         }
-        return false; 
+        
+        // 버전이 다르면 경고만 표시 (데이터는 유지)
+        if (savedVersion && savedVersion !== GAME_VERSION) {
+            console.warn(`⚠️ 게임 버전이 변경되었습니다. (${savedVersion} → ${GAME_VERSION})`);
+            console.warn('기존 데이터를 사용합니다. 문제가 있으면 설정에서 초기화해주세요.');
+        }
+        
+        // 버전이 없으면 (기존 사용자) 버전을 현재 버전으로 설정
+        if (!savedVersion) {
+            localStorage.setItem(VERSION_KEY, GAME_VERSION);
+        }
+        
+        try {
+            const parsed = JSON.parse(saved);
+            Object.assign(state, parsed);
+            
+            // 버전이 다를 때만 사용자에게 알림 (한 번만)
+            if (savedVersion && savedVersion !== GAME_VERSION) {
+                const versionWarningShown = sessionStorage.getItem('version_warning_shown');
+                if (!versionWarningShown) {
+                    setTimeout(() => {
+                        spawnMessage('⚠️ 게임이 업데이트되었습니다. 문제가 있으면 설정에서 초기화해주세요.', 'event');
+                        sessionStorage.setItem('version_warning_shown', 'true');
+                    }, 1000);
+                }
+            }
+            
+            return true; 
+        } catch (e) {
+            console.error("세이브 파일 오류", e);
+            return false;
+        }
     }
 
     // [수정] 3. 게임 초기화
@@ -1355,11 +1395,17 @@
         updateUI(); 
     };
 
+    let isResetting = false;
     function resetGame() {
+        if (isResetting) return; // 이미 초기화 중이면 무시
         if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 데이터가 영구 삭제됩니다.)")) {
-            localStorage.removeItem('midnight_cottage_v30_hardcore');
-            alert("데이터가 삭제되었습니다. 새로고침합니다.");
-            location.reload();
+            isResetting = true;
+            localStorage.removeItem(SAVE_KEY);
+            localStorage.removeItem(VERSION_KEY);
+            // localStorage 변경사항이 확실히 반영되도록 약간의 지연 후 새로고침
+            setTimeout(() => {
+                window.location.href = window.location.href;
+            }, 100);
         }
     }
 
