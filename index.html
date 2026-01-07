@@ -887,49 +887,82 @@ VIP 굿즈 받기
 
     // Google 로그인
     function signInWithGoogle() {
+        console.log("🔵 signInWithGoogle 함수 호출됨");
+        console.log("Firebase 상태:", { isFirebaseEnabled, firebaseAuth: !!firebaseAuth, firebase: typeof firebase });
+        
         if (!isFirebaseEnabled || !firebaseAuth) {
-            alert('Firebase가 설정되지 않았습니다.');
+            alert('Firebase가 설정되지 않았습니다.\n\n콘솔을 확인해주세요. (F12)');
             console.error("Firebase 상태:", { isFirebaseEnabled, firebaseAuth: !!firebaseAuth });
             return;
         }
         
-        const provider = new firebase.auth.GoogleAuthProvider();
-        
-        // 모바일이거나 팝업이 차단된 경우 redirect 사용
-        const isMobile = window.innerWidth <= 768;
-        
-        if (isMobile) {
-            // 모바일에서는 redirect 방식 사용
-            firebaseAuth.signInWithRedirect(provider)
-                .then(() => {
-                    console.log("✅ Google 로그인 리다이렉트 시작");
-                })
-                .catch((error) => {
-                    console.error("❌ Google 로그인 리다이렉트 실패:", error);
-                    alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code);
-                });
-        } else {
-            // PC에서는 팝업 방식 시도, 실패 시 redirect
-            firebaseAuth.signInWithPopup(provider)
-                .then((result) => {
-                    console.log("✅ Google 로그인 성공:", result.user.email);
-                    spawnMessage('✅ Google 로그인 성공!', 'event');
-                    // 로그인 성공 시 Firebase에서 데이터 불러오기
-                    loadGameFromFirebase();
-                })
-                .catch((error) => {
-                    console.error("❌ Google 로그인 팝업 실패:", error);
-                    console.error("에러 코드:", error.code);
-                    console.error("에러 메시지:", error.message);
-                    
-                    // 팝업 차단 등의 경우 redirect로 재시도
-                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
-                        console.log("팝업이 차단되었습니다. 리다이렉트 방식으로 재시도...");
-                        return firebaseAuth.signInWithRedirect(provider);
-                    } else {
-                        alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code + '\n\nFirebase Console에서 Google Sign-in이 활성화되어 있는지 확인해주세요.');
-                    }
-                });
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            console.log("GoogleAuthProvider 생성 완료");
+            
+            // 모바일이거나 팝업이 차단된 경우 redirect 사용
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // 모바일에서는 redirect 방식 사용
+                firebaseAuth.signInWithRedirect(provider)
+                    .then(() => {
+                        console.log("✅ Google 로그인 리다이렉트 시작");
+                    })
+                    .catch((error) => {
+                        console.error("❌ Google 로그인 리다이렉트 실패:", error);
+                        if (error.code && error.code.includes('requests-from-referer')) {
+                            // 도메인 승인 오류
+                            const errorMsg = 'Firebase Console에서 도메인 승인이 필요합니다.\n\n' +
+                                '해결 방법:\n' +
+                                '1. https://console.firebase.google.com 접속\n' +
+                                '2. 프로젝트 선택 > Authentication > Settings\n' +
+                                '3. "승인된 도메인" 섹션에서\n' +
+                                '4. "도메인 추가" 클릭\n' +
+                                '5. "midnightcottage-studio.github.io" 추가\n\n' +
+                                '에러 코드: ' + error.code;
+                            alert(errorMsg);
+                        } else {
+                            alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code);
+                        }
+                    });
+            } else {
+                // PC에서는 팝업 방식 시도, 실패 시 redirect
+                firebaseAuth.signInWithPopup(provider)
+                    .then((result) => {
+                        console.log("✅ Google 로그인 성공:", result.user.email);
+                        spawnMessage('✅ Google 로그인 성공!', 'event');
+                        // 로그인 성공 시 Firebase에서 데이터 불러오기
+                        loadGameFromFirebase();
+                    })
+                    .catch((error) => {
+                        console.error("❌ Google 로그인 팝업 실패:", error);
+                        console.error("에러 코드:", error.code);
+                        console.error("에러 메시지:", error.message);
+                        
+                        // 팝업 차단 등의 경우 redirect로 재시도
+                        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                            console.log("팝업이 차단되었습니다. 리다이렉트 방식으로 재시도...");
+                            return firebaseAuth.signInWithRedirect(provider);
+                        } else if (error.code && error.code.includes('requests-from-referer')) {
+                            // 도메인 승인 오류
+                            const errorMsg = 'Firebase Console에서 도메인 승인이 필요합니다.\n\n' +
+                                '해결 방법:\n' +
+                                '1. https://console.firebase.google.com 접속\n' +
+                                '2. 프로젝트 선택 > Authentication > Settings\n' +
+                                '3. "승인된 도메인" 섹션에서\n' +
+                                '4. "도메인 추가" 클릭\n' +
+                                '5. "midnightcottage-studio.github.io" 추가\n\n' +
+                                '에러 코드: ' + error.code;
+                            alert(errorMsg);
+                        } else {
+                            alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code + '\n\nFirebase Console에서 Google Sign-in이 활성화되어 있는지 확인해주세요.');
+                        }
+                    });
+            }
+        } catch (error) {
+            console.error("❌ signInWithGoogle 함수 내부 오류:", error);
+            alert('로그인 중 오류가 발생했습니다: ' + error.message + '\n\n콘솔을 확인해주세요. (F12)');
         }
     }
     
