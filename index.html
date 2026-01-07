@@ -119,6 +119,7 @@
         
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; padding: 40px; text-align: center; border-radius: 24px; box-sizing: border-box; backdrop-filter: blur(5px); }
         #donation-modal { z-index: 201 !important; }
+        #offline-reward-modal { z-index: 202 !important; }
         .modal h2 { margin-top: 0; margin-bottom: 30px; font-size: 28px; }
         /* PC 버전: 설정 모달 타이트하게 */
         @media (min-width: 769px) {
@@ -305,6 +306,7 @@
             #help-modal-content > div[style*="display:flex"] > div > div[style*="padding:15px 20px"] { padding: 12px 12px 10px 12px !important; }
             .gallery-item.locked::before { font-size: 16px !important; }
             .center-popup { z-index: 10001 !important; }
+            #offline-reward-modal { z-index: 10002 !important; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
         }
@@ -521,6 +523,25 @@
             </div>
         </div>
     </div>
+    <div id="offline-reward-modal" class="modal" onclick="if(event.target === this) toggleModal('offline-reward-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--gold); text-align:center; min-width: 350px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
+            <h2 style="color:var(--gold); margin-top:0; margin-bottom:20px; font-size:24px;">💰 오프라인 수익</h2>
+            <div style="font-size:60px; margin:20px 0;">⏰</div>
+            <p id="offline-time-text" style="font-size:16px; color:#ccc; margin-bottom:20px; line-height:1.6;"></p>
+            <div style="padding:20px; background:rgba(255, 158, 100, 0.1); border:2px solid var(--gold); border-radius:15px; margin:20px 0;">
+                <p style="font-size:14px; color:#888; margin:0 0 10px 0;">오프라인 수익</p>
+                <p id="offline-reward-amount" style="font-size:32px; color:var(--gold); font-weight:900; margin:0;"></p>
+            </div>
+            <button onclick="event.stopPropagation(); claimOfflineReward();" 
+                    style="background:var(--gold); color:#000; border:none; padding:15px 30px; border-radius:12px; font-weight:900; cursor:pointer; font-size:16px; width: 100%; margin-top:15px; box-shadow:0 0 20px rgba(255, 158, 100, 0.4);">
+                보상 받기
+            </button>
+            <p style="font-size:11px; color:#888; margin-top:15px; line-height:1.5;">
+                💡 오프라인 수익은 직접 플레이보다 적게 지급됩니다.<br>
+                최대 24시간까지 수익이 누적됩니다.
+            </p>
+        </div>
+    </div>
     <div id="donation-modal" class="modal" onclick="if(event.target === this) toggleModal('donation-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--gold); text-align:center; min-width: 350px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
             <h2 style="color:var(--gold); margin-top:0; margin-bottom:20px; font-size:24px;">☕ 후원하기</h2>
@@ -685,7 +706,8 @@ VIP 굿즈 받기
         upgrades: [], history: [], artifacts: Array(20).fill(false),
         rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
         residents: [], achievements: [], endingSeen: false,
-        playerName: '', vipUnlocked: false
+        playerName: '', vipUnlocked: false,
+        lastActiveTime: Date.now() // 마지막 접속 시간
     };
 
     // ============================================================
@@ -968,6 +990,9 @@ VIP 굿즈 받기
 
     // [수정] 1. 저장 기능 (로컬 + Firebase 클라우드 저장)
     function saveGame() {
+        // 마지막 접속 시간 업데이트
+        state.lastActiveTime = Date.now();
+        
         // 로컬 저장 (항상)
         try {
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
@@ -1066,6 +1091,9 @@ VIP 굿즈 받기
                     }, 1000);
                 }
             }
+            
+            // 오프라인 수익 계산
+            checkOfflineReward();
             
                 return true; 
             } catch (e) {
@@ -1446,6 +1474,107 @@ VIP 굿즈 받기
         popup.innerHTML = `<div style="font-size:40px;">${emoji}</div><div>${title}</div><div style="font-size:16px; color:#fff; font-weight:500;">[${sub}]</div>`;
         document.body.appendChild(popup);
         setTimeout(() => popup.remove(), 3000);
+    }
+    
+    // 오프라인 수익 계산 및 보상 모달 표시
+    function checkOfflineReward() {
+        if (!state.lastActiveTime) {
+            state.lastActiveTime = Date.now();
+            return;
+        }
+        
+        const now = Date.now();
+        const offlineTimeMs = now - state.lastActiveTime;
+        const offlineTimeSec = Math.floor(offlineTimeMs / 1000);
+        
+        // 최소 1분 이상 오프라인이어야 보상 지급
+        if (offlineTimeSec < 60) {
+            return;
+        }
+        
+        // 최대 24시간(86400초)까지만 수익 누적
+        const maxOfflineTimeSec = 86400;
+        const cappedOfflineTimeSec = Math.min(offlineTimeSec, maxOfflineTimeSec);
+        
+        // 현재 수익 계산 (startGame의 로직과 동일)
+        let boost = 1 + (state.artifacts.filter(x=>x).length * 0.1);
+        let incomePerSec = state.autoIncome * boost;
+        if (state.residents.length > 0) {
+            let avgStress = state.residents.reduce((a,b)=>a+b.stress, 0) / state.residents.length;
+            if (avgStress > 80) incomePerSec *= 0.5;
+        }
+        
+        // 오프라인 효율: 40% (직접 플레이보다 적게)
+        const offlineEfficiency = 0.4;
+        const offlineReward = Math.floor(incomePerSec * cappedOfflineTimeSec * offlineEfficiency);
+        
+        if (offlineReward > 0) {
+            // 오프라인 보상 정보 저장
+            window.pendingOfflineReward = {
+                amount: offlineReward,
+                timeSec: cappedOfflineTimeSec,
+                fullTimeSec: offlineTimeSec
+            };
+            
+            // 게임 시작 후 보상 모달 표시
+            setTimeout(() => {
+                showOfflineRewardModal();
+            }, 1500);
+        }
+    }
+    
+    // 오프라인 보상 모달 표시
+    function showOfflineRewardModal() {
+        if (!window.pendingOfflineReward) return;
+        
+        const reward = window.pendingOfflineReward;
+        const modal = document.getElementById('offline-reward-modal');
+        const timeText = document.getElementById('offline-time-text');
+        const amountText = document.getElementById('offline-reward-amount');
+        
+        if (!modal || !timeText || !amountText) return;
+        
+        // 시간 포맷팅
+        const hours = Math.floor(reward.timeSec / 3600);
+        const minutes = Math.floor((reward.timeSec % 3600) / 60);
+        const seconds = reward.timeSec % 60;
+        
+        let timeStr = '';
+        if (hours > 0) {
+            timeStr += `${hours}시간 `;
+        }
+        if (minutes > 0 || hours > 0) {
+            timeStr += `${minutes}분 `;
+        }
+        timeStr += `${seconds}초`;
+        
+        // 최대 시간 초과 시 표시
+        if (reward.fullTimeSec > reward.timeSec) {
+            timeStr += ` (최대 24시간까지 누적)`;
+        }
+        
+        timeText.textContent = `오프라인 시간: ${timeStr}`;
+        amountText.textContent = `+${reward.amount.toLocaleString()}원`;
+        
+        toggleModal('offline-reward-modal');
+    }
+    
+    // 오프라인 보상 받기
+    function claimOfflineReward() {
+        if (!window.pendingOfflineReward) return;
+        
+        const reward = window.pendingOfflineReward;
+        state.money += reward.amount;
+        
+        addHistory(`💰 <b>오프라인 수익:</b> ${reward.amount.toLocaleString()}원 획득!`);
+        
+        updateUI();
+        saveGame();
+        
+        toggleModal('offline-reward-modal');
+        window.pendingOfflineReward = null;
+        
+        showCenterPopup('💰', '오프라인 수익 획득!', `${reward.amount.toLocaleString()}원`);
     }
 
     function showEvolutionToast(rankName) {
