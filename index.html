@@ -314,6 +314,7 @@
             #food-menu-list > div > div:first-child > div > p { font-size: 11px !important; margin-top: 3px !important; }
             #food-menu-list > div > div:last-child > span { font-size: 16px !important; }
             #food-menu-list > div > div:last-child > button { padding: 6px 12px !important; font-size: 12px !important; }
+            .res-icon-box > div[style*="스트레스"] { font-size: 8px !important; padding: 1px 4px !important; }
             .gallery-item.locked::before { font-size: 16px !important; }
             .center-popup { z-index: 10001 !important; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
@@ -433,8 +434,8 @@
 
     <div class="content-container">
         <div class="main-panel" style="position:relative;">
-            <button id="food-icon-btn" onclick="toggleModal('food-modal')" 
-                    style="position:absolute; top:10px; left:10px; background:rgba(187, 154, 247, 0.9); border:2px solid var(--accent); color:#000; border-radius:50%; width:50px; height:50px; cursor:pointer; display:none; justify-content:center; align-items:center; font-size:24px; font-weight:900; z-index:100; box-shadow:0 0 20px rgba(187, 154, 247, 0.5); transition:0.3s;">
+            <button id="food-icon-btn" class="icon-btn" onclick="toggleModal('food-modal')" 
+                    style="position:absolute; top:10px; left:10px; display:none; z-index:100;">
                 🍜
             </button>
             <img id="desk-clicker" src="https://i.imgur.com/MuFQQ5A.png" alt="City Image">
@@ -1584,7 +1585,7 @@ VIP 굿즈 받기
             let relText = r.relType;
             if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}의 ${r.relType}`; }
             const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
-            const stressTag = r.stress > 0 ? '<div style="position:absolute; top:-5px; left:-5px; background:var(--heart); color:#fff; font-size:10px; font-weight:900; padding:2px 6px; border-radius:8px; border:2px solid var(--card); z-index:10; box-shadow:0 0 8px rgba(247, 118, 142, 0.5);">스트레스</div>' : '';
+            const stressTag = r.stress >= 70 ? '<div style="position:absolute; top:-5px; left:-5px; background:var(--heart); color:#c04a5a; font-size:9px; font-weight:900; padding:2px 6px; border-radius:8px; border:2px solid var(--card); z-index:10; box-shadow:0 0 8px rgba(247, 118, 142, 0.5);">스트레스</div>' : '';
             return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}${stressTag}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
         }).join('');
         
@@ -1611,8 +1612,13 @@ VIP 굿즈 받기
         const menuList = document.getElementById('food-menu-list');
         if (!menuList) return;
         
+        // 모든 주민의 스트레스 합계 확인
+        const totalStress = state.residents.reduce((sum, r) => sum + r.stress, 0);
+        const hasStress = totalStress > 0;
+        
         menuList.innerHTML = foodMenu.map((food, index) => {
             const canAfford = state.money >= food.price;
+            const canBuy = canAfford && hasStress; // 돈이 있고 스트레스가 있을 때만 구매 가능
             return `
                 <div style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px;">
                     <div style="display:flex; align-items:center; gap:10px;">
@@ -1625,8 +1631,8 @@ VIP 굿즈 받기
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:var(--gold); font-weight:900; font-size:18px;">💵 ${food.price.toLocaleString()}원</span>
                         <button class="food-buy-btn" data-food-index="${index}" 
-                                style="background:${canAfford ? 'var(--accent)' : '#666'}; color:${canAfford ? '#000' : '#999'}; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:${canAfford ? 'pointer' : 'not-allowed'}; font-size:14px; white-space:nowrap;"
-                                ${!canAfford ? 'disabled' : ''}>
+                                style="background:${canBuy ? 'var(--accent)' : '#666'}; color:${canBuy ? '#000' : '#999'}; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:${canBuy ? 'pointer' : 'not-allowed'}; font-size:14px; white-space:nowrap;"
+                                ${!canBuy ? 'disabled' : ''}>
                             구매
                         </button>
                     </div>
@@ -1634,13 +1640,20 @@ VIP 굿즈 받기
             `;
         }).join('');
         
-        // 이벤트 리스너 추가
+        // 이벤트 리스너 추가 (기존 리스너 제거 후 새로 추가)
         const buyButtons = menuList.querySelectorAll('.food-buy-btn');
         buyButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            // 기존 리스너 제거를 위해 클론 후 교체
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const foodIndex = parseInt(this.getAttribute('data-food-index'));
-                buyFood(foodIndex);
+                e.preventDefault();
+                if (!this.disabled) {
+                    const foodIndex = parseInt(this.getAttribute('data-food-index'));
+                    buyFood(foodIndex);
+                }
             });
         });
     }
