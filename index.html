@@ -511,13 +511,24 @@
                 3. 마지막 <b>유토피아 랭크</b>에 도달하면 엔딩!
             </p>
             
-            <div style="margin: 25px 0; padding: 20px; background: rgba(187, 154, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
-                <h3 style="color:var(--accent); font-size:16px; margin:0 0 15px 0; font-weight:800;">⭐ 후원자 명예의 전당</h3>
-                <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:8px; padding:8px 15px; background:rgba(255, 158, 100, 0.15); border:1px solid var(--gold); border-radius:8px; width:100%; max-width:250px;">
-                        <span style="font-size:20px;">👑</span>
-                        <span style="color:var(--gold); font-weight:800; font-size:15px;">바이퍼</span>
+            <div style="display:flex; gap:15px; margin: 25px 0; flex-wrap:wrap;">
+                <div style="flex:1; min-width:200px; padding: 20px; background: rgba(187, 154, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
+                    <h3 style="color:var(--accent); font-size:16px; margin:0 0 15px 0; font-weight:800;">⭐ 후원자 명예의 전당</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:8px; padding:8px 15px; background:rgba(255, 158, 100, 0.15); border:1px solid var(--gold); border-radius:8px; width:100%; max-width:250px;">
+                            <span style="font-size:20px;">👑</span>
+                            <span style="color:var(--gold); font-weight:800; font-size:15px;">바이퍼</span>
+                        </div>
                     </div>
+                </div>
+                
+                <div style="flex:1; min-width:200px; padding: 20px; background: rgba(122, 162, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
+                    <h3 style="color:var(--neon-blue); font-size:16px; margin:0 0 15px 0; font-weight:800;">📊 전체 유저 랭킹</h3>
+                    <button onclick="toggleModal('help-modal'); toggleModal('ranking-modal');" 
+                            style="background:var(--neon-blue); color:#000; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; width: 100%; margin-bottom:10px;">
+                        랭킹 보기
+                    </button>
+                    <p style="font-size:11px; color:#888; margin:0; text-align:left;">다른 유저들과 랭크를 비교해보세요!</p>
                 </div>
             </div>
             
@@ -530,15 +541,6 @@
                     <!-- 로그인/로그아웃 버튼이 여기에 동적으로 추가됨 -->
                 </div>
                 <p style="font-size:11px; color:#888; margin-top:10px; text-align:left;">Google 로그인으로 데이터를 안전하게 저장하세요!</p>
-            </div>
-            
-            <div style="margin: 25px 0; padding: 20px; background: rgba(122, 162, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
-                <h3 style="color:var(--neon-blue); font-size:16px; margin:0 0 15px 0; font-weight:800;">📊 전체 유저 랭킹</h3>
-                <button onclick="toggleModal('help-modal'); toggleModal('ranking-modal');" 
-                        style="background:var(--neon-blue); color:#000; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; width: 100%; margin-bottom:10px;">
-                    랭킹 보기
-                </button>
-                <p style="font-size:11px; color:#888; margin:0; text-align:left;">다른 유저들과 랭크를 비교해보세요!</p>
             </div>
             
             <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
@@ -1390,7 +1392,10 @@
 
     function closeModalByBg(e, id) {
         if (id === 'museum-modal') { if (!e.target.closest('.artifact-slot')) { toggleModal(id); } return; }
-        if (e.target.id === id) { toggleModal(id); }
+        // 모달 배경(바깥쪽 div)을 클릭했을 때 닫기
+        if (e.target.id === id || e.target.classList.contains('modal')) {
+            toggleModal(id);
+        }
     }
 
     function selectRoom(rankIndex) {
