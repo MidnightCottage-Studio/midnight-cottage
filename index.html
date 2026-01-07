@@ -523,19 +523,15 @@
             </div>
         </div>
     </div>
-    <div id="offline-reward-modal" class="modal" onclick="if(event.target === this) toggleModal('offline-reward-modal')">
-        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--gold); text-align:center; min-width: 350px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
-            <h2 style="color:var(--gold); margin-top:0; margin-bottom:20px; font-size:24px;">💰 오프라인 수익</h2>
+    <div id="offline-reward-modal" class="modal" style="pointer-events: none;">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--accent); text-align:center; min-width: 350px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; pointer-events: auto;">
+            <h2 style="color:var(--accent); margin-top:0; margin-bottom:20px; font-size:24px;">💰 오프라인 수익</h2>
             <div style="font-size:60px; margin:20px 0;">⏰</div>
             <p id="offline-time-text" style="font-size:16px; color:#ccc; margin-bottom:20px; line-height:1.6;"></p>
-            <div style="padding:20px; background:rgba(255, 158, 100, 0.1); border:2px solid var(--gold); border-radius:15px; margin:20px 0;">
+            <div style="padding:20px; background:rgba(187, 154, 247, 0.1); border:2px solid var(--accent); border-radius:15px; margin:20px 0;">
                 <p style="font-size:14px; color:#888; margin:0 0 10px 0;">오프라인 수익</p>
-                <p id="offline-reward-amount" style="font-size:32px; color:var(--gold); font-weight:900; margin:0;"></p>
+                <p id="offline-reward-amount" style="font-size:32px; color:var(--accent); font-weight:900; margin:0;"></p>
             </div>
-            <button onclick="event.stopPropagation(); claimOfflineReward();" 
-                    style="background:var(--gold); color:#000; border:none; padding:15px 30px; border-radius:12px; font-weight:900; cursor:pointer; font-size:16px; width: 100%; margin-top:15px; box-shadow:0 0 20px rgba(255, 158, 100, 0.4);">
-                보상 받기
-            </button>
             <p style="font-size:11px; color:#888; margin-top:15px; line-height:1.5;">
                 💡 오프라인 수익은 직접 플레이보다 적게 지급됩니다.<br>
                 최대 24시간까지 수익이 누적됩니다.
@@ -1553,7 +1549,7 @@ VIP 굿즈 받기
         }
     }
     
-    // 오프라인 보상 모달 표시
+    // 오프라인 보상 모달 표시 (자동으로 보상 지급 후 사라짐)
     function showOfflineRewardModal() {
         console.log("⏰ showOfflineRewardModal 실행");
         console.log("⏰ window.pendingOfflineReward:", window.pendingOfflineReward);
@@ -1597,14 +1593,7 @@ VIP 굿즈 받기
         timeText.textContent = `오프라인 시간: ${timeStr}`;
         amountText.textContent = `+${reward.amount.toLocaleString()}원`;
         
-        toggleModal('offline-reward-modal');
-    }
-    
-    // 오프라인 보상 받기
-    function claimOfflineReward() {
-        if (!window.pendingOfflineReward) return;
-        
-        const reward = window.pendingOfflineReward;
+        // 자동으로 보상 지급
         state.money += reward.amount;
         
         // 보상을 받은 후에만 마지막 접속 시간 업데이트
@@ -1615,10 +1604,15 @@ VIP 굿즈 받기
         updateUI();
         saveGame();
         
+        // 모달 표시
         toggleModal('offline-reward-modal');
-        window.pendingOfflineReward = null;
         
-        showCenterPopup('💰', '오프라인 수익 획득!', `${reward.amount.toLocaleString()}원`);
+        // 3초 후 자동으로 모달 닫기
+        setTimeout(() => {
+            toggleModal('offline-reward-modal');
+            window.pendingOfflineReward = null;
+            showCenterPopup('💰', '오프라인 수익 획득!', `${reward.amount.toLocaleString()}원`);
+        }, 3000);
     }
 
     function showEvolutionToast(rankName) {
