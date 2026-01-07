@@ -285,7 +285,8 @@
             .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; }
             .gallery-item img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
 
-            .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; }
+            .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+            #help-modal > div { max-height: calc(100vh - 40px); overflow-y: auto; margin: auto; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
             .gacha-container { width: 100%; }
         }
@@ -503,7 +504,7 @@
         </div>
     </div>
     <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
-        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
             <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
             <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
                 1. <b>🏺 유물 박물관</b>에서 유물을 복원해 수익을 뻥튀기하세요.<br>
