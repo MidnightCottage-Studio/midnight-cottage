@@ -596,6 +596,14 @@
         "VIP": "全財産を払っても惜しくない時間だった。ありがとう。"
     };
 
+    // 🔥 [추가] 직업 이름 한글 -> 일본어 변환기
+    const jobNameMap = {
+        "화가": "画家", "소설가": "小説家", "교수": "教授", "리퍼닥": "リパードク",
+        "ASMR DJ": "ASMR DJ", "모델": "モデル", "형사": "刑事", "넷러너": "ネットランナー",
+        "라멘노점상": "ラーメン屋台", "온천주인": "温泉宿の主人", "LP바 사장님": "LPバーのマスター",
+        "뮤지션": "ミュージシャン", "고양이": "猫", "VIP": "VIP"
+    };
+
     // [修正] 1. 保存機能 (ローカルストレージ) - キー名を変更
     function saveGame() {
         try {
@@ -679,7 +687,7 @@
             stress: 0, 
             affection: 50, 
             partnerId: null, 
-            relType: '솔로', // 内部ロジック用 (表示時に変換)
+            relType: '솔로', 
             dialogues: selectedDialogues
         };
     }
@@ -763,10 +771,11 @@
                 return;
             }
             const char = state.residents[step];
-            // 엔딩 대사 매핑 확인
+            // [修正] Job名を日本語マップから取得して表示
+            const jobName = jobNameMap[char.job] || char.job;
             const msg = endingDialogues[char.job] || "一緒で楽しかったよ。幸せになってね！";
             emojiDiv.innerText = char.emoji;
-            nameDiv.innerText = `${char.job} ${char.name}`;
+            nameDiv.innerText = `${jobName} ${char.name}`;
             msgDiv.innerText = `"${msg}"`;
             container.classList.add('show');
             setTimeout(() => {
@@ -990,7 +999,9 @@
             let relText = r.relType === '솔로' ? 'ソロ' : (r.relType === '불륜' ? '不倫' : 'カップル');
             if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}の${relText}`; }
             const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
-            return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
+            // [修正] Job名を日本語マップから取得して表示
+            const jobName = jobNameMap[r.job] || r.job;
+            return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${jobName}</div><div class="res-rel">${relText}</div></div>`;
         }).join('');
         
         document.getElementById('upgrade-list').innerHTML = state.upgrades.map((u, i) => {
