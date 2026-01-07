@@ -1113,10 +1113,8 @@ VIP 굿즈 받기
             document.getElementById('start-screen').style.display = 'none';
             startGame();
             addHistory("💻 <b>시스템:</b> 지난번 작업을 이어서 시작합니다.");
-            // 게임 시작 후 오프라인 보상 체크
-            setTimeout(() => {
-                checkOfflineReward();
-            }, 2000);
+            // 게임 시작 후 오프라인 보상 체크 (즉시)
+            checkOfflineReward();
         } else {
             // 없으면 입주 신청서 띄움
             loadSetupUI(0);
@@ -1538,20 +1536,17 @@ VIP 굿즈 받기
             
             console.log("⏰ 오프라인 보상 모달 표시 예정", window.pendingOfflineReward);
             
-            // 게임 시작 후 보상 모달 표시
-            setTimeout(() => {
-                console.log("⏰ showOfflineRewardModal 호출");
-                showOfflineRewardModal();
-            }, 1500);
+            // 즉시 오프라인 보상 표시
+            showOfflineReward();
         } else {
             console.log("⏰ 오프라인 보상: 계산된 보상이 0원이므로 표시 안 함");
             // 보상이 0원이면 마지막 접속 시간을 업데이트하지 않음
         }
     }
     
-    // 오프라인 보상 모달 표시 (자동으로 보상 지급 후 사라짐)
-    function showOfflineRewardModal() {
-        console.log("⏰ showOfflineRewardModal 실행");
+    // 오프라인 보상 표시 (spawnMessage 형식)
+    function showOfflineReward() {
+        console.log("⏰ showOfflineReward 실행");
         console.log("⏰ window.pendingOfflineReward:", window.pendingOfflineReward);
         
         if (!window.pendingOfflineReward) {
@@ -1560,16 +1555,6 @@ VIP 굿즈 받기
         }
         
         const reward = window.pendingOfflineReward;
-        const modal = document.getElementById('offline-reward-modal');
-        const timeText = document.getElementById('offline-time-text');
-        const amountText = document.getElementById('offline-reward-amount');
-        
-        console.log("⏰ 모달 요소 확인:", { modal: !!modal, timeText: !!timeText, amountText: !!amountText });
-        
-        if (!modal || !timeText || !amountText) {
-            console.log("⏰ 모달 요소가 없음");
-            return;
-        }
         
         // 시간 포맷팅
         const hours = Math.floor(reward.timeSec / 3600);
@@ -1590,9 +1575,6 @@ VIP 굿즈 받기
             timeStr += ` (최대 24시간까지 누적)`;
         }
         
-        timeText.textContent = `오프라인 시간: ${timeStr}`;
-        amountText.textContent = `+${reward.amount.toLocaleString()}원`;
-        
         // 자동으로 보상 지급
         state.money += reward.amount;
         
@@ -1604,15 +1586,11 @@ VIP 굿즈 받기
         updateUI();
         saveGame();
         
-        // 모달 표시
-        toggleModal('offline-reward-modal');
+        // spawnMessage 형식으로 표시
+        const messageText = `💰 오프라인 수익: ${timeStr} 동안 <b style="color:var(--accent);">${reward.amount.toLocaleString()}원</b> 획득!`;
+        spawnMessage(messageText, 'event');
         
-        // 3초 후 자동으로 모달 닫기
-        setTimeout(() => {
-            toggleModal('offline-reward-modal');
-            window.pendingOfflineReward = null;
-            showCenterPopup('💰', '오프라인 수익 획득!', `${reward.amount.toLocaleString()}원`);
-        }, 3000);
+        window.pendingOfflineReward = null;
     }
 
     function showEvolutionToast(rankName) {
