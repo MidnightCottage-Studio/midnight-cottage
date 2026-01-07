@@ -490,9 +490,9 @@
         </div>
     </div>
     <div id="food-modal" class="modal" onclick="closeModalByBg(event, 'food-modal')">
-        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 350px; max-width: 600px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
-            <h2 style="color:var(--gold); margin-top:0; margin-bottom:15px; font-size:24px;">🍜 합성 라면 가판대</h2>
-            <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.6;">
+        <div onclick="(function(e){if(!e.target.closest('.food-buy-btn')){closeModalByBg(e, 'food-modal');}})(event)" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 350px; max-width: 600px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
+            <h2 style="color:var(--gold); margin-top:0; margin-bottom:15px; font-size:24px; pointer-events:none;">🍜 합성 라면 가판대</h2>
+            <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.6; pointer-events:none;">
                 따뜻한 음식이 모든 주민의 스트레스를 해소해줍니다.
             </p>
             <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:12px; text-align:left;">
@@ -1629,7 +1629,7 @@ VIP 굿즈 받기
                         </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="color:var(--gold); font-weight:900; font-size:18px;">💵 ${food.price.toLocaleString()}원</span>
+                        <span style="color:var(--gold); font-weight:900; font-size:18px;">💵 ${food.price.toLocaleString()}</span>
                         <button class="food-buy-btn" data-food-index="${index}" 
                                 style="background:${canBuy ? 'var(--accent)' : '#666'}; color:${canBuy ? '#000' : '#999'}; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:${canBuy ? 'pointer' : 'not-allowed'}; font-size:14px; white-space:nowrap;"
                                 ${!canBuy ? 'disabled' : ''}>
@@ -1692,6 +1692,9 @@ VIP 굿즈 받기
         renderFoodMenu(); // 버튼 상태 업데이트
         render(); // 주민 스트레스 바 업데이트
         saveGame();
+        
+        // 모달 닫기
+        toggleModal('food-modal');
     }
 
     function buy(idx) {
