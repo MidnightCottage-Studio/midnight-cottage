@@ -1570,7 +1570,8 @@ VIP 굿즈 받기
             let relText = r.relType;
             if (r.partnerId !== null && state.residents[r.partnerId]) { relText = `${state.residents[r.partnerId].name}의 ${r.relType}`; }
             const genderBg = r.gender === '여' ? 'var(--female-bg)' : (r.gender === '남' ? 'var(--male-bg)' : '#444');
-            return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
+            const stressTag = r.stress > 0 ? '<div style="position:absolute; top:-5px; left:-5px; background:var(--heart); color:#fff; font-size:10px; font-weight:900; padding:2px 6px; border-radius:8px; border:2px solid var(--card); z-index:10; box-shadow:0 0 8px rgba(247, 118, 142, 0.5);">스트레스</div>' : '';
+            return `<div class="res-card" onclick="talkToResident(${i})"><div class="res-icon-box" style="background: ${genderBg}">${r.emoji}${stressTag}</div><div class="stress-box"><div class="stress-fill" id="stress-${i}" style="width: ${r.stress}%"></div></div><div class="res-name">${r.name}</div><div class="res-job" style="font-size:8px;">${r.job}</div><div class="res-rel">${relText}</div></div>`;
         }).join('');
         
         document.getElementById('upgrade-list').innerHTML = state.upgrades.map((u, i) => {
