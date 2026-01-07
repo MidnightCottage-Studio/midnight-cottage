@@ -1051,6 +1051,11 @@ VIP 굿즈 받기
                 
                 console.log("✅ Firebase 클라우드 데이터 로드 성공");
                 spawnMessage('☁️ 클라우드 데이터를 불러왔습니다!', 'event');
+                
+                // Firebase 로드 후 오프라인 보상 체크
+                setTimeout(() => {
+                    checkOfflineReward();
+                }, 2000);
             }
         }, (error) => {
             console.error("❌ Firebase 데이터 로드 실패:", error);
@@ -1092,9 +1097,6 @@ VIP 굿즈 받기
                 }
             }
             
-            // 오프라인 수익 계산
-            checkOfflineReward();
-            
                 return true; 
             } catch (e) {
                 console.error("세이브 파일 오류", e);
@@ -1115,6 +1117,10 @@ VIP 굿즈 받기
             document.getElementById('start-screen').style.display = 'none';
             startGame();
             addHistory("💻 <b>시스템:</b> 지난번 작업을 이어서 시작합니다.");
+            // 게임 시작 후 오프라인 보상 체크
+            setTimeout(() => {
+                checkOfflineReward();
+            }, 2000);
         } else {
             // 없으면 입주 신청서 띄움
             loadSetupUI(0);
@@ -1478,8 +1484,11 @@ VIP 굿즈 받기
     
     // 오프라인 수익 계산 및 보상 모달 표시
     function checkOfflineReward() {
+        // lastActiveTime이 없으면 현재 시간으로 초기화하고 리턴
         if (!state.lastActiveTime) {
             state.lastActiveTime = Date.now();
+            saveGame();
+            console.log("⏰ 오프라인 보상: 마지막 접속 시간 초기화");
             return;
         }
         
@@ -1487,8 +1496,11 @@ VIP 굿즈 받기
         const offlineTimeMs = now - state.lastActiveTime;
         const offlineTimeSec = Math.floor(offlineTimeMs / 1000);
         
+        console.log(`⏰ 오프라인 보상 체크: ${offlineTimeSec}초 경과`);
+        
         // 최소 1분 이상 오프라인이어야 보상 지급
         if (offlineTimeSec < 60) {
+            console.log("⏰ 오프라인 보상: 1분 미만이므로 보상 없음");
             return;
         }
         
@@ -1508,6 +1520,8 @@ VIP 굿즈 받기
         const offlineEfficiency = 0.4;
         const offlineReward = Math.floor(incomePerSec * cappedOfflineTimeSec * offlineEfficiency);
         
+        console.log(`⏰ 오프라인 보상 계산: 초당 수익=${incomePerSec}, 시간=${cappedOfflineTimeSec}초, 보상=${offlineReward}원`);
+        
         if (offlineReward > 0) {
             // 오프라인 보상 정보 저장
             window.pendingOfflineReward = {
@@ -1516,10 +1530,14 @@ VIP 굿즈 받기
                 fullTimeSec: offlineTimeSec
             };
             
+            console.log("⏰ 오프라인 보상 모달 표시 예정");
+            
             // 게임 시작 후 보상 모달 표시
             setTimeout(() => {
                 showOfflineRewardModal();
             }, 1500);
+        } else {
+            console.log("⏰ 오프라인 보상: 계산된 보상이 0원이므로 표시 안 함");
         }
     }
     
