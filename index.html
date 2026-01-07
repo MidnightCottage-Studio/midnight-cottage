@@ -685,8 +685,7 @@ VIP 굿즈 받기
         upgrades: [], history: [], artifacts: Array(20).fill(false),
         rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
         residents: [], achievements: [], endingSeen: false,
-        playerName: '', vipUnlocked: false,
-        lastActiveTime: Date.now() // 마지막 접속 시간
+        playerName: '', vipUnlocked: false
     };
 
     // ============================================================
@@ -969,9 +968,6 @@ VIP 굿즈 받기
 
     // [수정] 1. 저장 기능 (로컬 + Firebase 클라우드 저장)
     function saveGame() {
-        // lastActiveTime은 오프라인 보상 지급 후에만 업데이트됨
-        // (saveGame 호출 시마다 업데이트하면 오프라인 시간을 계산할 수 없음)
-        
         // 로컬 저장 (항상)
         try {
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
@@ -1030,11 +1026,6 @@ VIP 굿즈 받기
                 
                 console.log("✅ Firebase 클라우드 데이터 로드 성공");
                 spawnMessage('☁️ 클라우드 데이터를 불러왔습니다!', 'event');
-                
-                // Firebase 로드 후 오프라인 보상 체크
-                setTimeout(() => {
-                    checkOfflineReward();
-                }, 2000);
             }
         }, (error) => {
             console.error("❌ Firebase 데이터 로드 실패:", error);
@@ -1096,8 +1087,6 @@ VIP 굿즈 받기
             document.getElementById('start-screen').style.display = 'none';
             startGame();
             addHistory("💻 <b>시스템:</b> 지난번 작업을 이어서 시작합니다.");
-            // 게임 시작 후 오프라인 보상 체크 (즉시)
-            checkOfflineReward();
         } else {
             // 없으면 입주 신청서 띄움
             loadSetupUI(0);
@@ -1459,123 +1448,6 @@ VIP 굿즈 받기
         setTimeout(() => popup.remove(), 3000);
     }
     
-    // 오프라인 수익 계산 및 보상 모달 표시
-    function checkOfflineReward() {
-        console.log("⏰ 오프라인 보상 체크 시작");
-        console.log("⏰ state.lastActiveTime:", state.lastActiveTime);
-        console.log("⏰ state.autoIncome:", state.autoIncome);
-        
-        // lastActiveTime이 없거나 0이면 현재 시간으로 초기화하고 리턴
-        if (!state.lastActiveTime || state.lastActiveTime === 0) {
-            state.lastActiveTime = Date.now();
-            saveGame();
-            console.log("⏰ 오프라인 보상: 마지막 접속 시간 초기화", state.lastActiveTime);
-            return;
-        }
-        
-        const now = Date.now();
-        const offlineTimeMs = now - state.lastActiveTime;
-        const offlineTimeSec = Math.floor(offlineTimeMs / 1000);
-        
-        console.log(`⏰ 오프라인 보상 체크: ${offlineTimeSec}초 경과 (${Math.floor(offlineTimeSec/60)}분 ${offlineTimeSec%60}초)`);
-        
-        // 최소 1분 이상 오프라인이어야 보상 지급
-        if (offlineTimeSec < 60) {
-            console.log("⏰ 오프라인 보상: 1분 미만이므로 보상 없음");
-            // 1분 미만이면 마지막 접속 시간을 업데이트하지 않음 (다음에 다시 체크)
-            return;
-        }
-        
-        // 최대 24시간(86400초)까지만 수익 누적
-        const maxOfflineTimeSec = 86400;
-        const cappedOfflineTimeSec = Math.min(offlineTimeSec, maxOfflineTimeSec);
-        
-        // 현재 수익 계산 (startGame의 로직과 동일)
-        let boost = 1 + (state.artifacts.filter(x=>x).length * 0.1);
-        let incomePerSec = state.autoIncome * boost;
-        if (state.residents.length > 0) {
-            let avgStress = state.residents.reduce((a,b)=>a+b.stress, 0) / state.residents.length;
-            if (avgStress > 80) incomePerSec *= 0.5;
-        }
-        
-        // autoIncome이 0이거나 매우 작으면 최소 수익 보장
-        if (incomePerSec < 0.1) {
-            incomePerSec = 0.1; // 최소 초당 0.1원
-        }
-        
-        // 오프라인 효율: 40% (직접 플레이보다 적게)
-        const offlineEfficiency = 0.4;
-        const offlineReward = Math.floor(incomePerSec * cappedOfflineTimeSec * offlineEfficiency);
-        
-        console.log(`⏰ 오프라인 보상 계산: 초당 수익=${incomePerSec.toFixed(2)}, 시간=${cappedOfflineTimeSec}초, 보상=${offlineReward}원`);
-        
-        if (offlineReward > 0) {
-            // 오프라인 보상 정보 저장
-            window.pendingOfflineReward = {
-                amount: offlineReward,
-                timeSec: cappedOfflineTimeSec,
-                fullTimeSec: offlineTimeSec
-            };
-            
-            console.log("⏰ 오프라인 보상 모달 표시 예정", window.pendingOfflineReward);
-            
-            // 즉시 오프라인 보상 표시
-            showOfflineReward();
-        } else {
-            console.log("⏰ 오프라인 보상: 계산된 보상이 0원이므로 표시 안 함");
-            // 보상이 0원이면 마지막 접속 시간을 업데이트하지 않음
-        }
-    }
-    
-    // 오프라인 보상 표시 (spawnMessage 형식)
-    function showOfflineReward() {
-        console.log("⏰ showOfflineReward 실행");
-        console.log("⏰ window.pendingOfflineReward:", window.pendingOfflineReward);
-        
-        if (!window.pendingOfflineReward) {
-            console.log("⏰ pendingOfflineReward가 없음");
-            return;
-        }
-        
-        const reward = window.pendingOfflineReward;
-        
-        // 시간 포맷팅
-        const hours = Math.floor(reward.timeSec / 3600);
-        const minutes = Math.floor((reward.timeSec % 3600) / 60);
-        const seconds = reward.timeSec % 60;
-        
-        let timeStr = '';
-        if (hours > 0) {
-            timeStr += `${hours}시간 `;
-        }
-        if (minutes > 0 || hours > 0) {
-            timeStr += `${minutes}분 `;
-        }
-        timeStr += `${seconds}초`;
-        
-        // 최대 시간 초과 시 표시
-        if (reward.fullTimeSec > reward.timeSec) {
-            timeStr += ` (최대 24시간까지 누적)`;
-        }
-        
-        // 자동으로 보상 지급
-        state.money += reward.amount;
-        
-        // 보상을 받은 후에만 마지막 접속 시간 업데이트
-        state.lastActiveTime = Date.now();
-        
-        addHistory(`💰 <b>오프라인 수익:</b> ${reward.amount.toLocaleString()}원 획득!`);
-        
-        updateUI();
-        saveGame();
-        
-        // spawnMessage 형식으로 표시
-        const messageText = `💰 오프라인 수익: ${timeStr} 동안 <b style="color:var(--accent);">${reward.amount.toLocaleString()}원</b> 획득!`;
-        spawnMessage(messageText, 'event');
-        
-        window.pendingOfflineReward = null;
-    }
-
     function showEvolutionToast(rankName) {
         const evo = document.createElement('div');
         evo.className = 'evo-toast';
@@ -1888,22 +1760,12 @@ VIP 굿즈 받기
         if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 데이터가 영구 삭제됩니다.)")) {
             isResetting = true;
             // 모든 localStorage 데이터 삭제
-            localStorage.removeItem(SAVE_KEY);
-            localStorage.removeItem(VERSION_KEY);
+            localStorage.clear();
             // sessionStorage도 초기화
             sessionStorage.clear();
-            // state 초기화
-            Object.assign(state, {
-                money: 0, clickPower: 1, autoIncome: 1, 
-                upgrades: [], history: [], artifacts: Array(20).fill(false),
-                rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
-                residents: [], achievements: [], endingSeen: false,
-                playerName: '', vipUnlocked: false,
-                lastActiveTime: Date.now()
-            });
             // localStorage 변경사항이 확실히 반영되도록 약간의 지연 후 새로고침
             setTimeout(() => {
-                window.location.href = window.location.href;
+                window.location.reload();
             }, 100);
         }
     }
@@ -2229,29 +2091,6 @@ VIP 굿즈 받기
         }, 500);
     }
     
-    // 페이지를 닫거나 숨길 때 마지막 접속 시간 저장
-    window.addEventListener('beforeunload', function() {
-        if (state && typeof state === 'object') {
-            state.lastActiveTime = Date.now();
-            try {
-                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-            } catch (e) {
-                console.error("페이지 종료 시 저장 실패", e);
-            }
-        }
-    });
-    
-    // 페이지가 숨겨질 때도 저장 (모바일에서 앱 전환 시)
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden && state && typeof state === 'object') {
-            state.lastActiveTime = Date.now();
-            try {
-                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-            } catch (e) {
-                console.error("페이지 숨김 시 저장 실패", e);
-            }
-        }
-    });
 </script>
 </body>
 </html>
