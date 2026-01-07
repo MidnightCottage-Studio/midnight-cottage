@@ -714,7 +714,8 @@ VIP 굿즈 받기
         rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
         residents: [], achievements: [], endingSeen: false,
         playerName: '', vipUnlocked: false,
-        foodUnlocked: false // 음식 가판대 해금 여부
+        foodUnlocked: false, // 음식 가판대 해금 여부
+        unlockedAchievements: [] // 달성한 업적 ID 목록 (초기화되어도 유지됨)
     };
 
     // ============================================================
@@ -1129,7 +1130,22 @@ VIP 굿즈 받기
         const savedVersion = localStorage.getItem(VERSION_KEY);
         const saved = localStorage.getItem(SAVE_KEY);
         
+        // 업적 달성 정보 먼저 불러오기 (초기화되어도 유지되는 데이터)
+        const savedAchievements = localStorage.getItem('midnight_cottage_unlocked_achievements');
+        if (savedAchievements) {
+            try {
+                state.unlockedAchievements = JSON.parse(savedAchievements);
+            } catch (e) {
+                console.error("업적 정보 로드 실패", e);
+                state.unlockedAchievements = [];
+            }
+        }
+        
         if (!saved) {
+            // 게임 데이터가 없어도 업적 정보는 복원
+            if (state.unlockedAchievements && state.unlockedAchievements.length > 0) {
+                restoreAchievements();
+            }
             return false;
         }
         
@@ -1146,12 +1162,23 @@ VIP 굿즈 받기
         
             try {
                 const parsed = JSON.parse(saved);
+                // 업적 달성 정보를 백업 (파싱 전에 저장된 업적 정보 사용)
+                const savedUnlockedAchievements = state.unlockedAchievements || parsed.unlockedAchievements || [];
                 Object.assign(state, parsed);
+                // 업적 정보 복원 (이미 로드한 정보 우선 사용)
+                if (state.unlockedAchievements && state.unlockedAchievements.length > 0) {
+                    // 이미 로드한 업적 정보 사용
+                } else {
+                    state.unlockedAchievements = savedUnlockedAchievements;
+                }
                 
                 // 기존 사용자 호환: foodUnlocked가 없으면 rank에 따라 설정
                 if (state.foodUnlocked === undefined) {
                     state.foodUnlocked = (state.rank >= 7);
                 }
+                
+                // 업적 달성 상태 복원
+                restoreAchievements();
             
             // 버전이 다를 때만 사용자에게 알림 (한 번만)
             if (savedVersion && savedVersion !== GAME_VERSION) {
@@ -1489,12 +1516,32 @@ VIP 굿즈 받기
         achievements.forEach(ach => {
             if (!ach.unlocked && ach.check(state)) {
                 ach.unlocked = true;
+                // 업적 달성 상태를 state에 저장
+                if (!state.unlockedAchievements) {
+                    state.unlockedAchievements = [];
+                }
+                if (!state.unlockedAchievements.includes(ach.id)) {
+                    state.unlockedAchievements.push(ach.id);
+                }
                 changed = true;
                 showCenterPopup(ach.icon, "업적 달성!", ach.name);
                 addHistory(`🏆 <b>업적 달성:</b> [${ach.name}] - ${ach.desc}`);
+                saveGame(); // 업적 달성 시 즉시 저장
             }
         });
         if (changed) { renderAchievements(); }
+    }
+    
+    // 업적 달성 상태 복원 (게임 로드 시 호출)
+    function restoreAchievements() {
+        if (state.unlockedAchievements && state.unlockedAchievements.length > 0) {
+            achievements.forEach(ach => {
+                if (state.unlockedAchievements.includes(ach.id)) {
+                    ach.unlocked = true;
+                }
+            });
+            renderAchievements();
+        }
     }
 
     function renderAchievements() {
@@ -1969,12 +2016,21 @@ VIP 굿즈 받기
     let isResetting = false;
     function resetGame() {
         if (isResetting) return; // 이미 초기화 중이면 무시
-        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 데이터가 영구 삭제됩니다.)")) {
+        if (confirm("정말 모든 데이터를 삭제하고 입주 신청서부터 다시 시작할까?\n(주의: 데이터가 영구 삭제됩니다. 단, 업적은 유지됩니다.)")) {
             isResetting = true;
+            // 업적 달성 정보 백업
+            const unlockedAchievements = state.unlockedAchievements || [];
+            
             // 모든 localStorage 데이터 삭제
             localStorage.clear();
             // sessionStorage도 초기화
             sessionStorage.clear();
+            
+            // 업적 달성 정보 복원 저장
+            if (unlockedAchievements.length > 0) {
+                localStorage.setItem('midnight_cottage_unlocked_achievements', JSON.stringify(unlockedAchievements));
+            }
+            
             // localStorage 변경사항이 확실히 반영되도록 약간의 지연 후 새로고침
             setTimeout(() => {
                 window.location.reload();
