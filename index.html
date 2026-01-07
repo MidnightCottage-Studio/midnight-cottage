@@ -1304,11 +1304,37 @@
                 showCenterPopup("💖", "커플 탄생!", `${charA.name} ♥ ${charB.name}`);
                 addHistory(`💖 <b>축하!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 연인이 되었습니다!`);
                 saveGame();
-            } else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
+            // C. [불륜] 한 명이라도 파트너가 있는데 호감도가 높을 때
+            else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
+                // 이미 둘 다 불륜 상태가 아닐 때만 발동
                 if (charA.relType !== '불륜' || charB.relType !== '불륜') {
+                    
+                    // 1. A의 기존 파트너 정리 (있다면)
+                    if (charA.partnerId !== null) {
+                        const exA = state.residents[charA.partnerId];
+                        if (exA && exA.id !== charB.id) { 
+                            exA.relType = '솔로'; 
+                            exA.partnerId = null; 
+                            exA.stress += 30; // 배신당한 충격으로 스트레스 증가
+                        }
+                    }
+
+                    // 2. B의 기존 파트너 정리 (있다면)
+                    if (charB.partnerId !== null) {
+                        const exB = state.residents[charB.partnerId];
+                        if (exB && exB.id !== charA.id) { 
+                            exB.relType = '솔로'; 
+                            exB.partnerId = null; 
+                            exB.stress += 30; 
+                        }
+                    }
+
+                    // 3. 새로운 불륜 관계 형성
                     charA.relType = '불륜'; charB.relType = '불륜';
+                    charA.partnerId = charB.id; charB.partnerId = charA.id; // 서로 파트너 연결
+
                     showCenterPopup("😈", "위험한 관계", `${charA.name} & ${charB.name}`);
-                    addHistory(`😈 <b>충격!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 금지된 사랑에 빠졌습니다...`);
+                    addHistory(`😈 <b>충격!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 금지된 사랑에 빠졌습니다... (기존 연인과는 끝났습니다)`);
                     saveGame();
                 }
             }
