@@ -5,6 +5,9 @@
     <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>미드나잇 코티지 Midnight Cottage</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg: #09090d; --card: #12121a; --accent: #bb9af7; --gold: #ff9e64;
@@ -471,6 +474,33 @@
             </p>
         </div>
     </div>
+    <div id="ranking-modal" class="modal" onclick="closeModalByBg(event, 'ranking-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 400px; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <h2 style="color:var(--gold); margin-bottom:10px;">📊 랭킹</h2>
+            <div id="firebase-status" style="margin-bottom:15px; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; font-size:12px;">
+                <span id="firebase-status-text" style="color:#888;">연결 상태 확인 중...</span>
+            </div>
+            
+            <div style="margin-bottom:20px; padding:15px; background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px;">
+                <label style="display:block; color:var(--accent); font-weight:700; margin-bottom:8px; text-align:left;">플레이어 이름</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="player-name-input" placeholder="이름을 입력하세요" 
+                           value="" 
+                           style="flex:1; background:#1a1a24; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; font-size:14px; font-family:'Pretendard'; outline:none;"
+                           onkeypress="if(event.key==='Enter') savePlayerName()">
+                    <button onclick="savePlayerName()" 
+                            style="background:var(--accent); color:#000; border:none; padding:10px 20px; border-radius:8px; font-weight:900; cursor:pointer; font-size:14px; white-space:nowrap;">
+                        저장
+                    </button>
+                </div>
+                <p style="font-size:11px; color:#888; margin-top:8px; text-align:left;">이름을 입력하면 랭킹에 표시됩니다</p>
+            </div>
+            
+            <div id="ranking-list" style="text-align:left;">
+                <p style="color:#888; font-style:italic;">랭킹 데이터를 불러오는 중...</p>
+            </div>
+        </div>
+    </div>
     <div id="help-modal" class="modal" onclick="closeModalByBg(event, 'help-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
             <h2 style="color:var(--gold)">🏠 설정 및 가이드</h2>
@@ -490,6 +520,15 @@
                 </div>
             </div>
             
+            <div style="margin: 25px 0; padding: 20px; background: rgba(122, 162, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
+                <h3 style="color:var(--neon-blue); font-size:16px; margin:0 0 15px 0; font-weight:800;">📊 전체 유저 랭킹</h3>
+                <button onclick="toggleModal('help-modal'); toggleModal('ranking-modal');" 
+                        style="background:var(--neon-blue); color:#000; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; width: 100%; margin-bottom:10px;">
+                    랭킹 보기
+                </button>
+                <p style="font-size:11px; color:#888; margin:0; text-align:left;">다른 유저들과 랭크를 비교해보세요!</p>
+            </div>
+            
             <button onclick="resetGame()" style="background:var(--danger); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 0 10px rgba(255, 85, 85, 0.3); width: 100%;">
                 ⚠️ 데이터 초기화 (처음부터)
             </button>
@@ -498,6 +537,50 @@
 </div>
 
 <script>
+    // ============================================================
+    // 🔥 Firebase 설정 (필수!)
+    // ============================================================
+    // Firebase Console (https://console.firebase.google.com)에서 프로젝트를 생성하고
+    // Realtime Database를 활성화한 후, 아래 설정값을 입력하세요.
+    // 
+    // 설정 방법:
+    // 1. Firebase Console 접속
+    // 2. 프로젝트 생성 (또는 기존 프로젝트 선택)
+    // 3. Realtime Database 생성 (테스트 모드로 시작)
+    // 4. 프로젝트 설정 > 일반 > 앱 추가 > 웹 앱
+    // 5. 아래 firebaseConfig에 복사한 설정값 입력
+    // ============================================================
+    
+    let firebaseApp = null;
+    let firebaseDatabase = null;
+    let isFirebaseEnabled = false;
+    
+    // Firebase 설정
+    const firebaseConfig = {
+        apiKey: "AIzaSyDAS2-ax-ORpsnGoG6XNsMx3rlQ9yJMkUc",
+        authDomain: "midnight-cottage-server.firebaseapp.com",
+        databaseURL: "https://midnight-cottage-server-default-rtdb.firebaseio.com",
+        projectId: "midnight-cottage-server",
+        storageBucket: "midnight-cottage-server.firebasestorage.app",
+        messagingSenderId: "680262922046",
+        appId: "1:680262922046:web:bd79062e2bf1f20464866f"
+    };
+    
+    // Firebase 초기화
+    try {
+        if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            firebaseDatabase = firebase.database();
+            isFirebaseEnabled = true;
+            console.log("✅ Firebase 연결 성공");
+        } else {
+            console.warn("⚠️ Firebase 설정이 필요합니다. 랭킹 기능은 로컬 모드로 동작합니다.");
+        }
+    } catch (e) {
+        console.error("❌ Firebase 초기화 실패:", e);
+        isFirebaseEnabled = false;
+    }
+    
     // 게임 버전 (업데이트 시 이 값을 변경하면 자동으로 데이터 초기화)
     const GAME_VERSION = "1.0.0";
     const SAVE_KEY = 'midnight_cottage_v30_hardcore';
@@ -508,7 +591,8 @@
         money: 0, clickPower: 1, autoIncome: 1, 
         upgrades: [], history: [], artifacts: Array(20).fill(false),
         rank: 1, currentSelectedRank: 1, totalUniquePurchased: 0,
-        residents: [], achievements: [], endingSeen: false
+        residents: [], achievements: [], endingSeen: false,
+        playerName: ''
     };
 
     // ============================================================
@@ -892,6 +976,24 @@
             if(id === 'shop-modal' && m.style.display === 'flex') {
                 updateGachaUI();
             }
+            if(id === 'ranking-modal' && m.style.display === 'flex') {
+                const nameInput = document.getElementById('player-name-input');
+                if (nameInput) {
+                    nameInput.value = state.playerName || '';
+                }
+                
+                // Firebase 연결 상태 표시
+                const statusText = document.getElementById('firebase-status-text');
+                if (statusText) {
+                    if (isFirebaseEnabled) {
+                        statusText.innerHTML = '✅ <span style="color:var(--healing);">전체 유저 랭킹 연결됨</span>';
+                    } else {
+                        statusText.innerHTML = '⚠️ <span style="color:#ffaa00;">로컬 모드 (Firebase 설정 필요)</span>';
+                    }
+                }
+                
+                renderRanking();
+            }
         }
     }
 
@@ -1189,6 +1291,11 @@
                 showEvolutionToast(rankNames[newRank-1]);
                 addHistory(`🌟 <b>도시 진화:</b> [${rankNames[newRank-1]}] 달성!`);
                 
+                // 랭크가 올라가면 랭킹 자동 업데이트
+                if (state.playerName) {
+                    submitRanking();
+                }
+                
                 if (newRank >= 20 && !state.endingSeen) { 
                     state.endingSeen = true; 
                     startEndingSequence(); 
@@ -1418,6 +1525,272 @@
             }, 100);
         }
     }
+
+    // 랭킹 관련 함수들
+    const RANKING_KEY = 'midnight_cottage_ranking';
+    
+    function savePlayerName() {
+        const nameInput = document.getElementById('player-name-input');
+        if (!nameInput) return;
+        
+        const name = nameInput.value.trim();
+        if (name.length === 0) {
+            alert('이름을 입력해주세요!');
+            return;
+        }
+        
+        if (name.length > 20) {
+            alert('이름은 20자 이하로 입력해주세요!');
+            return;
+        }
+        
+        state.playerName = name;
+        saveGame();
+        
+        // 랭킹에 자동 제출
+        submitRanking();
+        
+        spawnMessage('✅ 이름이 저장되었습니다!', 'event');
+    }
+    
+    function submitRanking() {
+        if (!state.playerName || state.playerName.trim().length === 0) {
+            return;
+        }
+        
+        const rankingData = {
+            name: state.playerName,
+            rank: state.rank,
+            rankName: rankNames[state.rank - 1],
+            totalUniquePurchased: state.totalUniquePurchased,
+            money: state.money,
+            timestamp: Date.now()
+        };
+        
+        // Firebase 사용 가능하면 Firebase에 저장
+        if (isFirebaseEnabled && firebaseDatabase) {
+            const playerKey = state.playerName.replace(/[.#$\[\]]/g, '_'); // Firebase 키에 사용 불가능한 문자 제거
+            const playerRef = firebaseDatabase.ref(`rankings/${playerKey}`);
+            
+            // 기존 데이터 확인 후 더 높은 점수면 업데이트
+            playerRef.once('value', (snapshot) => {
+                const existing = snapshot.val();
+                if (!existing || 
+                    rankingData.rank > existing.rank || 
+                    (rankingData.rank === existing.rank && rankingData.totalUniquePurchased > existing.totalUniquePurchased)) {
+                    playerRef.set(rankingData)
+                        .then(() => {
+                            console.log('✅ Firebase 랭킹 저장 성공');
+                            renderRanking(); // 랭킹 다시 불러오기
+                        })
+                        .catch((error) => {
+                            console.error('❌ Firebase 랭킹 저장 실패:', error);
+                            // 실패 시 로컬에 저장 (폴백)
+                            saveRankingLocal(rankingData);
+                        });
+                } else {
+                    console.log('ℹ️ 기존 기록이 더 높아 업데이트하지 않습니다.');
+                }
+            });
+        } else {
+            // Firebase 없으면 로컬에 저장
+            saveRankingLocal(rankingData);
+        }
+    }
+    
+    function saveRankingLocal(rankingData) {
+        // 로컬 랭킹 데이터 가져오기
+        let rankings = [];
+        try {
+            const saved = localStorage.getItem(RANKING_KEY);
+            if (saved) {
+                rankings = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('랭킹 데이터 로드 실패', e);
+        }
+        
+        // 기존 기록 찾기 (같은 이름이면 업데이트)
+        const existingIndex = rankings.findIndex(r => r.name === state.playerName);
+        if (existingIndex >= 0) {
+            // 더 높은 랭크면 업데이트
+            if (rankingData.rank > rankings[existingIndex].rank || 
+                (rankingData.rank === rankings[existingIndex].rank && rankingData.totalUniquePurchased > rankings[existingIndex].totalUniquePurchased)) {
+                rankings[existingIndex] = rankingData;
+            }
+        } else {
+            rankings.push(rankingData);
+        }
+        
+        // 랭크 순으로 정렬 (랭크가 같으면 totalUniquePurchased로)
+        rankings.sort((a, b) => {
+            if (b.rank !== a.rank) return b.rank - a.rank;
+            return b.totalUniquePurchased - a.totalUniquePurchased;
+        });
+        
+        // 최대 100명만 저장
+        if (rankings.length > 100) {
+            rankings = rankings.slice(0, 100);
+        }
+        
+        // 저장
+        try {
+            localStorage.setItem(RANKING_KEY, JSON.stringify(rankings));
+        } catch (e) {
+            console.error('랭킹 데이터 저장 실패', e);
+        }
+        
+        // 랭킹 표시 업데이트
+        renderRanking();
+    }
+    
+    function loadRanking(callback) {
+        // Firebase 사용 가능하면 Firebase에서 불러오기
+        if (isFirebaseEnabled && firebaseDatabase) {
+            const rankingsRef = firebaseDatabase.ref('rankings');
+            
+            rankingsRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                let rankings = [];
+                
+                if (data) {
+                    // 객체를 배열로 변환
+                    rankings = Object.values(data);
+                    
+                    // 랭크 순으로 정렬 (랭크가 같으면 totalUniquePurchased로)
+                    rankings.sort((a, b) => {
+                        if (b.rank !== a.rank) return b.rank - a.rank;
+                        return b.totalUniquePurchased - a.totalUniquePurchased;
+                    });
+                    
+                    // 최대 100명만
+                    if (rankings.length > 100) {
+                        rankings = rankings.slice(0, 100);
+                    }
+                }
+                
+                if (callback) callback(rankings);
+            }, (error) => {
+                console.error('❌ Firebase 랭킹 로드 실패:', error);
+                // 실패 시 로컬에서 불러오기 (폴백)
+                const localRankings = loadRankingLocal();
+                if (callback) callback(localRankings);
+            });
+            
+            // 실시간 업데이트 리스너 등록
+            rankingsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                let rankings = [];
+                
+                if (data) {
+                    rankings = Object.values(data);
+                    rankings.sort((a, b) => {
+                        if (b.rank !== a.rank) return b.rank - a.rank;
+                        return b.totalUniquePurchased - a.totalUniquePurchased;
+                    });
+                    if (rankings.length > 100) {
+                        rankings = rankings.slice(0, 100);
+                    }
+                }
+                
+                // 랭킹 모달이 열려있으면 자동 업데이트
+                const rankingModal = document.getElementById('ranking-modal');
+                if (rankingModal && rankingModal.style.display === 'flex') {
+                    renderRankingWithData(rankings);
+                }
+            });
+        } else {
+            // Firebase 없으면 로컬에서 불러오기
+            const localRankings = loadRankingLocal();
+            if (callback) callback(localRankings);
+        }
+    }
+    
+    function loadRankingLocal() {
+        try {
+            const saved = localStorage.getItem(RANKING_KEY);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('랭킹 데이터 로드 실패', e);
+        }
+        return [];
+    }
+    
+    function renderRanking() {
+        const rankingList = document.getElementById('ranking-list');
+        if (!rankingList) return;
+        
+        rankingList.innerHTML = '<p style="color:#888; font-style:italic; text-align:center;">랭킹 데이터를 불러오는 중...</p>';
+        
+        loadRanking((rankings) => {
+            renderRankingWithData(rankings);
+        });
+    }
+    
+    function renderRankingWithData(rankings) {
+        const rankingList = document.getElementById('ranking-list');
+        if (!rankingList) return;
+        
+        if (rankings.length === 0) {
+            rankingList.innerHTML = '<p style="color:#888; font-style:italic; text-align:center;">아직 랭킹 데이터가 없습니다.<br>이름을 입력하고 게임을 진행하면 랭킹에 등록됩니다!</p>';
+            return;
+        }
+        
+        const currentPlayerIndex = rankings.findIndex(r => r.name === state.playerName);
+        
+        let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
+        
+        rankings.forEach((entry, index) => {
+            const isCurrentPlayer = entry.name === state.playerName;
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+            const rankText = index < 3 ? `${medal} ` : `${index + 1}위 `;
+            
+            html += `
+                <div style="
+                    display:flex; 
+                    align-items:center; 
+                    justify-content:space-between;
+                    padding:12px 15px; 
+                    background:${isCurrentPlayer ? 'rgba(187, 154, 247, 0.2)' : 'rgba(255,255,255,0.03)'}; 
+                    border:1px solid ${isCurrentPlayer ? 'var(--accent)' : 'rgba(255,255,255,0.1)'}; 
+                    border-radius:10px;
+                    ${isCurrentPlayer ? 'box-shadow: 0 0 10px rgba(187, 154, 247, 0.3);' : ''}
+                ">
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span style="color:${index < 3 ? 'var(--gold)' : 'var(--text)'}; font-weight:800; font-size:14px; min-width:50px;">${rankText}</span>
+                            <span style="color:${isCurrentPlayer ? 'var(--accent)' : '#fff'}; font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${entry.name}</span>
+                            ${isCurrentPlayer ? '<span style="color:var(--accent); font-size:11px;">(나)</span>' : ''}
+                        </div>
+                        <div style="color:#aaa; font-size:12px;">
+                            ${entry.rankName} (Rank.${entry.rank})
+                        </div>
+                    </div>
+                    <div style="text-align:right; margin-left:10px;">
+                        <div style="color:var(--gold); font-weight:700; font-size:13px;">건물 ${entry.totalUniquePurchased}개</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        if (currentPlayerIndex < 0 && state.playerName) {
+            html += `
+                <div style="margin-top:15px; padding:12px; background:rgba(255,255,255,0.05); border:1px dashed var(--border); border-radius:8px; text-align:center;">
+                    <p style="color:#888; font-size:12px; margin:0;">
+                        현재 랭크: <span style="color:var(--gold); font-weight:700;">Rank.${state.rank} ${rankNames[state.rank - 1]}</span><br>
+                        이름을 저장하면 랭킹에 등록됩니다!
+                    </p>
+                </div>
+            `;
+        }
+        
+        rankingList.innerHTML = html;
+    }
+    
 
     function openGallery() {
         const grid = document.getElementById('gallery-grid');
