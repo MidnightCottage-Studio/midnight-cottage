@@ -990,8 +990,8 @@ VIP 굿즈 받기
 
     // [수정] 1. 저장 기능 (로컬 + Firebase 클라우드 저장)
     function saveGame() {
-        // 마지막 접속 시간 업데이트
-        state.lastActiveTime = Date.now();
+        // lastActiveTime은 오프라인 보상 지급 후에만 업데이트됨
+        // (saveGame 호출 시마다 업데이트하면 오프라인 시간을 계산할 수 없음)
         
         // 로컬 저장 (항상)
         try {
@@ -1484,11 +1484,15 @@ VIP 굿즈 받기
     
     // 오프라인 수익 계산 및 보상 모달 표시
     function checkOfflineReward() {
-        // lastActiveTime이 없으면 현재 시간으로 초기화하고 리턴
-        if (!state.lastActiveTime) {
+        console.log("⏰ 오프라인 보상 체크 시작");
+        console.log("⏰ state.lastActiveTime:", state.lastActiveTime);
+        console.log("⏰ state.autoIncome:", state.autoIncome);
+        
+        // lastActiveTime이 없거나 0이면 현재 시간으로 초기화하고 리턴
+        if (!state.lastActiveTime || state.lastActiveTime === 0) {
             state.lastActiveTime = Date.now();
             saveGame();
-            console.log("⏰ 오프라인 보상: 마지막 접속 시간 초기화");
+            console.log("⏰ 오프라인 보상: 마지막 접속 시간 초기화", state.lastActiveTime);
             return;
         }
         
@@ -1496,11 +1500,12 @@ VIP 굿즈 받기
         const offlineTimeMs = now - state.lastActiveTime;
         const offlineTimeSec = Math.floor(offlineTimeMs / 1000);
         
-        console.log(`⏰ 오프라인 보상 체크: ${offlineTimeSec}초 경과`);
+        console.log(`⏰ 오프라인 보상 체크: ${offlineTimeSec}초 경과 (${Math.floor(offlineTimeSec/60)}분 ${offlineTimeSec%60}초)`);
         
         // 최소 1분 이상 오프라인이어야 보상 지급
         if (offlineTimeSec < 60) {
             console.log("⏰ 오프라인 보상: 1분 미만이므로 보상 없음");
+            // 1분 미만이면 마지막 접속 시간을 업데이트하지 않음 (다음에 다시 체크)
             return;
         }
         
@@ -1516,11 +1521,16 @@ VIP 굿즈 받기
             if (avgStress > 80) incomePerSec *= 0.5;
         }
         
+        // autoIncome이 0이거나 매우 작으면 최소 수익 보장
+        if (incomePerSec < 0.1) {
+            incomePerSec = 0.1; // 최소 초당 0.1원
+        }
+        
         // 오프라인 효율: 40% (직접 플레이보다 적게)
         const offlineEfficiency = 0.4;
         const offlineReward = Math.floor(incomePerSec * cappedOfflineTimeSec * offlineEfficiency);
         
-        console.log(`⏰ 오프라인 보상 계산: 초당 수익=${incomePerSec}, 시간=${cappedOfflineTimeSec}초, 보상=${offlineReward}원`);
+        console.log(`⏰ 오프라인 보상 계산: 초당 수익=${incomePerSec.toFixed(2)}, 시간=${cappedOfflineTimeSec}초, 보상=${offlineReward}원`);
         
         if (offlineReward > 0) {
             // 오프라인 보상 정보 저장
@@ -1530,27 +1540,40 @@ VIP 굿즈 받기
                 fullTimeSec: offlineTimeSec
             };
             
-            console.log("⏰ 오프라인 보상 모달 표시 예정");
+            console.log("⏰ 오프라인 보상 모달 표시 예정", window.pendingOfflineReward);
             
             // 게임 시작 후 보상 모달 표시
             setTimeout(() => {
+                console.log("⏰ showOfflineRewardModal 호출");
                 showOfflineRewardModal();
             }, 1500);
         } else {
             console.log("⏰ 오프라인 보상: 계산된 보상이 0원이므로 표시 안 함");
+            // 보상이 0원이면 마지막 접속 시간을 업데이트하지 않음
         }
     }
     
     // 오프라인 보상 모달 표시
     function showOfflineRewardModal() {
-        if (!window.pendingOfflineReward) return;
+        console.log("⏰ showOfflineRewardModal 실행");
+        console.log("⏰ window.pendingOfflineReward:", window.pendingOfflineReward);
+        
+        if (!window.pendingOfflineReward) {
+            console.log("⏰ pendingOfflineReward가 없음");
+            return;
+        }
         
         const reward = window.pendingOfflineReward;
         const modal = document.getElementById('offline-reward-modal');
         const timeText = document.getElementById('offline-time-text');
         const amountText = document.getElementById('offline-reward-amount');
         
-        if (!modal || !timeText || !amountText) return;
+        console.log("⏰ 모달 요소 확인:", { modal: !!modal, timeText: !!timeText, amountText: !!amountText });
+        
+        if (!modal || !timeText || !amountText) {
+            console.log("⏰ 모달 요소가 없음");
+            return;
+        }
         
         // 시간 포맷팅
         const hours = Math.floor(reward.timeSec / 3600);
@@ -1583,6 +1606,9 @@ VIP 굿즈 받기
         
         const reward = window.pendingOfflineReward;
         state.money += reward.amount;
+        
+        // 보상을 받은 후에만 마지막 접속 시간 업데이트
+        state.lastActiveTime = Date.now();
         
         addHistory(`💰 <b>오프라인 수익:</b> ${reward.amount.toLocaleString()}원 획득!`);
         
@@ -2235,6 +2261,30 @@ VIP 굿즈 받기
             }
         }, 500);
     }
+    
+    // 페이지를 닫거나 숨길 때 마지막 접속 시간 저장
+    window.addEventListener('beforeunload', function() {
+        if (state && typeof state === 'object') {
+            state.lastActiveTime = Date.now();
+            try {
+                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error("페이지 종료 시 저장 실패", e);
+            }
+        }
+    });
+    
+    // 페이지가 숨겨질 때도 저장 (모바일에서 앱 전환 시)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && state && typeof state === 'object') {
+            state.lastActiveTime = Date.now();
+            try {
+                localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error("페이지 숨김 시 저장 실패", e);
+            }
+        }
+    });
 </script>
 </body>
 </html>
