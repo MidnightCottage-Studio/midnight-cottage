@@ -8,6 +8,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         :root {
             --bg: #09090d; --card: #12121a; --accent: #bb9af7; --gold: #ff9e64;
@@ -520,6 +521,17 @@
                 </div>
             </div>
             
+            <div style="margin: 25px 0; padding: 20px; background: rgba(80, 250, 123, 0.1); border: 1px solid var(--border); border-radius: 12px;">
+                <h3 style="color:var(--healing); font-size:16px; margin:0 0 15px 0; font-weight:800;">☁️ 클라우드 저장</h3>
+                <div id="auth-status" style="margin-bottom:15px; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px; font-size:13px; color:#aaa;">
+                    로그인 상태 확인 중...
+                </div>
+                <div id="auth-buttons" style="display:flex; flex-direction:column; gap:8px;">
+                    <!-- 로그인/로그아웃 버튼이 여기에 동적으로 추가됨 -->
+                </div>
+                <p style="font-size:11px; color:#888; margin-top:10px; text-align:left;">Google 로그인으로 데이터를 안전하게 저장하세요!</p>
+            </div>
+            
             <div style="margin: 25px 0; padding: 20px; background: rgba(122, 162, 247, 0.1); border: 1px solid var(--border); border-radius: 12px;">
                 <h3 style="color:var(--neon-blue); font-size:16px; margin:0 0 15px 0; font-weight:800;">📊 전체 유저 랭킹</h3>
                 <button onclick="toggleModal('help-modal'); toggleModal('ranking-modal');" 
@@ -553,7 +565,9 @@
     
     let firebaseApp = null;
     let firebaseDatabase = null;
+    let firebaseAuth = null;
     let isFirebaseEnabled = false;
+    let currentUser = null;
     
     // Firebase 설정
     const firebaseConfig = {
@@ -571,8 +585,21 @@
         if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
             firebaseApp = firebase.initializeApp(firebaseConfig);
             firebaseDatabase = firebase.database();
+            firebaseAuth = firebase.auth();
             isFirebaseEnabled = true;
             console.log("✅ Firebase 연결 성공");
+            
+            // 로그인 상태 감지
+            firebaseAuth.onAuthStateChanged((user) => {
+                currentUser = user;
+                updateAuthUI();
+                if (user) {
+                    console.log("✅ 로그인됨:", user.email);
+                    loadGameFromFirebase();
+                } else {
+                    console.log("ℹ️ 로그아웃됨");
+                }
+            });
         } else {
             console.warn("⚠️ Firebase 설정이 필요합니다. 랭킹 기능은 로컬 모드로 동작합니다.");
         }
@@ -792,17 +819,149 @@
 
     window.onload = function() {
         init();
+        // Firebase Auth 상태 확인 후 UI 업데이트
+        if (isFirebaseEnabled && firebaseAuth) {
+            setTimeout(updateAuthUI, 500);
+        }
     };
+    
+    // Google 로그인
+    function signInWithGoogle() {
+        if (!isFirebaseEnabled || !firebaseAuth) {
+            alert('Firebase가 설정되지 않았습니다.');
+            return;
+        }
+        
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebaseAuth.signInWithPopup(provider)
+            .then((result) => {
+                console.log("✅ Google 로그인 성공:", result.user.email);
+                spawnMessage('✅ Google 로그인 성공!', 'event');
+                // 로그인 성공 시 Firebase에서 데이터 불러오기
+                loadGameFromFirebase();
+            })
+            .catch((error) => {
+                console.error("❌ Google 로그인 실패:", error);
+                alert('로그인 실패: ' + error.message);
+            });
+    }
+    
+    // 로그아웃
+    function signOut() {
+        if (!firebaseAuth) return;
+        
+        if (confirm('로그아웃하시겠습니까? 로컬 데이터는 유지됩니다.')) {
+            firebaseAuth.signOut()
+                .then(() => {
+                    console.log("✅ 로그아웃 성공");
+                    spawnMessage('로그아웃되었습니다.', 'event');
+                })
+                .catch((error) => {
+                    console.error("❌ 로그아웃 실패:", error);
+                });
+        }
+    }
+    
+    // 인증 UI 업데이트
+    function updateAuthUI() {
+        const authStatus = document.getElementById('auth-status');
+        const authButtons = document.getElementById('auth-buttons');
+        
+        if (!authStatus || !authButtons) return;
+        
+        if (!isFirebaseEnabled) {
+            authStatus.innerHTML = '⚠️ <span style="color:#ffaa00;">Firebase 설정 필요</span>';
+            authButtons.innerHTML = '<p style="color:#888; font-size:12px;">Firebase가 설정되지 않았습니다.</p>';
+            return;
+        }
+        
+        if (currentUser) {
+            // 로그인 상태
+            const email = currentUser.email || '알 수 없음';
+            authStatus.innerHTML = `✅ <span style="color:var(--healing);">로그인됨</span><br><span style="font-size:11px; color:#aaa;">${email}</span>`;
+            authButtons.innerHTML = `
+                <button onclick="signOut()" 
+                        style="background:#666; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; width: 100%;">
+                    로그아웃
+                </button>
+            `;
+        } else {
+            // 로그아웃 상태
+            authStatus.innerHTML = '⚠️ <span style="color:#888;">로그인되지 않음</span>';
+            authButtons.innerHTML = `
+                <button onclick="signInWithGoogle()" 
+                        style="background:#4285f4; color:#fff; border:none; padding:12px 20px; border-radius:8px; font-weight:900; cursor:pointer; font-size:14px; width: 100%; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <span>🔵</span>
+                    <span>Google로 로그인</span>
+                </button>
+            `;
+        }
+    }
 
-    // [수정] 1. 저장 기능 (오직 브라우저 로컬 저장만!)
+    // [수정] 1. 저장 기능 (로컬 + Firebase 클라우드 저장)
     function saveGame() {
+        // 로컬 저장 (항상)
         try {
             localStorage.setItem(SAVE_KEY, JSON.stringify(state));
             localStorage.setItem(VERSION_KEY, GAME_VERSION);
-            // console.log("자동 저장됨"); 
         } catch (e) {
-            console.error("저장 실패", e);
+            console.error("로컬 저장 실패", e);
         }
+        
+        // Firebase 클라우드 저장 (로그인한 경우)
+        if (isFirebaseEnabled && currentUser) {
+            saveGameToFirebase();
+        }
+    }
+    
+    // Firebase에 게임 데이터 저장
+    function saveGameToFirebase() {
+        if (!firebaseDatabase || !currentUser) return;
+        
+        const userRef = firebaseDatabase.ref(`users/${currentUser.uid}/gameData`);
+        const saveData = {
+            ...state,
+            version: GAME_VERSION,
+            lastSaved: Date.now()
+        };
+        
+        userRef.set(saveData)
+            .then(() => {
+                console.log("✅ Firebase 클라우드 저장 성공");
+            })
+            .catch((error) => {
+                console.error("❌ Firebase 저장 실패:", error);
+            });
+    }
+    
+    // Firebase에서 게임 데이터 불러오기
+    function loadGameFromFirebase() {
+        if (!firebaseDatabase || !currentUser) return;
+        
+        const userRef = firebaseDatabase.ref(`users/${currentUser.uid}/gameData`);
+        userRef.once('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // 버전 체크
+                if (data.version && data.version !== GAME_VERSION) {
+                    console.warn(`⚠️ 클라우드 데이터 버전 불일치: ${data.version} → ${GAME_VERSION}`);
+                }
+                
+                // 데이터 로드
+                delete data.version;
+                delete data.lastSaved;
+                Object.assign(state, data);
+                
+                // UI 업데이트
+                render();
+                updateUI();
+                
+                console.log("✅ Firebase 클라우드 데이터 로드 성공");
+                spawnMessage('☁️ 클라우드 데이터를 불러왔습니다!', 'event');
+            }
+        }, (error) => {
+            console.error("❌ Firebase 데이터 로드 실패:", error);
+        });
     }
 
     // [수정] 2. 불러오기 기능 (버전 체크 포함)
@@ -975,6 +1134,9 @@
             }
             if(id === 'shop-modal' && m.style.display === 'flex') {
                 updateGachaUI();
+            }
+            if(id === 'help-modal' && m.style.display === 'flex') {
+                updateAuthUI();
             }
             if(id === 'ranking-modal' && m.style.display === 'flex') {
                 const nameInput = document.getElementById('player-name-input');
