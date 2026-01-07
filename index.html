@@ -1229,7 +1229,7 @@
             { t:'good', v:4, m:`${a}${getJosa(a,'와과')} ${b}${getJosa(b,'은는')} 야식으로 편의점 컵라면을 나눠 먹었어.` },
             { t:'good', v:5, m:`${a}${getJosa(a,'이가')} ${b}의 고장 난 소품을 뚝딱 고쳐주었어.` },
             { t:'good', v:3, m:`${a}${getJosa(a,'와과')} ${b}${getJosa(b,'은는')} 라디오에서 나오는 옛날 노래를 따라 불렀어.` },
-            { type:'good', v:4, m:`${a}${getJosa(a,'이가')} ${b}에게 재미있는 유머를 들려주었어.` },
+            { t:'good', v:4, m:`${a}${getJosa(a,'이가')} ${b}에게 재미있는 유머를 들려주었어.` },
             { t:'good', v:5, m:`${a}${getJosa(a,'와과')} ${b}${getJosa(b,'은는')} 서로의 어릴 적 사진을 보여주며 웃었어.` },
             { t:'good', v:4, m:`${a}${getJosa(a,'이가')} 피곤한 ${b}의 어깨를 주물러 주었어.` },
             { t:'good', v:3, m:`${a}${getJosa(a,'와과')} ${b}${getJosa(b,'은는')} 방 구조를 어떻게 바꿀지 상의했어.` },
@@ -1290,23 +1290,28 @@
 
         addHistory(`${typeLabel} ${evt.m} <span style="color:${valColor}">(${heartIcon}${evt.v > 0 ? '+' : ''}${evt.v})</span>`);
 
-        // (이 아래 관계 변화 로직은 기존 코드 그대로 유지)
+        // 관계 변화 로직
+        // A. [이별]
         if (charA.partnerId === charB.id && (charA.affection < 30 || charB.affection < 30)) {
             charA.relType = '솔로'; charB.relType = '솔로';
             charA.partnerId = null; charB.partnerId = null;
             showCenterPopup("💔", "결별", `${charA.name} ⚡ ${charB.name}`);
             addHistory(`💔 <b>이별:</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 헤어졌습니다.`);
             saveGame();
-        } else if (charA.affection >= 90 && charB.affection >= 90) {
+        } 
+        
+        // B. [커플 탄생]
+        else if (charA.affection >= 90 && charB.affection >= 90) {
             if (charA.relType === '솔로' && charB.relType === '솔로') {
                 charA.relType = '커플'; charB.relType = '커플';
                 charA.partnerId = charB.id; charB.partnerId = charA.id;
                 showCenterPopup("💖", "커플 탄생!", `${charA.name} ♥ ${charB.name}`);
                 addHistory(`💖 <b>축하!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 연인이 되었습니다!`);
-                } saveGame();
-            // C. [불륜] 한 명이라도 파트너가 있는데 호감도가 높을 때
+                saveGame();
+            } 
+            
+            // C. [불륜] 및 기존 연인 정리
             else if (charA.partnerId !== charB.id && (charA.relType === '커플' || charB.relType === '커플')) {
-                // 이미 둘 다 불륜 상태가 아닐 때만 발동
                 if (charA.relType !== '불륜' || charB.relType !== '불륜') {
                     
                     // 1. A의 기존 파트너 정리 (있다면)
@@ -1315,7 +1320,7 @@
                         if (exA && exA.id !== charB.id) { 
                             exA.relType = '솔로'; 
                             exA.partnerId = null; 
-                            exA.stress += 30; // 배신당한 충격으로 스트레스 증가
+                            exA.stress += 30; 
                         }
                     }
 
@@ -1329,9 +1334,9 @@
                         }
                     }
 
-                    // 3. 새로운 불륜 관계 형성
+                    // 3. 불륜 관계 맺기
                     charA.relType = '불륜'; charB.relType = '불륜';
-                    charA.partnerId = charB.id; charB.partnerId = charA.id; // 서로 파트너 연결
+                    charA.partnerId = charB.id; charB.partnerId = charA.id;
 
                     showCenterPopup("😈", "위험한 관계", `${charA.name} & ${charB.name}`);
                     addHistory(`😈 <b>충격!</b> ${charA.name}${getJosa(charA.name, '와과')} ${charB.name}${getJosa(charB.name, '은는')} 금지된 사랑에 빠졌습니다... (기존 연인과는 끝났습니다)`);
