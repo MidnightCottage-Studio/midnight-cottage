@@ -303,6 +303,17 @@
             #help-modal-content > div[style*="display:flex"] > div > div[style*="padding:8px 20px"] { padding: 8px 12px !important; }
             #help-modal-content > div[style*="display:flex"] > div > button { padding: 10px 12px !important; font-size: 13px !important; }
             #help-modal-content > div[style*="display:flex"] > div > div[style*="padding:15px 20px"] { padding: 12px 12px 10px 12px !important; }
+            #food-modal > div { padding: 15px 12px 20px 12px !important; max-height: calc(100vh - 30px) !important; }
+            #food-modal h2 { margin-top: 0 !important; margin-bottom: 8px !important; font-size: 18px !important; }
+            #food-modal > div > p { margin-bottom: 8px !important; font-size: 11px !important; }
+            #food-menu-list { gap: 8px !important; grid-template-columns: 1fr !important; }
+            #food-menu-list > div { padding: 10px !important; gap: 8px !important; }
+            #food-menu-list > div > div:first-child { gap: 8px !important; }
+            #food-menu-list > div > div:first-child > span { font-size: 24px !important; }
+            #food-menu-list > div > div:first-child > div > h4 { font-size: 14px !important; }
+            #food-menu-list > div > div:first-child > div > p { font-size: 11px !important; margin-top: 3px !important; }
+            #food-menu-list > div > div:last-child > span { font-size: 16px !important; }
+            #food-menu-list > div > div:last-child > button { padding: 6px 12px !important; font-size: 12px !important; }
             .gallery-item.locked::before { font-size: 16px !important; }
             .center-popup { z-index: 10001 !important; }
             .start-form { width: 90%; max-width: 350px; padding: 20px; box-sizing: border-box; margin: 0 auto; }
@@ -414,7 +425,6 @@
                 <button class="icon-btn" onclick="openGallery()">🖼️</button>
                 <button class="icon-btn" onclick="toggleModal('museum-modal')" style="font-size:12px !important;">🏛️</button>
                 <button class="icon-btn" onclick="toggleModal('history-modal')">📜</button>
-                <button id="food-icon-btn" class="icon-btn" onclick="toggleModal('food-modal')" style="display:none;">🍜</button>
                 <button class="icon-btn" onclick="toggleModal('help-modal')">?</button>
             </div>
             <div id="event-log">💻작업 화이팅! 미드나잇 코티지가 너를 반겨.</div>
@@ -422,7 +432,11 @@
     </div>
 
     <div class="content-container">
-        <div class="main-panel">
+        <div class="main-panel" style="position:relative;">
+            <button id="food-icon-btn" onclick="toggleModal('food-modal')" 
+                    style="position:absolute; top:10px; left:10px; background:rgba(187, 154, 247, 0.9); border:2px solid var(--accent); color:#000; border-radius:50%; width:50px; height:50px; cursor:pointer; display:none; justify-content:center; align-items:center; font-size:24px; font-weight:900; z-index:100; box-shadow:0 0 20px rgba(187, 154, 247, 0.5); transition:0.3s;">
+                🍜
+            </button>
             <img id="desk-clicker" src="https://i.imgur.com/MuFQQ5A.png" alt="City Image">
             <div id="dialogue-stack"></div>
         </div>
@@ -476,11 +490,11 @@
     </div>
     <div id="food-modal" class="modal" onclick="closeModalByBg(event, 'food-modal')">
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 350px; max-width: 600px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
-            <h2 style="color:var(--gold); margin-top:0; margin-bottom:20px; font-size:24px;">🍜 합성 라면 가판대</h2>
-            <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6;">
+            <h2 style="color:var(--gold); margin-top:0; margin-bottom:15px; font-size:24px;">🍜 합성 라면 가판대</h2>
+            <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.6;">
                 따뜻한 음식이 모든 주민의 스트레스를 해소해줍니다.
             </p>
-            <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:15px; text-align:left;">
+            <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:12px; text-align:left;">
                 <!-- 음식 메뉴가 여기에 동적으로 추가됩니다 -->
             </div>
         </div>
@@ -1610,7 +1624,7 @@ VIP 굿즈 받기
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="color:var(--gold); font-weight:900; font-size:18px;">💵 ${food.price.toLocaleString()}원</span>
-                        <button onclick="event.stopPropagation(); buyFood(${index});" 
+                        <button class="food-buy-btn" data-food-index="${index}" 
                                 style="background:${canAfford ? 'var(--accent)' : '#666'}; color:${canAfford ? '#000' : '#999'}; border:none; padding:8px 16px; border-radius:8px; font-weight:900; cursor:${canAfford ? 'pointer' : 'not-allowed'}; font-size:14px; white-space:nowrap;"
                                 ${!canAfford ? 'disabled' : ''}>
                             구매
@@ -1619,6 +1633,16 @@ VIP 굿즈 받기
                 </div>
             `;
         }).join('');
+        
+        // 이벤트 리스너 추가
+        const buyButtons = menuList.querySelectorAll('.food-buy-btn');
+        buyButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const foodIndex = parseInt(this.getAttribute('data-food-index'));
+                buyFood(foodIndex);
+            });
+        });
     }
     
     // 음식 구매
