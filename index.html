@@ -303,7 +303,8 @@
             #help-modal-content > div[style*="display:flex"] > div > div[style*="padding:8px 20px"] { padding: 8px 12px !important; }
             #help-modal-content > div[style*="display:flex"] > div > button { padding: 10px 12px !important; font-size: 13px !important; }
             #help-modal-content > div[style*="display:flex"] > div > div[style*="padding:15px 20px"] { padding: 12px 12px 10px 12px !important; }
-            #food-modal > div { padding: 15px 12px 20px 12px !important; max-height: calc(100vh - 30px) !important; }
+            #food-modal > div { padding: 15px 12px 50px 12px !important; max-height: calc(100vh - 30px) !important; }
+            #food-menu-list { padding-bottom: 30px !important; }
             #food-modal h2 { margin-top: 0 !important; margin-bottom: 8px !important; font-size: 18px !important; }
             #food-modal > div > p { margin-bottom: 8px !important; font-size: 11px !important; }
             #food-menu-list { gap: 8px !important; grid-template-columns: 1fr !important; }
@@ -490,12 +491,12 @@
         </div>
     </div>
     <div id="food-modal" class="modal" onclick="closeModalByBg(event, 'food-modal')">
-        <div onclick="(function(e){if(!e.target.closest('.food-buy-btn')){closeModalByBg(e, 'food-modal');}})(event)" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 350px; max-width: 600px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
+        <div onclick="(function(e){if(!e.target.closest('.food-buy-btn') && !e.target.closest('.food-item-card')){toggleModal('food-modal');}})(event)" style="background:var(--card); padding:30px 30px 50px 30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 350px; max-width: 600px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
             <h2 style="color:var(--gold); margin-top:0; margin-bottom:15px; font-size:24px; pointer-events:none;">🍜 합성 라면 가판대</h2>
             <p style="font-size:14px; color:#ccc; margin-bottom:15px; line-height:1.6; pointer-events:none;">
                 따뜻한 음식이 모든 주민의 스트레스를 해소해줍니다.
             </p>
-            <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:12px; text-align:left;">
+            <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:12px; text-align:left; padding-bottom:20px;">
                 <!-- 음식 메뉴가 여기에 동적으로 추가됩니다 -->
             </div>
         </div>
@@ -1619,7 +1620,7 @@ VIP 굿즈 받기
             const canAfford = state.money >= food.price;
             const canBuy = canAfford && hasStress; // 돈이 있고 스트레스가 있을 때만 구매 가능
             return `
-                <div style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px;">
+                <div class="food-item-card" onclick="(function(e){if(!e.target.closest('.food-buy-btn')){toggleModal('food-modal');}})(event)" style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px; display:flex; flex-direction:column; gap:10px; cursor:pointer;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span style="font-size:32px;">${food.icon}</span>
                         <div style="flex:1;">
