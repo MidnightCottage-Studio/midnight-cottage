@@ -885,34 +885,75 @@ VIP 굿즈 받기
     const tempResidents = []; 
     let snsPosts = [];
 
+    // Google 로그인
+    function signInWithGoogle() {
+        if (!isFirebaseEnabled || !firebaseAuth) {
+            alert('Firebase가 설정되지 않았습니다.');
+            console.error("Firebase 상태:", { isFirebaseEnabled, firebaseAuth: !!firebaseAuth });
+            return;
+        }
+        
+        const provider = new firebase.auth.GoogleAuthProvider();
+        
+        // 모바일이거나 팝업이 차단된 경우 redirect 사용
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // 모바일에서는 redirect 방식 사용
+            firebaseAuth.signInWithRedirect(provider)
+                .then(() => {
+                    console.log("✅ Google 로그인 리다이렉트 시작");
+                })
+                .catch((error) => {
+                    console.error("❌ Google 로그인 리다이렉트 실패:", error);
+                    alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code);
+                });
+        } else {
+            // PC에서는 팝업 방식 시도, 실패 시 redirect
+            firebaseAuth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log("✅ Google 로그인 성공:", result.user.email);
+                    spawnMessage('✅ Google 로그인 성공!', 'event');
+                    // 로그인 성공 시 Firebase에서 데이터 불러오기
+                    loadGameFromFirebase();
+                })
+                .catch((error) => {
+                    console.error("❌ Google 로그인 팝업 실패:", error);
+                    console.error("에러 코드:", error.code);
+                    console.error("에러 메시지:", error.message);
+                    
+                    // 팝업 차단 등의 경우 redirect로 재시도
+                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                        console.log("팝업이 차단되었습니다. 리다이렉트 방식으로 재시도...");
+                        return firebaseAuth.signInWithRedirect(provider);
+                    } else {
+                        alert('로그인 실패: ' + error.message + '\n\n에러 코드: ' + error.code + '\n\nFirebase Console에서 Google Sign-in이 활성화되어 있는지 확인해주세요.');
+                    }
+                });
+        }
+    }
+    
+    // 페이지 로드 시 리다이렉트 결과 확인
     window.onload = function() {
         init();
         // Firebase Auth 상태 확인 후 UI 업데이트
         if (isFirebaseEnabled && firebaseAuth) {
             setTimeout(updateAuthUI, 500);
+            
+            // 리다이렉트 로그인 결과 확인
+            firebaseAuth.getRedirectResult()
+                .then((result) => {
+                    if (result.user) {
+                        console.log("✅ 리다이렉트 로그인 성공:", result.user.email);
+                        spawnMessage('✅ Google 로그인 성공!', 'event');
+                        loadGameFromFirebase();
+                    }
+                })
+                .catch((error) => {
+                    console.error("❌ 리다이렉트 로그인 결과 확인 실패:", error);
+                });
         }
     };
-    
-    // Google 로그인
-    function signInWithGoogle() {
-        if (!isFirebaseEnabled || !firebaseAuth) {
-            alert('Firebase가 설정되지 않았습니다.');
-            return;
-        }
-        
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebaseAuth.signInWithPopup(provider)
-            .then((result) => {
-                console.log("✅ Google 로그인 성공:", result.user.email);
-                spawnMessage('✅ Google 로그인 성공!', 'event');
-                // 로그인 성공 시 Firebase에서 데이터 불러오기
-                loadGameFromFirebase();
-            })
-            .catch((error) => {
-                console.error("❌ Google 로그인 실패:", error);
-                alert('로그인 실패: ' + error.message);
-            });
-    }
     
     // 로그아웃
     function signOut() {
