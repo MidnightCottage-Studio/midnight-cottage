@@ -430,7 +430,6 @@
                 <button class="icon-btn" onclick="openGallery()">🖼️</button>
                 <button class="icon-btn" onclick="toggleModal('museum-modal')" style="font-size:12px !important;">🏛️</button>
                 <button class="icon-btn" onclick="toggleModal('history-modal')">📜</button>
-                <button id="btn-radio" class="icon-btn" onclick="toggleModal('radio-modal')" style="display:none;">📡</button>
                 <button class="icon-btn" onclick="toggleModal('help-modal')">?</button>
             </div>
             <div id="event-log">💻작업 화이팅! 미드나잇 코티지가 너를 반겨.</div>
@@ -439,8 +438,12 @@
 
     <div class="content-container">
         <div class="main-panel" style="position:relative;">
-            <button id="food-icon-btn" class="icon-btn" onclick="toggleModal('food-modal')" 
+            <button id="btn-radio" class="icon-btn" onclick="toggleModal('radio-modal')" 
                     style="position:absolute; top:10px; left:10px; display:none; z-index:100;">
+                📡
+            </button>
+            <button id="food-icon-btn" class="icon-btn" onclick="toggleModal('food-modal')" 
+                    style="position:absolute; top:70px; left:10px; display:none; z-index:100;">
                 🍜
             </button>
             <img id="desk-clicker" src="https://i.imgur.com/MuFQQ5A.png" alt="City Image">
@@ -1871,6 +1874,12 @@ VIP 굿즈 받기
             radioBtn.style.display = (state.rank >= 5) ? 'flex' : 'none';
         }
         
+        // 라디오 모달이 열려있으면 메시지 업데이트
+        const radioModal = document.getElementById('radio-modal');
+        if (radioModal && radioModal.style.display === 'flex') {
+            // 이미 로드된 상태면 업데이트 안 함 (실시간 리스너가 처리)
+        }
+        
         // 음식 모달이 열려있으면 메뉴 업데이트
         const foodModal = document.getElementById('food-modal');
         if (foodModal && foodModal.style.display === 'flex') {
@@ -2091,7 +2100,10 @@ VIP 굿즈 받기
     
     function sendRadioMessage() {
         const input = document.getElementById('radio-input');
-        if (!input) return;
+        if (!input) {
+            console.error('radio-input 요소를 찾을 수 없습니다.');
+            return;
+        }
         
         const text = input.value.trim();
         if (text.length === 0) {
@@ -2104,80 +2116,137 @@ VIP 굿즈 받기
             return;
         }
         
-        // Firebase에 메시지 전송
-        if (isFirebaseEnabled && firebaseDatabase) {
-            const messageData = {
-                text: text,
-                nickname: '익명',
-                timestamp: Date.now()
-            };
-            
-            firebaseDatabase.ref('radio_messages').push(messageData)
-                .then(() => {
-                    input.value = ''; // 입력창 비우기
-                    spawnMessage('✅ 신호가 전송되었습니다.', 'event');
-                })
-                .catch((error) => {
-                    console.error('라디오 메시지 전송 실패:', error);
-                    spawnMessage('❌ 신호 전송 실패. 연결을 확인해주세요.', 'event');
-                });
-        } else {
+        // Firebase 연결 확인
+        if (!isFirebaseEnabled || !firebaseDatabase) {
             spawnMessage('❌ Firebase 연결이 필요합니다.', 'event');
+            console.warn('Firebase 연결이 없습니다. isFirebaseEnabled:', isFirebaseEnabled, 'firebaseDatabase:', firebaseDatabase);
+            return;
         }
+        
+        // 전송 버튼 비활성화 (중복 전송 방지)
+        const sendBtn = document.getElementById('btn-send-radio');
+        if (sendBtn) {
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5';
+            sendBtn.innerText = '전송 중...';
+        }
+        
+        // Firebase에 메시지 전송
+        const messageData = {
+            text: text,
+            nickname: '익명',
+            timestamp: Date.now()
+        };
+        
+        firebaseDatabase.ref('radio_messages').push(messageData)
+            .then(() => {
+                input.value = ''; // 입력창 비우기
+                spawnMessage('✅ 신호가 전송되었습니다.', 'event');
+                
+                // 전송 버튼 다시 활성화
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.innerText = '전송';
+                }
+            })
+            .catch((error) => {
+                console.error('라디오 메시지 전송 실패:', error);
+                spawnMessage('❌ 신호 전송 실패: ' + (error.message || error.code || '알 수 없는 오류'), 'event');
+                
+                // 전송 버튼 다시 활성화
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.innerText = '전송';
+                }
+            });
     }
     
     function loadRadioMessages() {
         const radioList = document.getElementById('radio-list');
-        if (!radioList || !isFirebaseEnabled || !firebaseDatabase) {
-            if (radioList) {
-                radioList.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">Firebase 연결이 필요합니다.</div>';
-            }
+        if (!radioList) {
+            console.error('radio-list 요소를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // Firebase 연결 확인
+        if (!isFirebaseEnabled || !firebaseDatabase) {
+            radioList.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">Firebase 연결이 필요합니다.</div>';
+            console.warn('Firebase 연결이 없습니다. isFirebaseEnabled:', isFirebaseEnabled, 'firebaseDatabase:', firebaseDatabase);
             return;
         }
         
         // 기존 리스너 제거 (중복 방지)
         if (radioMessagesRef) {
-            radioMessagesRef.off();
+            radioMessagesRef.off('child_added');
+            radioMessagesRef = null;
         }
         
-        // 최근 20개 메시지 로드
-        const messagesQuery = firebaseDatabase.ref('radio_messages')
-            .orderByChild('timestamp')
-            .limitToLast(20);
+        // 메시지 로딩 중 표시
+        radioList.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">신호 수신 중...</div>';
         
-        messagesQuery.once('value', (snapshot) => {
+        // 모든 메시지 로드 (클라이언트에서 정렬 및 제한)
+        const messagesRef = firebaseDatabase.ref('radio_messages');
+        messagesRef.once('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                radioList.innerHTML = '<div style="color:#888; text-align:center; padding:20px;">아직 신호가 없습니다. 첫 번째 신호를 보내보세요!</div>';
+                setupRealtimeListener();
+                return;
+            }
+            
             const messages = [];
             snapshot.forEach((childSnapshot) => {
-                messages.push({
-                    key: childSnapshot.key,
-                    ...childSnapshot.val()
-                });
+                const data = childSnapshot.val();
+                if (data && data.timestamp) {
+                    messages.push({
+                        key: childSnapshot.key,
+                        text: data.text || '',
+                        nickname: data.nickname || '익명',
+                        timestamp: data.timestamp
+                    });
+                }
             });
             
             // 시간순으로 정렬 (오래된 것부터)
             messages.sort((a, b) => a.timestamp - b.timestamp);
             
-            // 메시지 렌더링
-            renderRadioMessages(messages);
+            // 최근 20개만 표시
+            const recentMessages = messages.slice(-20);
             
-            // 자동 스크롤
-            radioList.scrollTop = radioList.scrollHeight;
+            // 메시지 렌더링
+            renderRadioMessages(recentMessages);
+            
+            // 실시간 리스너 설정
+            setupRealtimeListener();
+            
         }).catch((error) => {
             console.error('라디오 메시지 로드 실패:', error);
-            radioList.innerHTML = '<div style="color:#ff5555; text-align:center; padding:20px;">메시지를 불러올 수 없습니다.</div>';
+            radioList.innerHTML = '<div style="color:#ff5555; text-align:center; padding:20px;">메시지를 불러올 수 없습니다.<br>오류: ' + (error.message || error.code) + '</div>';
         });
+    }
+    
+    function setupRealtimeListener() {
+        if (!isFirebaseEnabled || !firebaseDatabase) return;
         
         // 실시간 동기화: 새 메시지가 추가되면 자동으로 표시
         radioMessagesRef = firebaseDatabase.ref('radio_messages');
-        radioMessagesRef.orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
-            const messageData = {
+        radioMessagesRef.limitToLast(1).on('child_added', (snapshot) => {
+            const messageData = snapshot.val();
+            if (!messageData || !messageData.timestamp) return;
+            
+            const fullMessageData = {
                 key: snapshot.key,
-                ...snapshot.val()
+                text: messageData.text || '',
+                nickname: messageData.nickname || '익명',
+                timestamp: messageData.timestamp
             };
             
             // 이미 표시된 메시지인지 확인 (중복 방지)
             const radioList = document.getElementById('radio-list');
-            if (radioList && !radioList.querySelector(`[data-key="${messageData.key}"]`)) {
+            if (!radioList) return;
+            
+            if (!radioList.querySelector(`[data-key="${fullMessageData.key}"]`)) {
                 // 기존 메시지가 20개 이상이면 가장 오래된 것 제거
                 const existingMessages = radioList.querySelectorAll('.radio-message-item');
                 if (existingMessages.length >= 20) {
@@ -2185,11 +2254,13 @@ VIP 굿즈 받기
                 }
                 
                 // 새 메시지 추가
-                const messageElement = createRadioMessageElement(messageData);
+                const messageElement = createRadioMessageElement(fullMessageData);
                 radioList.appendChild(messageElement);
                 
                 // 자동 스크롤
-                radioList.scrollTop = radioList.scrollHeight;
+                setTimeout(() => {
+                    radioList.scrollTop = radioList.scrollHeight;
+                }, 100);
             }
         });
     }
