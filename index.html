@@ -3085,7 +3085,7 @@
                 const unlocked = isVIP ? state.vipUnlocked : (i < state.rank);
                 const isSelected = (i + 1) === state.currentSelectedRank;
                 const vipBadge = isVIP ? '<div style="position:absolute; top:5px; left:5px; background:var(--gold); color:#000; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:900; z-index:10; box-shadow:0 0 10px rgba(255, 158, 100, 0.5);">후원 전용</div>' : '';
-                return `<div class="gallery-item ${unlocked ? 'unlocked' : 'locked'} ${isSelected ? 'active' : ''}" style="position:relative;" onclick="${unlocked ? `selectRoom(${i+1})` : ''}">${vipBadge}<img src="${rankImages[i]}" loading="lazy"><div style="background:rgba(0,0,0,0.6); color:#fff; font-size:12px; font-weight:700;">${i+1}. ${name} ${isSelected ? ' (사용중)' : ''}</div></div>`;
+                return `<div class="gallery-item ${unlocked ? 'unlocked' : 'locked'} ${isSelected ? 'active' : ''}" style="position:relative;" onclick="${unlocked ? `selectRoom(${i+1})` : ''}">${vipBadge}<img src="${rankImages[i]}" loading="lazy"></div>`;
             }).join('');
             toggleModal('gallery-modal');
         }
