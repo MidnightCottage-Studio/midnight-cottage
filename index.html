@@ -909,6 +909,7 @@ VIP 굿즈 받기
     const rankNames = [
         "소박하고 아늑한 사이버펑크 방", 
         "심야의 코인 세탁소", 
+        "라디오 스튜디오", 
         "네온 아틀리에", 
         "빗속의 투명 버스 정류장", 
         "작가와 교수의 서재", 
@@ -918,7 +919,6 @@ VIP 굿즈 받기
         "리퍼닥의 정비소", 
         "네온 루프탑 수영장", 
         "별이 쏟아지는 다락방", 
-        "라디오 스튜디오", 
         "홀로그램 점술집", 
         "기억의 서재", 
         "포토 그래퍼의 암실", 
@@ -948,6 +948,7 @@ VIP 굿즈 받기
     const rankImages = [
         "https://i.imgur.com/MuFQQ5A.png", 
         "https://i.imgur.com/AnG14IK.png", 
+        "https://i.imgur.com/2Sz2iYA.png", 
         "https://i.imgur.com/1nAnNIb.png", 
         "https://i.imgur.com/016vCzS.png", 
         "https://i.imgur.com/eqwGBhl.png", 
@@ -957,7 +958,6 @@ VIP 굿즈 받기
         "https://i.imgur.com/br0HdSG.png", 
         "https://i.imgur.com/p5H4Vk8.png", 
         "https://i.imgur.com/9ApIszS.png", 
-        "https://i.imgur.com/2Sz2iYA.png", 
         "https://i.imgur.com/SRftF7H.png", 
         "https://i.imgur.com/a66LTMy.png", 
         "https://i.imgur.com/3qXyDTr.png", 
@@ -1885,8 +1885,8 @@ VIP 굿즈 받기
                 showEvolutionToast(rankNames[newRank-1]);
                 addHistory(`🌟 <b>도시 진화:</b> [${rankNames[newRank-1]}] 달성!`);
                 
-                // 랭크 5 해금 시 라디오 기능 안내
-                if (newRank === 5) {
+                // 랭크 3 해금 시 라디오 기능 안내
+                if (newRank === 3) {
                     setTimeout(() => {
                         spawnMessage('지지직... 외부 신호 수신 장치가 활성화되었습니다.', 'event');
                     }, 1500);
@@ -1951,10 +1951,10 @@ VIP 굿즈 받기
             foodIconBtn.style.display = (state.rank >= 7) ? 'flex' : 'none';
         }
         
-        // 라디오 아이콘 표시 (rank >= 5일 때만)
+        // 라디오 아이콘 표시 (rank >= 3일 때만)
         const radioBtn = document.getElementById('btn-radio');
         if (radioBtn) {
-            radioBtn.style.display = (state.rank >= 5) ? 'flex' : 'none';
+            radioBtn.style.display = (state.rank >= 3) ? 'flex' : 'none';
         }
         
         // 라디오 모달이 열려있으면 메시지 업데이트
