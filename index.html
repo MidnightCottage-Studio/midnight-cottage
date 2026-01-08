@@ -1905,11 +1905,12 @@ VIP 굿즈 받기
                 if (state.playerName) {
                     submitRanking();
                 }
-                
-                if (newRank >= 34 && !state.endingSeen) { 
-                    state.endingSeen = true; 
-                    startEndingSequence(); 
-                }
+            }
+            
+            // 유토피아(Rank 34) 해금 시 엔딩 체크 (블록 밖에서 체크하여 이미 rank 34인 상태에서도 작동)
+            if (state.rank >= 34 && !state.endingSeen) {
+                state.endingSeen = true;
+                startEndingSequence();
             }
             
             render(); 
@@ -2680,13 +2681,13 @@ VIP 굿즈 받기
         
         // 테스트 코드: test1998 입력 시 엔딩 테스트 조건 설정
         if (enteredCode === 'test1998') {
-            // 마지막 방 전단계까지 입수 (rank 19)
-            state.rank = 19;
-            state.currentSelectedRank = 19;
-            state.totalUniquePurchased = 99; // rank 34 = 99/3 + 1 = 34 (엔딩 직전)
+            // 유토피아(Rank 34) 직전 상태로 설정
+            state.rank = 33;
+            state.currentSelectedRank = 33;
+            state.totalUniquePurchased = 96; // rank 33 = 96/3 + 1 = 33, 다음 건물 구매 시 rank 34가 됨
             
-            // 건물 90개 구매 상태로 설정
-            for (let i = 0; i < 90; i++) {
+            // 건물 96개 구매 상태로 설정
+            for (let i = 0; i < 96; i++) {
                 if (state.upgrades[i]) {
                     state.upgrades[i].lv = 1;
                     // 가격도 업그레이드된 상태로 설정
@@ -2708,7 +2709,7 @@ VIP 굿즈 받기
             statusDiv.innerHTML = '<span style="color:var(--healing); font-weight:800;">✅ 테스트 모드 활성화! 엔딩 테스트 준비 완료!</span>';
             codeInput.value = '';
             
-            showCenterPopup('🎮', '테스트 모드', '엔딩 테스트를 위한 조건이 설정되었습니다!<br>유토피아 건물을 구매하면 엔딩이 시작됩니다.');
+            showCenterPopup('🎮', '테스트 모드', '엔딩 테스트를 위한 조건이 설정되었습니다!<br>다음 건물을 구매하면 Rank 34(유토피아)가 되고 엔딩이 시작됩니다.');
             addHistory('🎮 <b>테스트 모드:</b> 엔딩 테스트 조건이 설정되었습니다.');
             
             // 갤러리 업데이트
