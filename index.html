@@ -1891,6 +1891,11 @@ VIP 굿즈 받기
     function buy(idx) {
         const u = state.upgrades[idx], d = upgrades[idx];
         
+        if (!u || !d) {
+            console.error('구매할 수 없는 건물입니다:', idx);
+            return;
+        }
+        
         // 1. 구매 로직
         if(state.money >= u.price) {
             state.money -= u.price; 
@@ -1937,13 +1942,18 @@ VIP 굿즈 받기
                 }
             }
             
-            // 미드나잇 유토피아 건물(인덱스 99) 최초 구매 시 엔딩 트리거
+            // 미드나잇 유토피아 건물 최초 구매 시 엔딩 트리거
             // 또는 Rank 34 달성 시 엔딩 트리거
-            if ((idx === 99 && u.lv === 1) || (state.rank >= 34 && !state.endingSeen)) {
+            if (d && d.name === "미드나잇 유토피아" && u.lv === 1) {
+                // 미드나잇 유토피아 최초 구매 시
                 if (!state.endingSeen) {
-                    state.endingSeen = true;
-                    startEndingSequence();
+                    state.endingSeen = true; 
+                    startEndingSequence(); 
                 }
+            } else if (state.rank >= 34 && !state.endingSeen) {
+                // Rank 34 달성 시
+                state.endingSeen = true;
+                startEndingSequence();
             }
             
             render(); 
@@ -2727,24 +2737,27 @@ VIP 굿즈 받기
             // 유토피아 건물(인덱스 99)을 제외한 모든 건물(인덱스 0-98) 구매 상태로 설정
             const utopiaIndex = 99; // 미드나잇 유토피아는 마지막 건물
             for (let i = 0; i < utopiaIndex; i++) {
-                if (state.upgrades[i]) {
+                if (state.upgrades[i] && upgrades[i]) {
                     // 구매 상태로 설정 (lv >= 1)
                     if (state.upgrades[i].lv === 0) {
                         state.upgrades[i].lv = 1;
-                        // 가격도 업그레이드된 상태로 설정
-                        state.upgrades[i].price = Math.floor(state.upgrades[i].basePrice * 1.6);
+                        // 가격도 업그레이드된 상태로 설정 (upgrades 배열에서 basePrice 가져오기)
+                        const basePrice = upgrades[i].basePrice;
+                        state.upgrades[i].price = Math.floor(basePrice * 1.6);
                     }
                 }
             }
             
             // 유토피아 건물은 구매하지 않은 상태로 유지 (lv = 0)
-            if (state.upgrades[utopiaIndex]) {
+            if (state.upgrades[utopiaIndex] && upgrades[utopiaIndex]) {
                 state.upgrades[utopiaIndex].lv = 0;
-                state.upgrades[utopiaIndex].price = state.upgrades[utopiaIndex].basePrice;
+                // basePrice를 upgrades 배열에서 가져와서 설정
+                const utopiaBasePrice = upgrades[utopiaIndex].basePrice;
+                state.upgrades[utopiaIndex].price = utopiaBasePrice;
             }
             
             // 유토피아 건물 살 수 있을만큼 돈 설정
-            const utopiaBasePrice = Math.floor(15 * Math.pow(1.4, utopiaIndex));
+            const utopiaBasePrice = upgrades[utopiaIndex] ? upgrades[utopiaIndex].basePrice : Math.floor(15 * Math.pow(1.4, utopiaIndex));
             state.money = utopiaBasePrice * 10;
             
             // VIP도 해금
