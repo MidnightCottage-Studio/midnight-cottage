@@ -1213,7 +1213,7 @@ VIP 굿즈 받기
                 
                 // 기존 사용자 호환: foodUnlocked가 없으면 rank에 따라 설정
                 if (state.foodUnlocked === undefined) {
-                    state.foodUnlocked = (state.rank >= 7);
+                    state.foodUnlocked = (state.rank >= 8);
                 }
                 
                 // UI 업데이트
@@ -1277,7 +1277,7 @@ VIP 굿즈 받기
                 
                 // 기존 사용자 호환: foodUnlocked가 없으면 rank에 따라 설정
                 if (state.foodUnlocked === undefined) {
-                    state.foodUnlocked = (state.rank >= 7);
+                    state.foodUnlocked = (state.rank >= 8);
                 }
                 
                 // 업적 달성 상태 복원
@@ -1878,14 +1878,13 @@ VIP 굿즈 받기
         // 히스토리 추가
         addHistory(`🍜 <b>길거리 음식:</b> [${food.name}] 구매! 모든 주민의 스트레스가 해소되었습니다.`);
         
+        // 모달 먼저 닫기
+        toggleModal('food-modal');
+        
         // UI 업데이트
         updateUI();
-        renderFoodMenu(); // 버튼 상태 업데이트
         render(); // 주민 스트레스 바 업데이트
         saveGame();
-        
-        // 모달 닫기
-        toggleModal('food-modal');
     }
 
     function buy(idx) {
@@ -1927,8 +1926,8 @@ VIP 굿즈 받기
                     }, 1500);
                 }
                 
-                // 랭크 7 해금 시 음식 가판대 기능 안내
-                if (newRank === 7 && !state.foodUnlocked) {
+                // 랭크 8 해금 시 음식 가판대 기능 안내 (합성 라면 가판대)
+                if (newRank === 8 && !state.foodUnlocked) {
                     state.foodUnlocked = true;
                     setTimeout(() => {
                         showCenterPopup('🍜', '합성 라면 가판대 해금!', '이제 라면 가판대에서 음식을 사 먹을 수 있습니다!');
@@ -1989,10 +1988,10 @@ VIP 굿즈 받기
         const displayCount = `${currentProgress} / 3`;
         if(document.getElementById('dev-bar-fill')) document.getElementById('dev-bar-fill').style.width = displayProgress;
         
-        // 음식 가판대 아이콘 표시 (rank >= 7일 때만)
+        // 음식 가판대 아이콘 표시 (rank >= 8일 때만)
         const foodIconBtn = document.getElementById('food-icon-btn');
         if (foodIconBtn) {
-            foodIconBtn.style.display = (state.rank >= 7) ? 'flex' : 'none';
+            foodIconBtn.style.display = (state.rank >= 8) ? 'flex' : 'none';
         }
         
         // 라디오 아이콘 표시 (rank >= 3일 때만)
