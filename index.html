@@ -290,8 +290,8 @@
             .artifact-slot { width: 100%; aspect-ratio: 1 / 1; font-size: 14px; } 
 
             .gallery-grid { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 10px 5px 80px 5px; width: 100%; box-sizing: border-box; overflow-y: auto; }
-            .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; }
-            .gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; min-height: 200px; }
+            .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; min-height: 350px; }
+            .gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; min-height: 300px; }
 
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 10px; box-sizing: border-box; overflow-y: auto; }
             #donation-modal { z-index: 10000 !important; }
@@ -447,6 +447,10 @@
                     style="position:absolute; top:70px; left:10px; display:none; z-index:100;">
                 🍜
             </button>
+            <button id="fortune-icon-btn" class="icon-btn" onclick="toggleModal('fortune-modal')" 
+                    style="position:absolute; top:130px; left:10px; display:none; z-index:100;">
+                🔮
+            </button>
             <img id="desk-clicker" src="https://i.imgur.com/MuFQQ5A.png" alt="City Image">
             <div id="dialogue-stack"></div>
         </div>
@@ -506,6 +510,17 @@
             </p>
             <div id="food-menu-list" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:12px; text-align:left; padding-bottom:20px;">
                 <!-- 음식 메뉴가 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+    </div>
+    <div id="fortune-modal" class="modal" onclick="closeModalByBg(event, 'fortune-modal')">
+        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--heart); text-align:center; min-width: 400px; max-width: 700px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
+            <h2 style="color:var(--heart); margin-top:0; margin-bottom:20px; font-size:24px; pointer-events:none;">🔮 운명의 붉은 실</h2>
+            <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6; pointer-events:none;">
+                점술집에서 운명의 실을 조작하여 캐릭터들의 관계를 바꿀 수 있습니다.
+            </p>
+            <div id="fortune-char-list" style="display:flex; flex-direction:column; gap:15px; text-align:left; padding-bottom:20px;">
+                <!-- 캐릭터 목록이 여기에 동적으로 추가됩니다 -->
             </div>
         </div>
     </div>
@@ -1456,6 +1471,14 @@ VIP 굿즈 받기
             if(id === 'food-modal' && m.style.display === 'flex') {
                 renderFoodMenu();
             }
+            if(id === 'fortune-modal') {
+                if (m.style.display === 'flex') {
+                    // 모달이 열릴 때 선택 상태 초기화
+                    window.currentPartnerSelectChar = null;
+                    window.currentPartnerSelectType = null;
+                    renderFortuneModal();
+                }
+            }
             if(id === 'radio-modal') {
                 if (m.style.display === 'flex') {
                     loadRadioMessages();
@@ -1806,6 +1829,228 @@ VIP 굿즈 받기
         else descBox.innerText = "아직 미수집된 유물이니 박물관에서 구해봐!";
     }
     
+    // 점술집 모달 렌더링
+    function renderFortuneModal() {
+        const charList = document.getElementById('fortune-char-list');
+        if (!charList) return;
+        
+        // window 객체 초기화 (없을 경우)
+        if (typeof window.currentPartnerSelectChar === 'undefined') {
+            window.currentPartnerSelectChar = null;
+            window.currentPartnerSelectType = null;
+        }
+        
+        if (state.residents.length === 0) {
+            charList.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">주민이 없습니다.</p>';
+            return;
+        }
+        
+        charList.innerHTML = state.residents.map((char, i) => {
+            const partner = char.partnerId !== null ? state.residents[char.partnerId] : null;
+            const partnerName = partner ? partner.name : '없음';
+            const relTypeText = char.relType === '솔로' ? '솔로' : (char.relType === '커플' ? '연인' : '불륜');
+            
+            let actionButtons = '';
+            
+            if (char.relType === '불륜') {
+                // 불륜 상태: 불륜 해지, 솔로로 만들기
+                actionButtons = `
+                    <button onclick="breakRelationship(${i})" style="background:var(--heart); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; margin-right:8px;">
+                        불륜 해지하기
+                    </button>
+                    <button onclick="setToSolo(${i})" style="background:#666; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px;">
+                        솔로로 만들기
+                    </button>
+                `;
+            } else if (char.relType === '커플') {
+                // 연인 상태: 불륜으로 만들기, 솔로로 만들기
+                actionButtons = `
+                    <button onclick="showPartnerSelector(${i}, '불륜')" style="background:var(--heart); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; margin-right:8px;">
+                        불륜으로 만들기
+                    </button>
+                    <button onclick="setToSolo(${i})" style="background:#666; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px;">
+                        솔로로 만들기
+                    </button>
+                `;
+            } else {
+                // 솔로 상태: 불륜으로 만들기, 연인으로 만들기
+                actionButtons = `
+                    <button onclick="showPartnerSelector(${i}, '불륜')" style="background:var(--heart); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; margin-right:8px;">
+                        불륜으로 만들기
+                    </button>
+                    <button onclick="showPartnerSelector(${i}, '커플')" style="background:var(--accent); color:#000; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px;">
+                        연인으로 만들기
+                    </button>
+                `;
+            }
+            
+            // 파트너 선택 UI가 표시되는지 확인
+            const showPartnerSelect = window.currentPartnerSelectChar === i;
+            let partnerSelectUI = '';
+            
+            if (showPartnerSelect) {
+                const availablePartners = state.residents.filter((r, idx) => idx !== i && r.id !== char.partnerId);
+                if (availablePartners.length > 0) {
+                    partnerSelectUI = `
+                        <div id="partner-select-${i}" style="margin-top:12px; padding:12px; background:rgba(187, 154, 247, 0.2); border:1px solid var(--border); border-radius:8px;">
+                            <p style="margin:0 0 10px 0; color:var(--text); font-size:13px; font-weight:700;">
+                                ${window.currentPartnerSelectType === '불륜' ? '불륜' : '연인'} 관계를 맺을 파트너를 선택하세요:
+                            </p>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                ${availablePartners.map((p, pIdx) => {
+                                    const partnerIdx = state.residents.findIndex(r => r.id === p.id);
+                                    return `
+                                        <button onclick="confirmPartnerSelection(${i}, ${partnerIdx}, '${window.currentPartnerSelectType}')" 
+                                                style="background:var(--accent); color:#000; border:none; padding:6px 12px; border-radius:6px; font-weight:700; cursor:pointer; font-size:12px; display:flex; align-items:center; gap:6px;">
+                                            <span>${p.emoji}</span>
+                                            <span>${p.name}</span>
+                                        </button>
+                                    `;
+                                }).join('')}
+                                <button onclick="cancelPartnerSelection()" style="background:#666; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:700; cursor:pointer; font-size:12px;">
+                                    취소
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            return `
+                <div style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px;">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <span style="font-size:32px;">${char.emoji}</span>
+                        <div style="flex:1;">
+                            <h4 style="margin:0; color:var(--text); font-size:16px; font-weight:800;">${char.name}</h4>
+                            <p style="margin:5px 0 0 0; color:#888; font-size:12px;">
+                                상태: <span style="color:${char.relType === '솔로' ? '#aaa' : (char.relType === '커플' ? 'var(--heart)' : '#ff6b9d')};">${relTypeText}</span>
+                                ${partner ? ` | 파트너: ${partnerName}` : ''}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        ${actionButtons}
+                    </div>
+                    ${partnerSelectUI}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // 관계 상태 변경 함수들
+    function breakRelationship(charIdx) {
+        const char = state.residents[charIdx];
+        if (!char || char.relType !== '불륜' || char.partnerId === null) return;
+        
+        const partner = state.residents[char.partnerId];
+        if (partner) {
+            partner.relType = '솔로';
+            partner.partnerId = null;
+        }
+        
+        char.relType = '솔로';
+        char.partnerId = null;
+        
+        addHistory(`🔮 <b>운명의 실:</b> ${char.name}${getJosa(char.name, '와과')} ${partner ? partner.name : '파트너'}${getJosa(partner ? partner.name : '', '은는')} 불륜 관계를 해지했습니다.`);
+        saveGame();
+        render();
+        renderFortuneModal();
+    }
+    
+    function setToSolo(charIdx) {
+        const char = state.residents[charIdx];
+        if (!char) return;
+        
+        // 기존 파트너가 있다면 해제
+        if (char.partnerId !== null) {
+            const partner = state.residents[char.partnerId];
+            if (partner) {
+                partner.relType = '솔로';
+                partner.partnerId = null;
+            }
+        }
+        
+        char.relType = '솔로';
+        char.partnerId = null;
+        
+        addHistory(`🔮 <b>운명의 실:</b> ${char.name}${getJosa(char.name, '은는')} 솔로가 되었습니다.`);
+        saveGame();
+        render();
+        renderFortuneModal();
+    }
+    
+    // 파트너 선택 UI 표시
+    function showPartnerSelector(charIdx, relType) {
+        if (state.residents.length < 2) {
+            spawnMessage(`${relType === '불륜' ? '불륜' : '연인'} 관계를 만들려면 최소 2명의 주민이 필요합니다.`, 'event');
+            return;
+        }
+        
+        const char = state.residents[charIdx];
+        if (!char) return;
+        
+        const otherResidents = state.residents.filter((r, i) => i !== charIdx && r.id !== char.partnerId);
+        if (otherResidents.length === 0) {
+            spawnMessage(`${relType === '불륜' ? '불륜' : '연인'} 관계를 만들 수 있는 다른 주민이 없습니다.`, 'event');
+            return;
+        }
+        
+        // 현재 선택 중인 캐릭터와 관계 타입 저장
+        window.currentPartnerSelectChar = charIdx;
+        window.currentPartnerSelectType = relType;
+        
+        // 모달 다시 렌더링
+        renderFortuneModal();
+    }
+    
+    // 파트너 선택 취소
+    function cancelPartnerSelection() {
+        window.currentPartnerSelectChar = null;
+        window.currentPartnerSelectType = null;
+        renderFortuneModal();
+    }
+    
+    // 파트너 선택 확인 및 관계 형성
+    function confirmPartnerSelection(charIdx, partnerIdx, relType) {
+        const char = state.residents[charIdx];
+        const partner = state.residents[partnerIdx];
+        
+        if (!char || !partner) return;
+        
+        // 기존 파트너 정리
+        if (char.partnerId !== null) {
+            const exPartner = state.residents[char.partnerId];
+            if (exPartner) {
+                exPartner.relType = '솔로';
+                exPartner.partnerId = null;
+            }
+        }
+        if (partner.partnerId !== null) {
+            const exPartner = state.residents[partner.partnerId];
+            if (exPartner) {
+                exPartner.relType = '솔로';
+                exPartner.partnerId = null;
+            }
+        }
+        
+        // 관계 형성
+        const relTypeText = relType === '불륜' ? '불륜' : '커플';
+        char.relType = relTypeText;
+        char.partnerId = partner.id;
+        partner.relType = relTypeText;
+        partner.partnerId = char.id;
+        
+        addHistory(`🔮 <b>운명의 실:</b> ${char.name}${getJosa(char.name, '와과')} ${partner.name}${getJosa(partner.name, '은는')} ${relTypeText} 관계가 되었습니다.`);
+        
+        // 선택 상태 초기화
+        window.currentPartnerSelectChar = null;
+        window.currentPartnerSelectType = null;
+        
+        saveGame();
+        render();
+        renderFortuneModal();
+    }
+    
     // 음식 메뉴 렌더링
     function renderFoodMenu() {
         const menuList = document.getElementById('food-menu-list');
@@ -1943,6 +2188,14 @@ VIP 굿즈 받기
                     }, 1500);
                 }
                 
+                // 랭크 13 해금 시 점술집 기능 안내
+                if (newRank === 13) {
+                    setTimeout(() => {
+                        showCenterPopup('🔮', '홀로그램 점술집 오픈!', '운명의 붉은 실로 관계를 조작할 수 있습니다!');
+                        spawnMessage('🔮 홀로그램 점술집이 열렸습니다! 운명의 붉은 실로 캐릭터들의 관계를 바꿀 수 있어요.', 'event');
+                    }, 1500);
+                }
+                
                 // 랭크가 올라가면 랭킹 자동 업데이트
                 if (state.playerName) {
                     submitRanking();
@@ -2008,6 +2261,12 @@ VIP 굿즈 받기
             radioBtn.style.display = (state.rank >= 3) ? 'flex' : 'none';
         }
         
+        // 점술집 아이콘 표시 (rank >= 13일 때만)
+        const fortuneIconBtn = document.getElementById('fortune-icon-btn');
+        if (fortuneIconBtn) {
+            fortuneIconBtn.style.display = (state.rank >= 13) ? 'flex' : 'none';
+        }
+        
         // 라디오 모달이 열려있으면 메시지 업데이트
         const radioModal = document.getElementById('radio-modal');
         if (radioModal && radioModal.style.display === 'flex') {
@@ -2018,6 +2277,12 @@ VIP 굿즈 받기
         const foodModal = document.getElementById('food-modal');
         if (foodModal && foodModal.style.display === 'flex') {
             renderFoodMenu();
+        }
+        
+        // 점술집 모달이 열려있으면 캐릭터 목록 업데이트
+        const fortuneModal = document.getElementById('fortune-modal');
+        if (fortuneModal && fortuneModal.style.display === 'flex') {
+            renderFortuneModal();
         }
         if(document.getElementById('dev-count')) document.getElementById('dev-count').innerText = displayCount;
         if(document.getElementById('city-name-display')) document.getElementById('city-name-display').innerText = displayRankName;
