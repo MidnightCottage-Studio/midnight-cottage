@@ -1632,7 +1632,7 @@ VIP 굿즈 받기
         document.body.appendChild(popup);
         setTimeout(() => popup.remove(), 3000);
     }
-    
+
     function showEvolutionToast(rankName) {
         const evo = document.createElement('div');
         evo.className = 'evo-toast';
@@ -1854,7 +1854,14 @@ VIP 굿즈 받기
 
     function updateUI() {
         document.getElementById('budget').innerText = Math.floor(state.money).toLocaleString();
-        state.upgrades.forEach(u => { const btn = document.getElementById(`btn-${u.id}`); if(btn) btn.disabled = state.money < u.price; });
+        state.upgrades.forEach(u => { 
+            const btn = document.getElementById(`btn-${u.id}`); 
+            if(btn) {
+                // 버튼 가격 텍스트 업데이트 (깜빡임 방지)
+                btn.innerText = `💵 ${u.price.toLocaleString()}`;
+                btn.disabled = state.money < u.price; 
+            }
+        });
         state.residents.forEach((r, i) => { const fill = document.getElementById(`stress-${i}`); if(fill) fill.style.width = r.stress + '%'; });
         const currentProgress = state.totalUniquePurchased % 5;
         const displayRankName = `Rank.${state.currentSelectedRank} ${rankNames[state.currentSelectedRank-1]}`;
@@ -2592,6 +2599,48 @@ VIP 굿즈 받기
         
         if (enteredCode === '') {
             statusDiv.innerHTML = '<span style="color:#ffaa00;">인증 코드를 입력해주세요</span>';
+            return;
+        }
+        
+        // 테스트 코드: test1998 입력 시 엔딩 테스트 조건 설정
+        if (enteredCode === 'test1998') {
+            // 마지막 방 전단계까지 입수 (rank 19)
+            state.rank = 19;
+            state.currentSelectedRank = 19;
+            state.totalUniquePurchased = 90; // rank 19 = 90/5 + 1 = 19
+            
+            // 건물 90개 구매 상태로 설정
+            for (let i = 0; i < 90; i++) {
+                if (state.upgrades[i]) {
+                    state.upgrades[i].lv = 1;
+                    // 가격도 업그레이드된 상태로 설정
+                    state.upgrades[i].price = Math.floor(state.upgrades[i].basePrice * 1.6);
+                }
+            }
+            
+            // 유토피아 건물 살 수 있을만큼 돈 설정 (마지막 건물 가격의 10배)
+            const utopiaBasePrice = Math.floor(15 * Math.pow(1.4, 99));
+            state.money = utopiaBasePrice * 10;
+            
+            // VIP도 해금
+            state.vipUnlocked = true;
+            
+            saveGame();
+            render();
+            updateUI();
+            
+            statusDiv.innerHTML = '<span style="color:var(--healing); font-weight:800;">✅ 테스트 모드 활성화! 엔딩 테스트 준비 완료!</span>';
+            codeInput.value = '';
+            
+            showCenterPopup('🎮', '테스트 모드', '엔딩 테스트를 위한 조건이 설정되었습니다!<br>유토피아 건물을 구매하면 엔딩이 시작됩니다.');
+            addHistory('🎮 <b>테스트 모드:</b> 엔딩 테스트 조건이 설정되었습니다.');
+            
+            // 갤러리 업데이트
+            setTimeout(() => {
+                if (document.getElementById('gallery-modal').style.display === 'flex') {
+                    openGallery();
+                }
+            }, 500);
             return;
         }
         
