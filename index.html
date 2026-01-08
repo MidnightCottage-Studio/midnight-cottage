@@ -545,7 +545,7 @@
         <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:1px solid var(--border); text-align:center; min-width: 300px;">
             <h2 style="color:var(--gold)">⭐ 발전도 안내</h2>
             <p style="font-size:15px; line-height:1.8; color:#ccc; margin-bottom: 20px;">
-                건물 최초 5회 건설 시 새로운 방을 얻을 수 있습니다.
+                건물 최초 3회 건설 시 새로운 방을 얻을 수 있습니다.
             </p>
         </div>
     </div>
@@ -906,9 +906,85 @@ VIP 굿즈 받기
         {n: "미드나잇 유토피아", h: true}
     ];
 
-    const rankNames = ["소박하고 아늑한 사이버펑크 방", "네온 아틀리에", "작가와 교수의 서재", "리퍼닥의 정비소", "라디오 스튜디오", "포토 그래퍼의 암실", "합성 라면 가판대", "비 내리는 테라스", "빈티지 레코드 샵", "지붕 위 정원", "사우나", "크롬 온천실", "LP바", "펜트하우스의 만찬", "몰소프트 레스토랑", "디스트릭트 쿼터", "데이터 하이웨이", "갤럭시 시티", "골든 선셋 시티", "유토피아 미드나잇 코티지", "고양이 카페", "베이퍼웨이브 신전", "머나먼 야자수의 휴양지"];
-    const rankImages = ["https://i.imgur.com/MuFQQ5A.png", "https://i.imgur.com/1nAnNIb.png", "https://i.imgur.com/eqwGBhl.png", "https://i.imgur.com/br0HdSG.png", "https://i.imgur.com/2Sz2iYA.png", "https://i.imgur.com/3qXyDTr.png", "https://i.imgur.com/J5mjTBn.png", "https://i.imgur.com/aI6UVY2.png", "https://i.imgur.com/QMSpzfL.png", "https://i.imgur.com/PwZ6vm3.png", "https://i.imgur.com/S4yBFXT.png", "https://i.imgur.com/A0HQ7e3.png", "https://i.imgur.com/qeB68bj.png", "https://i.imgur.com/RoQeLG8.png", "https://i.imgur.com/vuNzL4d.png", "https://i.imgur.com/P1SjHGR.png", "https://i.imgur.com/tApbEin.png", "https://i.imgur.com/ylCZJyn.png", "https://i.imgur.com/vA1hKCT.png", "https://i.imgur.com/ecGrFrH.png", "https://i.imgur.com/Oj4oY9l.png", "https://i.imgur.com/JztQMEX.png", "https://i.imgur.com/vO7T8t1.png"];
-    const VIP_ROOM_START_INDEX = 20; // VIP 방 시작 인덱스 (0-based이므로 20 = 21번째)
+    const rankNames = [
+        "소박하고 아늑한 사이버펑크 방", 
+        "심야의 코인 세탁소", 
+        "네온 아틀리에", 
+        "빗속의 투명 버스 정류장", 
+        "작가와 교수의 서재", 
+        "야간 열차의 일등석", 
+        "합성 라면 가판대", 
+        "기억 속 놀이터", 
+        "리퍼닥의 정비소", 
+        "네온 루프탑 수영장", 
+        "별이 쏟아지는 다락방", 
+        "라디오 스튜디오", 
+        "홀로그램 점술집", 
+        "기억의 서재", 
+        "포토 그래퍼의 암실", 
+        "폐역의 비밀 정원", 
+        "비 내리는 테라스", 
+        "올드 아메리칸 다이너", 
+        "빈티지 레코드 샵", 
+        "지붕 위 정원", 
+        "해질녘의 교실", 
+        "사우나", 
+        "크롬 온천실", 
+        "LP바", 
+        "우주 정거장의 전망대", 
+        "펜트하우스의 만찬", 
+        "심해의 네온 수족관", 
+        "쇼와 레트로 킷사텐", 
+        "몰소프트 레스토랑", 
+        "디스트릭트 쿼터", 
+        "데이터 하이웨이", 
+        "갤럭시 시티", 
+        "골든 선셋 시티", 
+        "유토피아 미드나잇 코티지", 
+        "고양이 카페", 
+        "베이퍼웨이브 신전", 
+        "머나먼 야자수의 휴양지"
+    ];
+    const rankImages = [
+        "https://i.imgur.com/MuFQQ5A.png", 
+        "https://i.imgur.com/AnG14IK.png", 
+        "https://i.imgur.com/1nAnNIb.png", 
+        "https://i.imgur.com/016vCzS.png", 
+        "https://i.imgur.com/eqwGBhl.png", 
+        "https://i.imgur.com/nVLZxvP.png", 
+        "https://i.imgur.com/J5mjTBn.png", 
+        "https://i.imgur.com/fqVxhUO.png", 
+        "https://i.imgur.com/br0HdSG.png", 
+        "https://i.imgur.com/p5H4Vk8.png", 
+        "https://i.imgur.com/9ApIszS.png", 
+        "https://i.imgur.com/2Sz2iYA.png", 
+        "https://i.imgur.com/SRftF7H.png", 
+        "https://i.imgur.com/a66LTMy.png", 
+        "https://i.imgur.com/3qXyDTr.png", 
+        "https://i.imgur.com/N9Vop5t.png", 
+        "https://i.imgur.com/aI6UVY2.png", 
+        "https://i.imgur.com/qGcoNlQ.png", 
+        "https://i.imgur.com/QMSpzfL.png", 
+        "https://i.imgur.com/PwZ6vm3.png", 
+        "https://i.imgur.com/cemXHYi.png", 
+        "https://i.imgur.com/S4yBFXT.png", 
+        "https://i.imgur.com/A0HQ7e3.png", 
+        "https://i.imgur.com/qeB68bj.png", 
+        "https://i.imgur.com/UJHXG4V.png", 
+        "https://i.imgur.com/RoQeLG8.png", 
+        "https://i.imgur.com/uPQ7M32.png", 
+        "https://i.imgur.com/oK5IQ91.png", 
+        "https://i.imgur.com/vuNzL4d.png", 
+        "https://i.imgur.com/P1SjHGR.png", 
+        "https://i.imgur.com/tApbEin.png", 
+        "https://i.imgur.com/ylCZJyn.png", 
+        "https://i.imgur.com/vA1hKCT.png", 
+        "https://i.imgur.com/ecGrFrH.png", 
+        "https://i.imgur.com/Oj4oY9l.png", 
+        "https://i.imgur.com/JztQMEX.png", 
+        "https://i.imgur.com/vO7T8t1.png"
+    ];
+    const VIP_ROOM_START_INDEX = 34; // VIP 방 시작 인덱스 (0-based이므로 34 = 35번째)
     const VIP_CODE = "LOVEMidnight0108";
     
     // 길거리 음식 메뉴
@@ -1802,7 +1878,7 @@ VIP 굿즈 받기
             
             u.price = Math.floor(u.price * 1.6);
             
-            const newRank = Math.min(20, Math.floor(state.totalUniquePurchased / 5) + 1);
+            const newRank = Math.min(34, Math.floor(state.totalUniquePurchased / 3) + 1);
             if (newRank > state.rank) {
                 state.rank = newRank; 
                 state.currentSelectedRank = newRank;
@@ -1830,7 +1906,7 @@ VIP 굿즈 받기
                     submitRanking();
                 }
                 
-                if (newRank >= 20 && !state.endingSeen) { 
+                if (newRank >= 34 && !state.endingSeen) { 
                     state.endingSeen = true; 
                     startEndingSequence(); 
                 }
@@ -1863,10 +1939,10 @@ VIP 굿즈 받기
             }
         });
         state.residents.forEach((r, i) => { const fill = document.getElementById(`stress-${i}`); if(fill) fill.style.width = r.stress + '%'; });
-        const currentProgress = state.totalUniquePurchased % 5;
+        const currentProgress = state.totalUniquePurchased % 3;
         const displayRankName = `Rank.${state.currentSelectedRank} ${rankNames[state.currentSelectedRank-1]}`;
-        const displayProgress = (currentProgress * 20) + '%';
-        const displayCount = `${currentProgress} / 5`;
+        const displayProgress = (currentProgress * (100/3)) + '%';
+        const displayCount = `${currentProgress} / 3`;
         if(document.getElementById('dev-bar-fill')) document.getElementById('dev-bar-fill').style.width = displayProgress;
         
         // 음식 가판대 아이콘 표시 (rank >= 7일 때만)
@@ -2607,7 +2683,7 @@ VIP 굿즈 받기
             // 마지막 방 전단계까지 입수 (rank 19)
             state.rank = 19;
             state.currentSelectedRank = 19;
-            state.totalUniquePurchased = 90; // rank 19 = 90/5 + 1 = 19
+            state.totalUniquePurchased = 99; // rank 34 = 99/3 + 1 = 34 (엔딩 직전)
             
             // 건물 90개 구매 상태로 설정
             for (let i = 0; i < 90; i++) {
