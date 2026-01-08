@@ -129,7 +129,7 @@
         }
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; width: 90%; overflow-y: auto; padding: 10px; max-height: 70vh; box-sizing: border-box; }
         .gallery-item { cursor: pointer; border-radius: 12px; border: 2px solid transparent; transition: 0.3s; overflow: hidden; position: relative; background: #181820; display: flex; flex-direction: column; padding-bottom: 10px; height: auto; }
-        .gallery-item img { width: 100%; height: 110px; object-fit: cover; opacity: 0.4; display: block; border-bottom: 1px solid #333; }
+        .gallery-item img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; opacity: 0.4; display: block; border-bottom: 1px solid #333; }
         .gallery-item.unlocked img { opacity: 1; }
         .gallery-item.active { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 158, 100, 0.3); }
         .gallery-item div { padding: 5px 10px; box-sizing: border-box; line-height: 1.2; }
@@ -290,8 +290,8 @@
             .artifact-slot { width: 100%; aspect-ratio: 1 / 1; font-size: 14px; } 
 
             .gallery-grid { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 10px 5px 80px 5px; width: 100%; box-sizing: border-box; overflow-y: auto; }
-            .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; min-height: 350px; }
-            .gallery-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; min-height: 300px; }
+            .gallery-item { width: 100%; height: auto; display: flex; flex-direction: column; min-height: 175px; }
+            .gallery-item img { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; min-height: 150px; }
 
             .modal { position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; z-index: 9999; padding: 10px; box-sizing: border-box; overflow-y: auto; }
             #donation-modal { z-index: 10000 !important; }
@@ -513,8 +513,8 @@
             </div>
         </div>
     </div>
-    <div id="fortune-modal" class="modal" onclick="closeModalByBg(event, 'fortune-modal')">
-        <div onclick="event.stopPropagation()" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--heart); text-align:center; min-width: 400px; max-width: 700px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
+    <div id="fortune-modal" class="modal" onclick="toggleModal('fortune-modal')">
+        <div onclick="toggleModal('fortune-modal')" style="background:var(--card); padding:30px; border-radius:20px; border:2px solid var(--heart); text-align:center; min-width: 400px; max-width: 700px; max-height: 90vh; overflow-y: auto; box-sizing: border-box; cursor:pointer;">
             <h2 style="color:var(--heart); margin-top:0; margin-bottom:20px; font-size:24px; pointer-events:none;">🔮 운명의 붉은 실</h2>
             <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6; pointer-events:none;">
                 점술집에서 운명의 실을 조작하여 캐릭터들의 관계를 바꿀 수 있습니다.
@@ -1917,7 +1917,7 @@ VIP 굿즈 받기
             }
             
             return `
-                <div style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px;">
+                <div style="background:rgba(187, 154, 247, 0.1); border:1px solid var(--border); border-radius:12px; padding:15px;" onclick="event.stopPropagation()">
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                         <span style="font-size:32px;">${char.emoji}</span>
                         <div style="flex:1;">
@@ -1954,7 +1954,7 @@ VIP 굿즈 받기
         addHistory(`🔮 <b>운명의 실:</b> ${char.name}${getJosa(char.name, '와과')} ${partner ? partner.name : '파트너'}${getJosa(partner ? partner.name : '', '은는')} 불륜 관계를 해지했습니다.`);
         saveGame();
         render();
-        renderFortuneModal();
+        toggleModal('fortune-modal');
     }
     
     function setToSolo(charIdx) {
@@ -1976,7 +1976,7 @@ VIP 굿즈 받기
         addHistory(`🔮 <b>운명의 실:</b> ${char.name}${getJosa(char.name, '은는')} 솔로가 되었습니다.`);
         saveGame();
         render();
-        renderFortuneModal();
+        toggleModal('fortune-modal');
     }
     
     // 파트너 선택 UI 표시
@@ -2048,7 +2048,7 @@ VIP 굿즈 받기
         
         saveGame();
         render();
-        renderFortuneModal();
+        toggleModal('fortune-modal');
     }
     
     // 음식 메뉴 렌더링
